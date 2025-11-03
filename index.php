@@ -11,7 +11,7 @@ use iutnc\netvod\Repository\NetVODRepository;
 
 session_start();
 
-NetVODRepository::setConfig('deefy.db.ini');
+NetVODRepository::setConfig('netvod.db.ini');
 
 // 1. On crée une nouvelle instance du dispatcher.
 //    Son constructeur va automatiquement lire l'URL.
