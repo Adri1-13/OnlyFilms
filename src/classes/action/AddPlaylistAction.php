@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace iutnc\netvod\action;
 
-use iutnc\deefy\audio\lists\Playlist;
-use iutnc\deefy\auth\AuthnProvider;
-use iutnc\deefy\exception\AuthnException;
-use iutnc\deefy\render\AudioListRenderer;
-use iutnc\deefy\Repository\DeefyRepository;
+use iutnc\netvod\audio\lists\Playlist;
+use iutnc\netvod\auth\AuthnProvider;
+use iutnc\netvod\exception\AuthnException;
+use iutnc\netvod\render\AudioListRenderer;
+use iutnc\netvod\Repository\NetVODRepository;
 
 class AddPlaylistAction extends Action {
 
@@ -56,7 +56,7 @@ class AddPlaylistAction extends Action {
 
         $playlist = new Playlist($nomPlaylist);
 
-        $repo = DeefyRepository::getInstance();
+        $repo = NetVODRepository::getInstance();
 
         $playlist= $repo->saveEmptyPlaylist($playlist);
 

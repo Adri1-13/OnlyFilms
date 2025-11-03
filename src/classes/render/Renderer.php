@@ -2,7 +2,7 @@
 
 declare (strict_types = 1);
 
-namespace iutnc\deefy\render;
+namespace iutnc\netvod\render;
 
 interface Renderer {
     public const COMPACT = 1;

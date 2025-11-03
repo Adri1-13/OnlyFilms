@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace iutnc\deefy\dispatch;
+namespace iutnc\netvod\dispatch;
 
 use iutnc\netvod\action\AddAlbumTrackAction;
 use iutnc\netvod\action\AddPlaylistAction;

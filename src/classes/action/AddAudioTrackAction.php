@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace iutnc\netvod\action;
 
-use iutnc\deefy\audio\lists\AudioList;
-use iutnc\deefy\audio\tracks\AudioTrack;
-use iutnc\deefy\auth\AuthnProvider;
-use iutnc\deefy\auth\Authz;
-use iutnc\deefy\exception\AuthnException;
-use iutnc\deefy\render\AudioListRenderer;
+use iutnc\netvod\audio\lists\AudioList;
+use iutnc\netvod\audio\tracks\AudioTrack;
+use iutnc\netvod\auth\AuthnProvider;
+use iutnc\netvod\auth\Authz;
+use iutnc\netvod\exception\AuthnException;
+use iutnc\netvod\render\AudioListRenderer;
 use finfo;
-use iutnc\deefy\Repository\DeefyRepository;
+use iutnc\netvod\Repository\NetVODRepository;
 
 abstract class AddAudioTrackAction extends Action {
 
@@ -106,7 +106,7 @@ abstract class AddAudioTrackAction extends Action {
 
         $nouvellePiste = $this->creerTrack($_POST, $cheminPourLeServeurWeb);
 
-        $repo = DeefyRepository::getInstance();
+        $repo = NetVODRepository::getInstance();
 
         $nouvellePiste = $repo->sauvegarderPiste($nouvellePiste);
 

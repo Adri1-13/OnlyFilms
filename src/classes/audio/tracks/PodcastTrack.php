@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace iutnc\deefy\audio\tracks;
+namespace iutnc\netvod\audio\tracks;
 
 
 class PodcastTrack extends AudioTrack {

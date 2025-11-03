@@ -3,10 +3,10 @@
 declare (strict_types = 1);
 
 
-namespace iutnc\deefy\audio\tracks;
+namespace iutnc\netvod\audio\tracks;
 
-use iutnc\deefy\exception\InvalidPropertyNameException;
-use iutnc\deefy\exception\InvalidPropertyValueException;
+use iutnc\netvod\exception\InvalidPropertyNameException;
+use iutnc\netvod\exception\InvalidPropertyValueException;
 
 
 abstract class AudioTrack {

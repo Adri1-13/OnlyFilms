@@ -6,12 +6,12 @@ declare(strict_types=1);
 require_once 'vendor/autoload.php';
 
 // On importe la classe Dispatcher pour pouvoir l'utiliser
-use iutnc\deefy\dispatch\Dispatcher;
-use iutnc\deefy\Repository\DeefyRepository;
+use iutnc\netvod\dispatch\Dispatcher;
+use iutnc\netvod\Repository\NetVODRepository;
 
 session_start();
 
-DeefyRepository::setConfig('deefy.db.ini');
+NetVODRepository::setConfig('deefy.db.ini');
 
 // 1. On crée une nouvelle instance du dispatcher.
 //    Son constructeur va automatiquement lire l'URL.

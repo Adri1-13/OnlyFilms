@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace iutnc\netvod\action;
 
 use iutnc\netvod\action\Action;
-use iutnc\deefy\auth\AuthnProvider;
+use iutnc\netvod\auth\AuthnProvider;
 
 class SignOutAction extends Action {
 

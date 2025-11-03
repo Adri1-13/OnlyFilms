@@ -2,7 +2,7 @@
 
 declare (strict_types = 1);
 
-namespace iutnc\deefy\audio\lists;
+namespace iutnc\netvod\audio\lists;
 
 class Album extends AudioList {
 

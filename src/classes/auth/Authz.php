@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace iutnc\deefy\auth;
+namespace iutnc\netvod\auth;
 
-use iutnc\deefy\exception\AuthnException;
-use iutnc\deefy\Repository\DeefyRepository;
+use iutnc\netvod\exception\AuthnException;
+use iutnc\netvod\Repository\NetVODRepository;
 
 class Authz {
 
@@ -27,7 +27,7 @@ class Authz {
             return;
         }
 
-        $repo = DeefyRepository::getInstance();
+        $repo = NetVODRepository::getInstance();
         $tabPlaylistsDuUser = $repo->trouverToutesLesPlaylistsD_unUser($user->id);
 
         if (!in_array($idPlaylist, $tabPlaylistsDuUser)) {

@@ -2,11 +2,11 @@
 
 declare(strict_types = 1);
 
-namespace iutnc\deefy\audio\lists;
+namespace iutnc\netvod\audio\lists;
 
 
-use iutnc\deefy\audio\tracks\AudioTrack;
-use iutnc\deefy\exception\InvalidPropertyNameException;
+use iutnc\netvod\audio\tracks\AudioTrack;
+use iutnc\netvod\exception\InvalidPropertyNameException;
 
 
 class AudioList {

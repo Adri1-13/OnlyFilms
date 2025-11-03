@@ -1,6 +1,6 @@
 <?php
 
-namespace iutnc\deefy\exception;
+namespace iutnc\netvod\exception;
 
 class AuthnException extends \Exception {
 

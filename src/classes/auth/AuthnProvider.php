@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace iutnc\deefy\auth;
+namespace iutnc\netvod\auth;
 
-use iutnc\deefy\exception\AuthnException;
-use iutnc\deefy\Repository\DeefyRepository;
+use iutnc\netvod\exception\AuthnException;
+use iutnc\netvod\Repository\NetVODRepository;
 
 class AuthnProvider {
 
     public static function signIn(string $email, string $passwd) : User {
-        $repo = DeefyRepository::getInstance();
+        $repo = NetVODRepository::getInstance();
         $user = $repo->trouverUser($email);
 
         if ($user === null) {
@@ -29,7 +29,7 @@ class AuthnProvider {
      */
     public static function register(string $email, string $passwd) : User {
 
-        $repo = DeefyRepository::getInstance();
+        $repo = NetVODRepository::getInstance();
         $user = $repo->trouverUser($email);
 
         if ($user !== null) {

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace iutnc\netvod\action;
 
-use iutnc\deefy\audio\tracks\AlbumTrack;
-use iutnc\deefy\audio\tracks\AudioTrack;
+use iutnc\netvod\audio\tracks\AlbumTrack;
+use iutnc\netvod\audio\tracks\AudioTrack;
 
 
 class AddAlbumTrackAction extends AddAudioTrackAction {

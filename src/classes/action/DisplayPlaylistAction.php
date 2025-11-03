@@ -4,11 +4,11 @@ declare(strict_types = 1);
 
 namespace iutnc\netvod\action;
 
-use iutnc\deefy\auth\AuthnProvider;
-use iutnc\deefy\auth\Authz;
-use iutnc\deefy\exception\AuthnException;
-use iutnc\deefy\render\AudioListRenderer;
-use iutnc\deefy\Repository\DeefyRepository;
+use iutnc\netvod\auth\AuthnProvider;
+use iutnc\netvod\auth\Authz;
+use iutnc\netvod\exception\AuthnException;
+use iutnc\netvod\render\AudioListRenderer;
+use iutnc\netvod\Repository\NetVODRepository;
 
 class DisplayPlaylistAction extends Action {
 
@@ -19,7 +19,7 @@ class DisplayPlaylistAction extends Action {
             return '<div class="alert alert-warning">Vous devez être connecté pour effectuer cette action.</div>';
         }
 
-        $repo = DeefyRepository::getInstance();
+        $repo = NetVODRepository::getInstance();
 
         if (!isset($_GET['id'])) {
             return '<div class="alert alert-danger" role="alert"><h4 class="alert-heading">Erreur</h4><p>Veuillez spécifier une id de playlist dans la query string</p></div>';

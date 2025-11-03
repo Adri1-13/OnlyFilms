@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace iutnc\deefy\Repository;
+namespace iutnc\netvod\Repository;
 
 /*
  * Classe permettant l'unique connexion à la base de données,
  * dès qu'une classe veut accéder ou modifier la bdd elle passe par cette classe de connexion
  */
 
-use iutnc\deefy\audio\lists\Playlist;
-use iutnc\deefy\audio\tracks\AlbumTrack;
-use iutnc\deefy\audio\tracks\AudioTrack;
-use iutnc\deefy\audio\tracks\PodcastTrack;
-use iutnc\deefy\auth\User;
+use iutnc\netvod\audio\lists\Playlist;
+use iutnc\netvod\audio\tracks\AlbumTrack;
+use iutnc\netvod\audio\tracks\AudioTrack;
+use iutnc\netvod\audio\tracks\PodcastTrack;
+use iutnc\netvod\auth\User;
 
-class DeefyRepository {
+class NetVODRepository {
     private \PDO $pdo;
-    private static ?DeefyRepository $instance = null;
+    private static ?NetVODRepository $instance = null;
     private static array $config = [];
 
 
@@ -36,15 +36,15 @@ class DeefyRepository {
         $this->pdo->prepare('SET NAMES \'UTF8\'')->execute(); // permet de gérer les accents dans les données
     }
 
-    public static function getInstance() : DeefyRepository {
+    public static function getInstance() : NetVODRepository {
         if (self::$instance === null) {
-            self::$instance = new DeefyRepository(self::$config);
+            self::$instance = new NetVODRepository(self::$config);
         }
         return self::$instance;
     }
     /*
      * pourquoi cette fonction et l'attribut qu'elle modifie doit être en static ?
-     * ça ne dépend pas de l'instance de DeefyRepository ?
+     * ça ne dépend pas de l'instance de NetVODRepository ?
      * ---> obligé parce que pour faire une instance on a besoin de la config, et si setConfig n'est pas static, alors il faut obligatoirement une instance
      * pour appeler la fonction, donc on doit mettre setConfig et config en static pour qu'ils ne dépendent pas d'une instance et ensuite pouvoir créer une instance de repository
      */

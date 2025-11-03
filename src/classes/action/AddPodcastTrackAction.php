@@ -4,8 +4,8 @@ declare(strict_types = 1);
 
 namespace iutnc\netvod\action;
 
-use iutnc\deefy\audio\tracks\AudioTrack;
-use iutnc\deefy\audio\tracks\PodcastTrack;
+use iutnc\netvod\audio\tracks\AudioTrack;
+use iutnc\netvod\audio\tracks\PodcastTrack;
 use finfo;
 
 class AddPodcastTrackAction extends AddAudioTrackAction {

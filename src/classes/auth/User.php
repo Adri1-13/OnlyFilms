@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace iutnc\deefy\auth;
+namespace iutnc\netvod\auth;
 
-use iutnc\deefy\exception\InvalidPropertyNameException;
+use iutnc\netvod\exception\InvalidPropertyNameException;
 
 class User {
     private int $id;

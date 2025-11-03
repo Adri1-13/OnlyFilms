@@ -2,9 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace iutnc\deefy\render;
+namespace iutnc\netvod\render;
 
-use iutnc\deefy\audio\tracks\AlbumTrack;
+use iutnc\netvod\audio\tracks\AlbumTrack;
 
 //require_once "AudioTrackRenderer.php";
 

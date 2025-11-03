@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace iutnc\netvod\action;
 
-use iutnc\deefy\auth\AuthnProvider;
-use iutnc\deefy\exception\AuthnException;
-use iutnc\deefy\Repository\DeefyRepository;
+use iutnc\netvod\auth\AuthnProvider;
+use iutnc\netvod\exception\AuthnException;
+use iutnc\netvod\Repository\NetVODRepository;
 
 class DisplayAllPlaylistUserAction extends Action {
 
@@ -20,7 +20,7 @@ class DisplayAllPlaylistUserAction extends Action {
         try {
             $user = AuthnProvider::getSignedInUser();
 
-            $repo = DeefyRepository::getInstance();
+            $repo = NetVODRepository::getInstance();
             $playlists = $repo->trouverToutesLesPlaylistsD_unUser($user->id);
 
             $html = '<h1 class="display-6 mb-4">Mes playlists</h1>';

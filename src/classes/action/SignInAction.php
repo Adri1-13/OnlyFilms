@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace iutnc\netvod\action;
 
-use iutnc\deefy\auth\AuthnProvider;
-use iutnc\deefy\exception\AuthnException;
+use iutnc\netvod\auth\AuthnProvider;
+use iutnc\netvod\exception\AuthnException;
 
 class SignInAction extends Action {
 

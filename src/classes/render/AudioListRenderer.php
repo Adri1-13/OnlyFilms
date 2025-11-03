@@ -2,11 +2,11 @@
 
 declare (strict_types = 1);
 
-namespace iutnc\deefy\render;
+namespace iutnc\netvod\render;
 
-use iutnc\deefy\audio\lists\AudioList;
-use iutnc\deefy\audio\tracks\AlbumTrack;
-use iutnc\deefy\audio\tracks\PodcastTrack;
+use iutnc\netvod\audio\lists\AudioList;
+use iutnc\netvod\audio\tracks\AlbumTrack;
+use iutnc\netvod\audio\tracks\PodcastTrack;
 
 class AudioListRenderer implements Renderer {
 
