@@ -1,0 +1,14 @@
+{
+  "name": "iutnc/netvod",
+  "description": "NetVOD",
+  "type": "projet",
+  "autoload": {
+    "psr-4": {
+      "iutnc\\netvod\\": "src/classes/"
+    }
+ },
+  "require": {
+    "ext-fileinfo": "*",
+    "ext-pdo": "*"
+  }
+}
