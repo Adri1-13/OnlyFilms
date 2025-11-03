@@ -1,0 +1,18 @@
+# IDE
+*.iml
+.idea/
+
+*.ini
+
+# Environnements
+.env
+.env.local
+.env.*.local
+
+# Build / artefacts
+/node_modules/
+/dist/
+/build/
+
+
+**/.git
