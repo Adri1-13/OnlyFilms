@@ -2,7 +2,7 @@
 *.iml
 .idea/
 
-*.ini
+## *.ini
 
 # Environnements
 .env
