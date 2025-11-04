@@ -2,8 +2,13 @@
 
 declare(strict_types=1);
 
-namespace iutnc\onlyfilms\repository;
- 
+namespace iutnc\onlyfilms\Repository;
+
+use iutnc\onlyfilms\video\lists\Serie;
+use iutnc\onlyfilms\video\tracks\Episode;
+
+
+
 use PDO;
 
 class OnlyFilmsRepository {
@@ -35,7 +40,7 @@ class OnlyFilmsRepository {
     }
     /*
      * pourquoi cette fonction et l'attribut qu'elle modifie doit être en static ?
-     * ça ne dépend pas de l'instance de OnlyFilmsRepository ?
+     * ça ne dépend pas de l'instance de NetVODRepository ?
      * ---> obligé parce que pour faire une instance on a besoin de la config, et si setConfig n'est pas static, alors il faut obligatoirement une instance
      * pour appeler la fonction, donc on doit mettre setConfig et config en static pour qu'ils ne dépendent pas d'une instance et ensuite pouvoir créer une instance de repository
      */
@@ -55,7 +60,7 @@ class OnlyFilmsRepository {
         /* =================== USER =================== */
 
 
-    function trouverUser(string $email) : User | null {
+    function findUser(string $email) : User | null {
         $requete = "SELECT id, email, passwd, role FROM user WHERE email = ?";
 
         $stmt = $this->pdo->prepare($requete);
@@ -84,17 +89,87 @@ class OnlyFilmsRepository {
     }
     
     /* =================== SERIES =================== */
-     public function findAllSeries(): array {
-        $stmt = $this->pdo->query("SELECT * FROM series ORDER BY date_added DESC");
-        return $stmt->fetchAll();
-    }
+public function findAllSeries(): array {
+    $stmt = $this->pdo->query("SELECT * FROM series ORDER BY date_added DESC");
+    $rows = $stmt->fetchAll();
 
-    public function findSeriesById(int $id): array  {
-        $stmt = $this->pdo->prepare("SELECT * FROM series WHERE series_id = ?");
-        $stmt->execute([$id]);
-        $res = $stmt->fetch();
-        return $res ?: null;
+    $series = [];
+    foreach ($rows as $r) {
+        $series[] = new Serie(
+            (int)$r['series_id'],
+            $r['title'],
+            $r['description'] ?? '',
+            $r['img'] ?? '',
+            (int)$r['year'],
+            $r['date_added']
+        );
     }
+    return $series;
+}
+
+
+
+public function findSeriesBySerieId(int $id): ?Serie {
+    $stmt = $this->pdo->prepare("SELECT * FROM series WHERE series_id = ?");
+    $stmt->execute([$id]);
+    $row = $stmt->fetch();
+
+    if ($row === false) return null;
+
+    return new Serie(
+        (int)$row['series_id'],
+        $row['title'],
+        $row['description'] ?? '',
+        $row['img'] ?? '',
+        (int)$row['year'],
+        $row['date_added']
+    );
+}
+
+public function findSeriesByUserId(int $userId): array {
+    $stmt = $this->pdo->prepare("
+        SELECT s.* FROM series s
+        JOIN Like_list l ON s.series_id = l.series_id
+        WHERE l.user_id = ? ORDER BY s.date_added DESC");
+    $stmt->execute([$userId]);
+    $rows = $stmt->fetchAll();
+
+    $series = [];
+    foreach ($rows as $r) {
+        $series[] = new Serie(
+            (int)$r['series_id'],
+            $r['title'],
+            $r['description'] ?? '',
+            $r['img'] ?? '',
+            (int)$r['year'],
+            $r['date_added']
+        );
+    }
+    return $series;
+}
+
+
+        /* =================== EPISODES =================== */
+    
+public function findEpisodesBySeriesId(int $seriesId): array {
+    $stmt = $this->pdo->prepare("SELECT * FROM episode WHERE series_id = ? ORDER BY num ASC");
+    $stmt->execute([$seriesId]);
+    $rows = $stmt->fetchAll();
+
+    $episodes = [];
+    foreach ($rows as $r) {
+        $episodes[] = new Episode(
+            (int)$r['episode_id'],
+            (int)$r['num'],
+            $r['title'],
+            $r['summary'] ?? '',
+            (int)$r['duration'],
+            $r['file'] ?? '',
+            (int)$r['series_id']
+        );
+    }
+    return $episodes;
+}
 
 
 
