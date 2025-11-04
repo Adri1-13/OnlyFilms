@@ -79,12 +79,12 @@ entity "watch_episode" as WatchEpisode {
 
 
 ' Définition des relations
-type -- Series : "concerns 0..N"
+Type -- Series : "concerne 0..N"
 
 
 ' Tables de liaison
-User -- commentary : "écrit 0..N"
-Series -- commentary : "reçoit 0..N"
+User -- Commentary : "écrit 0..N"
+Series -- Commentary : "reçoit 0..N"
 
 User -- Notation : "écrit 0..N"
 Series -- Notation : "reçoit 0..N"
