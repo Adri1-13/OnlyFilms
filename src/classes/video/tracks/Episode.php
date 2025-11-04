@@ -13,6 +13,27 @@ class Episode {
     private ?int $seriesId = null;
 
     /**
+     * @param int $id
+     * @param int $number
+     * @param string $title
+     * @param string|null $summary
+     * @param int $duration
+     * @param string|null $file
+     * @param int|null $seriesId
+     */
+    public function __construct(int $id, int $number, string $title, ?string $summary, int $duration, ?string $file, ?int $seriesId)
+    {
+        $this->id = $id;
+        $this->number = $number;
+        $this->title = $title;
+        $this->summary = $summary;
+        $this->duration = $duration;
+        $this->file = $file;
+        $this->seriesId = $seriesId;
+    }
+
+
+    /**
      * @return int
      */
     public function getId(): int

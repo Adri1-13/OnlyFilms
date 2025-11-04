@@ -3,7 +3,8 @@
 declare(strict_types=1);
 
 namespace iutnc\netvod\Repository;
-
+ 
+use PDO;
 
 class NetVODRepository {
     private \PDO $pdo;
@@ -51,6 +52,9 @@ class NetVODRepository {
     }
 
 
+        /* =================== USER =================== */
+
+
     function trouverUser(string $email) : User | null {
         $requete = "SELECT id, email, passwd, role FROM user WHERE email = ?";
 
@@ -78,8 +82,19 @@ class NetVODRepository {
 
         return new User((int)$nouvID, $email, $passwd, $role);
     }
+    
+    /* =================== SERIES =================== */
+     public function findAllSeries(): array {
+        $stmt = $this->pdo->query("SELECT * FROM series ORDER BY date_added DESC");
+        return $stmt->fetchAll();
+    }
 
-
+    public function findSeriesById(int $id): array  {
+        $stmt = $this->pdo->prepare("SELECT * FROM series WHERE series_id = ?");
+        $stmt->execute([$id]);
+        $res = $stmt->fetch();
+        return $res ?: null;
+    }
 
 
 
