@@ -14,5 +14,7 @@
 /dist/
 /build/
 
+#composer
+composer.lock
 
 **/.git
