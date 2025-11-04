@@ -5,98 +5,97 @@
 entity "user" as User {
   + **user_id (PK)** : int
   --
-  * email : varchar(255) [UNIQUE]
+  * mail : varchar(255) [UNIQUE]
   * password : varchar(255)
-  nom : varchar(100)
-  prenom : varchar(100)
-  genre_prefere : varchar(100)
+  name : varchar(100)
+  firstname : varchar(100)
 }
 
-entity "serie" as Serie {
-  + **serie_id (PK)** : int
+entity "series" as Series {
+  + **series_id (PK)** : int
   --
-  titre : varchar(128)
-  descriptif : text
+  title : varchar(128)
+  description : text
   img : varchar(256)
-  annee : int
-  date_ajout : date
+  year : int
+  date_added : date
   --
-  # genre_id (FK) : int
+  # type_id (FK) : int
 }
 
 entity "episode" as Episode {
   + **episode_id (PK)** : int
   --
-  numero : int
-  titre : varchar(128)
-  resume : text
-  duree : int
+  num : int
+  title : varchar(128)
+  summary : text
+  duration : int
   file : varchar(256)
   img : varchar(256)
   --
-  # **serie_id (FK)** : int
+  # **series_id (FK)** : int
 }
 
-entity "genre" as Genre {
-  + **genre_id (PK)** : int
+entity "type" as Type {
+  + **type_id (PK)** : int
   --
-  * nom : varchar(100) [UNIQUE]
+  * name : varchar(100) [UNIQUE]
 }
 
 ' Tables d'association
 
-entity "commentaire" as Commentaire {
+entity "commentary" as Commentary {
   + **user_id (PK, FK)** : int
-  + **serie_id (PK, FK)** : int
+  + **series_id (PK, FK)** : int
   --
   texte : text
-  date_creation : datetime
+  date_added : datetime
 }
 
 entity "notation" as Notation {
   + **user_id (PK, FK)** : int
-  + **serie_id (PK, FK)** : int
+  + **series_id (PK, FK)** : int
   --
   note : tinyint(1)
-  date_creation : datetime
+  date_added : datetime
 }
 
-entity "episode2serie" as Episode2Serie {
+entity "episode2series" as Episode2Series {
   + **episode_id (PK, FK)** : int
-  + **serie_id (PK, FK)** : int
+  + **series_id (PK, FK)** : int
 }
 
 entity "Like_list" as LikeList {
   + **user_id (PK, FK)** : int
-  + **serie_id (PK, FK)** : int
+  + **series_id (PK, FK)** : int
 }
 
 entity "watch_episode" as WatchEpisode {
   + **user_id (PK, FK)** : int
   + **episode_id (PK, FK)** : int
   --
-  date_visionnage : datetime
+  viewing_date : datetime
 }
 
 
 ' Définition des relations
-Genre }o--|{ Serie : "concerne 0..N"
+type -- Series : "concerns 0..N"
 
 
 ' Tables de liaison
-User }o--|{ Commentaire : "écrit 0..N"
-Serie }o--|{ Commentaire : "reçoit 0..N"
+User -- commentary : "écrit 0..N"
+Series -- commentary : "reçoit 0..N"
 
-User }o--|{ Notation : "écrit 0..N"
-Serie }o--|{ Notation : "reçoit 0..N"
+User -- Notation : "écrit 0..N"
+Series -- Notation : "reçoit 0..N"
 
-User }o--|{ LikeList : "préfère 0..N"
-Serie }o--|{ LikeList : "est préféré par 0..N"
+User -- LikeList : "préfère 0..N"
+Series -- LikeList : "est préféré par 0..N"
 
-User }o--|{ WatchEpisode : "visionne 0..N"
-Episode }o--|{ WatchEpisode : "est visionné par 0..N"
+User -- WatchEpisode : "visionne 0..N"
+Episode -- WatchEpisode : "est visionné par 0..N"
 
-Serie }o--|{ Episode2Serie : "contient 0..N"
-Episode }o--|{ Episode2Serie : "est dans 0..N"
+Series -- Episode2Series : "contient 0..N"
+Episode -- Episode2Series : "est dans 0..N"
 
 @enduml
