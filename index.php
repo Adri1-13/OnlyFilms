@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 require_once 'vendor/autoload.php';
 
-use iutnc\netvod\dispatch\Dispatcher;
-use iutnc\netvod\Repository\NetVODRepository;
+use iutnc\onlyfilms\dispatch\Dispatcher;
+use iutnc\onlyfilms\Repository\OnlyFilmsRepository;
 
 session_start();
 
