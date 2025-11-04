@@ -1,0 +1,102 @@
+@startuml
+
+' Définition des tables
+
+entity "user" as User {
+  + **user_id (PK)** : int
+  --
+  * email : varchar(255) [UNIQUE]
+  * password : varchar(255)
+  nom : varchar(100)
+  prenom : varchar(100)
+  genre_prefere : varchar(100)
+}
+
+entity "serie" as Serie {
+  + **serie_id (PK)** : int
+  --
+  titre : varchar(128)
+  descriptif : text
+  img : varchar(256)
+  annee : int
+  date_ajout : date
+  --
+  # genre_id (FK) : int
+}
+
+entity "episode" as Episode {
+  + **episode_id (PK)** : int
+  --
+  numero : int
+  titre : varchar(128)
+  resume : text
+  duree : int
+  file : varchar(256)
+  img : varchar(256)
+  --
+  # **serie_id (FK)** : int
+}
+
+entity "genre" as Genre {
+  + **genre_id (PK)** : int
+  --
+  * nom : varchar(100) [UNIQUE]
+}
+
+' Tables d'association
+
+entity "commentaire" as Commentaire {
+  + **user_id (PK, FK)** : int
+  + **serie_id (PK, FK)** : int
+  --
+  texte : text
+  date_creation : datetime
+}
+
+entity "notation" as Notation {
+  + **user_id (PK, FK)** : int
+  + **serie_id (PK, FK)** : int
+  --
+  note : tinyint(1)
+  date_creation : datetime
+}
+
+entity "episode2serie" as Episode2Serie {
+  + **episode_id (PK, FK)** : int
+  + **serie_id (PK, FK)** : int
+}
+
+entity "Like_list" as LikeList {
+  + **user_id (PK, FK)** : int
+  + **serie_id (PK, FK)** : int
+}
+
+entity "watch_episode" as WatchEpisode {
+  + **user_id (PK, FK)** : int
+  + **episode_id (PK, FK)** : int
+  --
+  date_visionnage : datetime
+}
+
+
+' Définition des relations
+Genre }o--|{ Serie : "concerne 0..N"
+
+
+' Tables de liaison
+User }o--|{ Commentaire : "écrit 0..N"
+Serie }o--|{ Commentaire : "reçoit 0..N"
+
+User }o--|{ Notation : "écrit 0..N"
+Serie }o--|{ Notation : "reçoit 0..N"
+
+User }o--|{ LikeList : "préfère 0..N"
+Serie }o--|{ LikeList : "est préféré par 0..N"
+
+User }o--|{ WatchEpisode : "visionne 0..N"
+Episode }o--|{ WatchEpisode : "est visionné par 0..N"
+
+Serie }o--|{ Episode2Serie : "contient 0..N"
+Episode }o--|{ Episode2Serie : "est dans 0..N"
+
+@enduml
