@@ -170,8 +170,4 @@ public function findEpisodesBySeriesId(int $seriesId): array {
     }
     return $episodes;
 }
-
-
-
-
 }
