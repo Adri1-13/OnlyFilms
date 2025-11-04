@@ -48,7 +48,7 @@ entity "commentary" as Commentary {
   + **user_id (PK, FK)** : int
   + **series_id (PK, FK)** : int
   --
-  texte : text
+  text : text
   date_added : datetime
 }
 
