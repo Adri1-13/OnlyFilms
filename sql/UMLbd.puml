@@ -5,41 +5,42 @@
 entity "user" as User {
   + **user_id (PK)** : int
   --
-  * mail : varchar(255) [UNIQUE]
-  * password : varchar(255)
+  mail : varchar(100) [UNIQUE]
+  password : varchar(100)
   name : varchar(100)
   firstname : varchar(100)
+  role : int
 }
 
 entity "series" as Series {
   + **series_id (PK)** : int
   --
-  title : varchar(128)
+  title : varchar(100)
   description : text
-  img : varchar(256)
+  img : varchar(100)
   year : int
   date_added : date
   --
-  # type_id (FK) : int
+  # genre_id (FK) : int
 }
 
 entity "episode" as Episode {
   + **episode_id (PK)** : int
   --
   num : int
-  title : varchar(128)
+  title : varchar(100)
   summary : text
   duration : int
-  file : varchar(256)
-  img : varchar(256)
+  file : varchar(100)
+  img : varchar(100)
   --
-  # **series_id (FK)** : int
+  # series_id (FK) : int
 }
 
-entity "type" as Type {
-  + **type_id (PK)** : int
+entity "genre" as Genre {
+  + **genre_id (PK)** : int
   --
-  * name : varchar(100) [UNIQUE]
+  name : varchar(100) [UNIQUE]
 }
 
 ' Tables d'association
@@ -56,7 +57,7 @@ entity "notation" as Notation {
   + **user_id (PK, FK)** : int
   + **series_id (PK, FK)** : int
   --
-  note : tinyint(1)
+  note : number
   date_added : datetime
 }
 
@@ -65,7 +66,7 @@ entity "episode2series" as Episode2Series {
   + **series_id (PK, FK)** : int
 }
 
-entity "Like_list" as LikeList {
+entity "like_list" as LikeList {
   + **user_id (PK, FK)** : int
   + **series_id (PK, FK)** : int
 }
@@ -79,7 +80,7 @@ entity "watch_episode" as WatchEpisode {
 
 
 ' Définition des relations
-Type -- Series : "concerne 0..N"
+Genre -- Series : "concerne 0..N"
 
 
 ' Tables de liaison
