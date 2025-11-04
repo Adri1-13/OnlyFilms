@@ -61,11 +61,6 @@ entity "notation" as Notation {
   date_added : datetime
 }
 
-entity "episode2series" as Episode2Series {
-  + **episode_id (PK, FK)** : int
-  + **series_id (PK, FK)** : int
-}
-
 entity "like_list" as LikeList {
   + **user_id (PK, FK)** : int
   + **series_id (PK, FK)** : int
@@ -96,7 +91,5 @@ Series -- LikeList : "est préféré par 0..N"
 User -- WatchEpisode : "visionne 0..N"
 Episode -- WatchEpisode : "est visionné par 0..N"
 
-Series -- Episode2Series : "contient 0..N"
-Episode -- Episode2Series : "est dans 0..N"
 
 @enduml
