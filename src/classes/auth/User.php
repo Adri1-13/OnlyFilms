@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-namespace iutnc\netvod\auth;
+namespace iutnc\onlyfilms\auth;
 
 
 class User {
     private int $id;
+    private string $firstname;
+    private string $name;
     private string $email;
     private string $passwd;
     private int $role;
@@ -42,6 +44,28 @@ class User {
     {
         return $this->passwd;
     }
+
+    public function getFirstname(): string
+    {
+        return $this->firstname;
+    }
+
+    public function setFirstname(string $firstname): void
+    {
+        $this->firstname = $firstname;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+
 
     public function setPasswd(string $passwd): void
     {

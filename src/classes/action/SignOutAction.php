@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace iutnc\netvod\action;
+namespace iutnc\onlyfilms\action;
 
-use iutnc\netvod\action\Action;
-use iutnc\netvod\auth\AuthnProvider;
+use iutnc\onlyfilms\action\Action;
+use iutnc\onlyfilms\auth\AuthnProvider;
 
 class SignOutAction extends Action {
 

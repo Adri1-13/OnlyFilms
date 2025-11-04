@@ -1,6 +1,6 @@
 <?php
 
-namespace iutnc\netvod\action;
+namespace iutnc\onlyfilms\action;
 
 abstract class Action {
 

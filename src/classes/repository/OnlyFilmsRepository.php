@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace iutnc\netvod\Repository;
+namespace iutnc\onlyfilms\repository;
  
 use PDO;
 
-class NetVODRepository {
+class OnlyFilmsRepository {
     private \PDO $pdo;
-    private static ?NetVODRepository $instance = null;
+    private static ?OnlyFilmsRepository $instance = null;
     private static array $config = [];
 
 
@@ -27,15 +27,15 @@ class NetVODRepository {
         $this->pdo->prepare('SET NAMES \'UTF8\'')->execute(); // permet de gérer les accents dans les données
     }
 
-    public static function getInstance() : NetVODRepository {
+    public static function getInstance() : OnlyFilmsRepository {
         if (self::$instance === null) {
-            self::$instance = new NetVODRepository(self::$config);
+            self::$instance = new OnlyFilmsRepository(self::$config);
         }
         return self::$instance;
     }
     /*
      * pourquoi cette fonction et l'attribut qu'elle modifie doit être en static ?
-     * ça ne dépend pas de l'instance de NetVODRepository ?
+     * ça ne dépend pas de l'instance de OnlyFilmsRepository ?
      * ---> obligé parce que pour faire une instance on a besoin de la config, et si setConfig n'est pas static, alors il faut obligatoirement une instance
      * pour appeler la fonction, donc on doit mettre setConfig et config en static pour qu'ils ne dépendent pas d'une instance et ensuite pouvoir créer une instance de repository
      */

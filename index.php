@@ -9,7 +9,7 @@ use iutnc\netvod\Repository\NetVODRepository;
 
 session_start();
 
-//NetVODRepository::setConfig('netvod.db.ini');
+//OnlyFilmsRepository::setConfig('netvod.db.ini');
 
 
 $dispatcher = new Dispatcher();
