@@ -32,7 +32,6 @@ class Episode {
         $this->seriesId = $seriesId;
     }
 
-
     /**
      * @return int
      */

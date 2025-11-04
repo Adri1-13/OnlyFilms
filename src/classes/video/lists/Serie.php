@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 namespace iutnc\onlyfilms\video\lists;
-
 class Serie {
 
     private int $id;
@@ -11,7 +10,22 @@ class Serie {
     private int $year;
     private string $dateAdded; // format 'YYYY-MM-DD'
 
-
+    public function __construct(
+        int $id,
+        string $title,
+        string $description,
+        string $image,
+        int $year,
+        string $dateAdded
+    ) {
+        $this->id = $id;
+        $this->title = $title;
+        $this->description = $description;
+        $this->image = $image;
+        $this->year = $year;
+        $this->dateAdded = $dateAdded;
+    }
+    
     /**
      * @return int
      */
