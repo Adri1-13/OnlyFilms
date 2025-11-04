@@ -4,14 +4,9 @@ declare(strict_types=1);
 
 namespace iutnc\onlyfilms\dispatch;
 
-use iutnc\onlyfilms\action\AddAlbumTrackAction;
-use iutnc\onlyfilms\action\AddPlaylistAction;
-use iutnc\onlyfilms\action\AddPodcastTrackAction;
 use iutnc\onlyfilms\action\AddUserAction;
-use iutnc\onlyfilms\action\DisplayAllPlaylistUserAction;
 use iutnc\onlyfilms\action\SignOutAction;
 use iutnc\onlyfilms\action\DefaultAction;
-use iutnc\onlyfilms\action\DisplayPlaylistAction;
 use iutnc\onlyfilms\action\SignInAction;
 
 class Dispatcher {
