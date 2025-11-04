@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace iutnc\netvod\auth;
+namespace iutnc\onlyfilms\auth;
 
-use iutnc\netvod\exception\AuthnException;
-use iutnc\netvod\Repository\NetVODRepository;
+use iutnc\onlyfilms\exception\AuthnException;
+use iutnc\onlyfilms\Repository\OnlyFilmsRepository;
 
 class Authz {
     // TODO

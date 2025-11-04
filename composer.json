@@ -1,10 +1,10 @@
 {
-  "name": "iutnc/netvod",
-  "description": "NetVOD",
+  "name": "iutnc/onlyfilms",
+  "description": "OnlyFilms",
   "type": "projet",
   "autoload": {
     "psr-4": {
-      "iutnc\\netvod\\": "src/classes/"
+      "iutnc\\onlyfilms\\": "src/classes/"
     }
  },
   "require": {

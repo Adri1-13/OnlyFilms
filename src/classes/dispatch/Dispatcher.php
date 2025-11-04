@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace iutnc\netvod\dispatch;
+namespace iutnc\onlyfilms\dispatch;
 
-use iutnc\netvod\action\AddAlbumTrackAction;
-use iutnc\netvod\action\AddPlaylistAction;
-use iutnc\netvod\action\AddPodcastTrackAction;
-use iutnc\netvod\action\AddUserAction;
-use iutnc\netvod\action\DisplayAllPlaylistUserAction;
-use iutnc\netvod\action\SignOutAction;
-use iutnc\netvod\action\DefaultAction;
-use iutnc\netvod\action\DisplayPlaylistAction;
-use iutnc\netvod\action\SignInAction;
+use iutnc\onlyfilms\action\AddAlbumTrackAction;
+use iutnc\onlyfilms\action\AddPlaylistAction;
+use iutnc\onlyfilms\action\AddPodcastTrackAction;
+use iutnc\onlyfilms\action\AddUserAction;
+use iutnc\onlyfilms\action\DisplayAllPlaylistUserAction;
+use iutnc\onlyfilms\action\SignOutAction;
+use iutnc\onlyfilms\action\DefaultAction;
+use iutnc\onlyfilms\action\DisplayPlaylistAction;
+use iutnc\onlyfilms\action\SignInAction;
 
 class Dispatcher {
 
@@ -30,7 +30,15 @@ class Dispatcher {
     public function run() : void {
 
         switch ($this->actionQuery) {
-
+            case 'add-user':
+                $action = new AddUserAction();
+                break;
+            case 'signout':
+                $action = new SignOutAction();
+                break;
+            case 'signin':
+                $action = new SignInAction();
+                break;
             case 'default':
             default:
                 $action = new DefaultAction();

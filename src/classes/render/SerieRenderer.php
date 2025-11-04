@@ -1,14 +1,14 @@
 <?php
 
-namespace iutnc\netvod\render;
+namespace iutnc\onlyfilms\render;
 
-use iutnc\netvod\render\Renderer;
+use iutnc\onlyfilms\render\Renderer;
+use iutnc\onlyfilms\video\tracks\Episode;
 
 class SerieRenderer implements Renderer
 {
-
-    public function render(int $selector): string
+    public static function render(int $selector, Episode $episode): string
     {
-        // TODO: Implement render() method.
+
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace iutnc\netvod\action;
+namespace iutnc\onlyfilms\action;
 
-use iutnc\netvod\action\Action;
+use iutnc\onlyfilms\action\Action;
 
 class Logout extends Action
 {

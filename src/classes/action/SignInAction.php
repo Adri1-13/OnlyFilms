@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace iutnc\netvod\action;
+namespace iutnc\onlyfilms\action;
 
-use iutnc\netvod\auth\AuthnProvider;
-use iutnc\netvod\exception\AuthnException;
+use iutnc\onlyfilms\auth\AuthnProvider;
+use iutnc\onlyfilms\exception\AuthnException;
 
 class SignInAction extends Action {
 

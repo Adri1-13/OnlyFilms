@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace iutnc\netvod\video\tracks;
+namespace iutnc\onlyfilms\video\tracks;
 
 class Episode {
 

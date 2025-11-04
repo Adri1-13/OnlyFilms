@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace iutnc\netvod\auth;
+namespace iutnc\onlyfilms\auth;
 
-use iutnc\netvod\exception\AuthnException;
-use iutnc\netvod\Repository\NetVODRepository;
+use iutnc\onlyfilms\exception\AuthnException;
+use iutnc\onlyfilms\Repository\OnlyFilmsRepository;
 
 class AuthnProvider {
 
     public static function signIn(string $email, string $passwd) : User {
-        $repo = NetVODRepository::getInstance();
+        $repo = OnlyFilmsRepository::getInstance();
         $user = $repo->trouverUser($email);
 
         if ($user === null) {
@@ -29,7 +29,7 @@ class AuthnProvider {
      */
     public static function register(string $email, string $passwd) : User {
 
-        $repo = NetVODRepository::getInstance();
+        $repo = OnlyFilmsRepository::getInstance();
         $user = $repo->trouverUser($email);
 
         if ($user !== null) {
