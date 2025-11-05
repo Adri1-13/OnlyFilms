@@ -176,4 +176,19 @@ public function findSeriesByUserId(int $userId): array {
     }
     return $episodes;
 }
+public function addComment(int $userId, int $serieId, string $comment, int $note): void
+{
+    $stmt = $this->pdo->prepare("
+        INSERT INTO commentary (user_id, series_id, text, date_added)
+        VALUES (?, ?, ?, NOW())
+    ");
+    $stmt->execute([$userId, $serieId, $comment]);
+
+    $stmt = $this->pdo->prepare("
+        INSERT INTO notation (user_id, series_id, note, date_added)
+        VALUES (?, ?, ?, NOW())
+    ");
+    $stmt->execute([$userId, $serieId, $note]);
+}
+
 }
