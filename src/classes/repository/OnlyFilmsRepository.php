@@ -193,4 +193,8 @@ class OnlyFilmsRepository {
         $stmt->execute([$userId, $serieId, $note]);
     }
 
+    public function addFav(int $userId, int $serieId): void {
+        $stmt = $this->pdo->prepare("INSERT INTO like_list (user_id, series_id) VALUES (?, ?)");
+        $stmt->execute([$userId, $serieId]);
+    }
 }
