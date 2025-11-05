@@ -223,4 +223,19 @@ public function addComment(int $userId, int $serieId, string $comment, int $note
     );
 }
 
+    public function addFav(int $userId, int $serieId): void {
+        $stmt = $this->pdo->prepare("INSERT INTO like_list (user_id, series_id) VALUES (?, ?)");
+        $stmt->execute([$userId, $serieId]);
+    }
+
+    public function isInFavList(int $userId, int $serieId): boolean {
+        $stmt = $this->pdo->prepare("SELECT * FROM like_list WHERE user_id = ? AND series_id = ?");
+        $stmt->execute([$userId, $serieId]);
+        $rows = $stmt->fetchAll();
+
+        if (!empty($rows)) {
+            return true;
+        }
+        return false;
+    }
 }
