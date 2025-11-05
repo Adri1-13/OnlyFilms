@@ -60,12 +60,12 @@ class OnlyFilmsRepository {
         /* =================== USER =================== */
 
 
-    function findUser(string $email) : User | null {
-        $requete = "SELECT * FROM user WHERE email = ?";
+    function findUser(string $mail) : User | null {
+        $requete = "SELECT * FROM user WHERE mail = ?";
 
         $stmt = $this->pdo->prepare($requete);
 
-        $stmt->execute([$email]);
+        $stmt->execute([$mail]);
 
         $ligne = $stmt->fetch(\PDO::FETCH_ASSOC); // normalement on a une unique ligne par user
 
@@ -73,19 +73,19 @@ class OnlyFilmsRepository {
             return null;
         }
 
-        return new User($ligne['id'], $ligne['firstname'], $ligne['name'], $ligne['email'], $ligne['passwd'], $ligne['role']);
+        return new User($ligne['id'], $ligne['firstname'], $ligne['name'], $ligne['mail'], $ligne['passwd'], $ligne['role']);
 
     }
 
-    function addUser(string $email, string $passwd, int $role) : User {
-        $requete = "INSERT INTO user(email, passwd, role) VALUES (?,?,?)";
+    function addUser(string $mail, string $passwd, int $role) : User {
+        $requete = "INSERT INTO user(mail, passwd, role) VALUES (?,?,?)";
 
         $stmt = $this->pdo->prepare($requete);
-        $stmt->execute([$email, $passwd, $role]);
+        $stmt->execute([$mail, $passwd, $role]);
 
         $nouvID = $this->pdo->lastInsertId();
 
-        return new User((int)$nouvID, $email, $passwd, $role);
+        return new User((int)$nouvID, $mail, $passwd, $role);
     }
     
     /* =================== SERIES =================== */
