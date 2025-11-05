@@ -240,4 +240,68 @@ class OnlyFilmsRepository {
         }
         return false;
     }
+    public function getUserInSerieProgress(int $userId): array
+{
+    // 1) Par série : combien vus + dernière date de visionnage
+    $sql = "
+        SELECT e.series_id,
+               COUNT(*) AS watched_count,
+               MAX(we.viewing_date) AS last_viewing
+        FROM watch_episode we
+        JOIN episode e ON e.episode_id = we.episode_id
+        WHERE we.user_id = ?
+        GROUP BY e.series_id
+        ORDER BY last_viewing DESC
+    ";
+    $st = $this->pdo->prepare($sql);
+    $st->execute([$userId]);
+    $rows = $st->fetchAll(\PDO::FETCH_ASSOC);
+
+    $result = [];
+
+    foreach ($rows as $r) {
+        $seriesId     = (int)$r['series_id'];
+        $watchedCount = (int)$r['watched_count'];
+
+        // 2) Total d'épisodes de la série
+        $stTot = $this->pdo->prepare("SELECT COUNT(*) FROM episode WHERE series_id = ?");
+        $stTot->execute([$seriesId]);
+        $total = (int)$stTot->fetchColumn();
+
+        // Si tout est vu, ce n'est plus "en cours"
+        if ($total <= 0 || $watchedCount >= $total) {
+            continue;
+        }
+
+        // 3) Dernier épisode vu (id) pour cette série
+        $stLastEp = $this->pdo->prepare("
+            SELECT we.episode_id
+            FROM watch_episode we
+            JOIN episode e ON e.episode_id = we.episode_id
+            WHERE we.user_id = ? AND e.series_id = ?
+            ORDER BY we.viewing_date DESC
+            LIMIT 1
+        ");
+        $stLastEp->execute([$userId, $seriesId]);
+        $lastEpisodeId = (int)$stLastEp->fetchColumn();
+
+        // 4) Objets avec méthodes existantes
+        $serieObj   = $this->findSeriesBySerieId($seriesId);
+        if ($serieObj === null) continue;
+
+        $episodeObj = $this->findEpisodeById($lastEpisodeId);
+
+        $pct = (int)round(($watchedCount / max(1, $total)) * 100);
+
+        $result[] = [
+            'series'        => $serieObj,     // objet Serie
+            'last_episode'  => $episodeObj,   // objet Episode
+            'progress_pct'  => $pct,          // int
+            'last_viewing'  => $r['last_viewing'],
+        ];
+    }
+
+    return $result;
+}
+
 }
