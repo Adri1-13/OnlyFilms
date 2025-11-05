@@ -113,3 +113,15 @@ CREATE TABLE `watch_episode` (
     FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
     FOREIGN KEY (`episode_id`) REFERENCES `episode` (`episode_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+-- Table d'association `watching_episode` (Suivi de visionnage en cours utilisateur/épisode)
+-- --------------------------------------------------------
+CREATE TABLE `watching_episode` (
+    `user_id` INT(11) NOT NULL,
+    `episode_id` INT(11) NOT NULL,
+    `time` INT(11) NOT NULL,
+    PRIMARY KEY (`user_id`, `episode_id`),
+    FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
+    FOREIGN KEY (`episode_id`) REFERENCES `episode` (`episode_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
