@@ -12,13 +12,49 @@ class AddCommentAction extends Action
 {
     public function executeGet(): string
     {
-            // La méthode GET pourrait rediriger vers la page de commentaire d'une série si nécessaire.
-            // On pourrait afficher un formulaire vide ou un message d'avertissement ici.
+        // Vérification si l'utilisateur est connecté
+        if (!isset($_SESSION['user'])) {
+            return "<p>Vous devez être connecté pour ajouter un commentaire.</p>";
+        }
+
+        // Récupérer l'ID de la série à partir du GET
+        $serieId = (int)$_GET['serie_id'];
+        
+        // Ici, on peut récupérer les informations de la série depuis la base de données si nécessaire
+        // Pour l'exemple, on assume que la série a un titre que nous pouvons afficher
+        $serieTitle = "Titre de la série";  // À remplacer par une vraie requête BDD pour récupérer le titre
+
+        // Afficher le formulaire pour ajouter un commentaire
         return <<<HTML
-        <h1>Ajouter un commentaire</h1>
-        <p>Pour ajouter un commentaire, vous devez d'abord être connecté.</p>
+        <h1>Ajouter un commentaire pour {$serieTitle}</h1>
+
+        <form action="index.php?action=add-comment" method="POST">
+            <input type="hidden" name="serie_id" value="{$serieId}" />
+            <div>
+                <label for="comment">Votre commentaire :</label>
+                <textarea name="comment" id="comment" rows="4" required></textarea>
+            </div>
+
+            <div>
+                <label for="note">Votre note (1 à 5) :</label>
+                <select name="note" id="note" required>
+                    <option value="1">1 étoile</option>
+                    <option value="2">2 étoiles</option>
+                    <option value="3">3 étoiles</option>
+                    <option value="4">4 étoiles</option>
+                    <option value="5">5 étoiles</option>
+                </select>
+            </div>
+
+            <div>
+                <button type="submit">Ajouter le commentaire</button>
+            </div>
+        </form>
+
+        <p><a href="serie_detail.php?serie_id={$serieId}">Retour à la série</a></p>
         HTML;
     }
+
 
     public function executePost(): string
     {
