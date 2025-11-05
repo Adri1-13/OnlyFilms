@@ -36,7 +36,6 @@ CREATE TABLE `series` (
     `year` INT(4) DEFAULT NULL,
     `date_added` DATE NOT NULL,
     PRIMARY KEY (`series_id`),
-    FOREIGN KEY (`genre_id`) REFERENCES `genre` (`genre_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
