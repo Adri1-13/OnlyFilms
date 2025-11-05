@@ -35,6 +35,9 @@ class Dispatcher {
             case 'signin':
                 $action = new SignInAction();
                 break;
+            case 'logout':
+                $action = new SignOutAction();
+                break;
             case 'catalog':
                 $action = new DisplayCatalogueAction();
                 break;

@@ -30,9 +30,9 @@ class DefaultAction extends Action
 
         // Sinon, affichage pour visiteur
         return <<<HTML
-            <h1>Bienvenue sur NetVOD </h1>
+            <h1>Bienvenue sur OnlyFilms</h1>
             <p>Explorez notre catalogue de séries en vous <a href="?action=signin">connectant</a>
-            ou en <a href="?action=register">créant un compte</a> gratuitement.</p>
+            ou en <a href="?action=add-user">créant un compte</a></p>
         HTML;
     }
 

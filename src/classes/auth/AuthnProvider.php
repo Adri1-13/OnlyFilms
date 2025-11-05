@@ -11,7 +11,7 @@ class AuthnProvider {
 
     public static function signIn(string $email, string $passwd) : User {
         $repo = OnlyFilmsRepository::getInstance();
-        $user = $repo->trouverUser($email);
+        $user = $repo->findUser($email);
 
         if ($user === null) {
             throw new AuthnException("Email ou mot de passe incorrect");
@@ -30,7 +30,7 @@ class AuthnProvider {
     public static function register(string $email, string $passwd) : User {
 
         $repo = OnlyFilmsRepository::getInstance();
-        $user = $repo->trouverUser($email);
+        $user = $repo->findUser($email);
 
         if ($user !== null) {
             throw new AuthnException("Cet utilisateur existe déjà");

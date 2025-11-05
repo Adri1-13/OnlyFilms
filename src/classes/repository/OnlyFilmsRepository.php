@@ -60,8 +60,8 @@ class OnlyFilmsRepository {
         /* =================== USER =================== */
 
 
-    public function findUser(string $email) : User | null {
-        $requete = "SELECT id, email, passwd, role FROM user WHERE email = ?";
+    function findUser(string $email) : User | null {
+        $requete = "SELECT * FROM user WHERE email = ?";
 
         $stmt = $this->pdo->prepare($requete);
 
@@ -73,11 +73,11 @@ class OnlyFilmsRepository {
             return null;
         }
 
-        return new User($ligne['id'], $ligne['email'], $ligne['passwd'], $ligne['role']);
+        return new User($ligne['id'], $ligne['firstname'], $ligne['name'], $ligne['email'], $ligne['passwd'], $ligne['role']);
 
     }
 
-    public function addUser(string $email, string $passwd, int $role) : User {
+    function addUser(string $email, string $passwd, int $role) : User {
         $requete = "INSERT INTO user(email, passwd, role) VALUES (?,?,?)";
 
         $stmt = $this->pdo->prepare($requete);
@@ -89,32 +89,32 @@ class OnlyFilmsRepository {
     }
     
     /* =================== SERIES =================== */
-    public function findAllSeries(): array {
-        $stmt = $this->pdo->query("SELECT * FROM series ORDER BY date_added DESC");
-        $rows = $stmt->fetchAll();
+public function findAllSeries(): array {
+    $stmt = $this->pdo->query("SELECT * FROM series ORDER BY date_added DESC");
+    $rows = $stmt->fetchAll();
 
-        $series = [];
-        foreach ($rows as $r) {
-            $series[] = new Serie(
-                (int)$r['series_id'],
-                $r['title'],
-                $r['description'] ?? '',
-                $r['img'] ?? '',
-                (int)$r['year'],
-                $r['date_added']
-            );
-        }
-        return $series;
+    $series = [];
+    foreach ($rows as $r) {
+        $series[] = new Serie(
+            (int)$r['series_id'],
+            $r['title'],
+            $r['description'] ?? '',
+            $r['img'] ?? '',
+            (int)$r['year'],
+            $r['date_added']
+        );
     }
+    return $series;
+}
 
 
 
-    public function findSeriesBySerieId(int $id): ?Serie {
-        $stmt = $this->pdo->prepare("SELECT * FROM series WHERE series_id = ?");
-        $stmt->execute([$id]);
-        $row = $stmt->fetch();
+public function findSeriesBySerieId(int $id): ?Serie {
+    $stmt = $this->pdo->prepare("SELECT * FROM series WHERE series_id = ?");
+    $stmt->execute([$id]);
+    $row = $stmt->fetch();
 
-        if ($row === false) return null;
+    if ($row === false) return null;
 
         return new Serie(
             (int)$row['series_id'],
@@ -126,38 +126,35 @@ class OnlyFilmsRepository {
         );
     }
 
-    public function findSeriesByUserId(int $userId): array {
-        $stmt = $this->pdo->prepare("
-            SELECT s.* FROM series s
-            JOIN Like_list l ON s.series_id = l.series_id
-            WHERE l.user_id = ? ORDER BY s.date_added DESC");
-        $stmt->execute([$userId]);
-        $rows = $stmt->fetchAll();
+public function findSeriesByUserId(int $userId): array {
+    $stmt = $this->pdo->prepare("
+        SELECT s.* FROM series s
+        JOIN Like_list l ON s.series_id = l.series_id
+        WHERE l.user_id = ? ORDER BY s.date_added DESC");
+    $stmt->execute([$userId]);
+    $rows = $stmt->fetchAll();
 
-        $series = [];
-        foreach ($rows as $r) {
-            $series[] = new Serie(
-                (int)$r['series_id'],
-                $r['title'],
-                $r['description'] ?? '',
-                $r['img'] ?? '',
-                (int)$r['year'],
-                $r['date_added']
-            );
-        }
-        return $series;
+    $series = [];
+    foreach ($rows as $r) {
+        $series[] = new Serie(
+            (int)$r['series_id'],
+            $r['title'],
+            $r['description'] ?? '',
+            $r['img'] ?? '',
+            (int)$r['year'],
+            $r['date_added']
+        );
     }
+    return $series;
+}
 
 
         /* =================== EPISODES =================== */
-
-    /**
-     * @throws \Exception
-     */
-    public function findEpisodesBySeriesId(int $seriesId): array {
-        $stmt = $this->pdo->prepare("SELECT * FROM episode WHERE series_id = ? ORDER BY num ASC");
-        $stmt->execute([$seriesId]);
-        $rows = $stmt->fetchAll();
+    
+public function findEpisodesBySeriesId(int $seriesId): array {
+    $stmt = $this->pdo->prepare("SELECT * FROM episode WHERE series_id = ? ORDER BY num ASC");
+    $stmt->execute([$seriesId]);
+    $rows = $stmt->fetchAll();
 
         $episodes = [];
         foreach ($rows as $r) {
