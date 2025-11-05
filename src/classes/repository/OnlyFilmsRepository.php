@@ -111,7 +111,7 @@ class OnlyFilmsRepository {
 
 
 
-    public function findSeriesBySerieId(int $id): ?Serie {
+    public function findSeriesBySerieId(int $id): ?Serie { // TODO : peut etre renomme meme si c faux en anglais (series -> serie) pour que le nom soit plus juste car on retourne qu'une serie
         $stmt = $this->pdo->prepare("SELECT * FROM series WHERE series_id = ?");
         $stmt->execute([$id]);
         $row = $stmt->fetch();
@@ -199,31 +199,31 @@ class OnlyFilmsRepository {
      * @throws OnlyFilmsRepositoryException
      */
     public function findEpisodeById(int $id) : Episode
-{
+    {
 
-    if ($id < 0) {
-        throw new OnlyFilmsRepositoryException("Id doit etre positif");
+        if ($id < 0) {
+            throw new OnlyFilmsRepositoryException("Id doit etre positif");
+        }
+        $stmt = $this->pdo->prepare("SELECT * FROM episode WHERE episode_id = ?");
+        $stmt->execute([$id]);
+        $rows = $stmt->fetchAll();
+
+        if (empty($rows)) {
+            throw new OnlyFilmsRepositoryException("Aucun épisode trouvé");
+        }
+
+        $row = $rows[0];
+        return new Episode(
+            $row['episode_id'], // $id
+            $row['num'],        // $number
+            $row['title'],      // $title
+            $row['summary'],    // $summary
+            $row['duration'],   // $duration
+            $row['file'],       // $file
+            $row['img'],        // $img
+            $row['series_id']   // $seriesId
+        );
     }
-    $stmt = $this->pdo->prepare("SELECT * FROM episode WHERE episode_id = ?");
-    $stmt->execute([$id]);
-    $rows = $stmt->fetchAll();
-
-    if (empty($rows)) {
-        throw new OnlyFilmsRepositoryException("Aucun épisode trouvé");
-    }
-
-    $row = $rows[0];
-    return new Episode(
-        $row['episode_id'], // $id
-        $row['num'],        // $number
-        $row['title'],      // $title
-        $row['summary'],    // $summary
-        $row['duration'],   // $duration
-        $row['file'],       // $file
-        $row['img'],        // $img
-        $row['series_id']   // $seriesId
-    );
-}
 
     public function addFav(int $userId, int $serieId): void {
         $stmt = $this->pdo->prepare("INSERT INTO like_list (user_id, series_id) VALUES (?, ?)");
