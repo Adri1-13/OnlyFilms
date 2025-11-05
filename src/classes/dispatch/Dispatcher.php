@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace iutnc\onlyfilms\dispatch;
 
 use iutnc\onlyfilms\action\AddUserAction;
+use iutnc\onlyfilms\action\DisplayFavoriteAction;
 use iutnc\onlyfilms\action\SignOutAction;
 use iutnc\onlyfilms\action\DefaultAction;
 use iutnc\onlyfilms\action\SignInAction;
@@ -43,7 +44,8 @@ class Dispatcher {
                 $action = new InProgressSeriesAction();
                 break;
             case 'favourite-series':
-
+                $action = new DisplayFavoriteAction();
+                break;
             case 'default':
             default:
                 $action = new DefaultAction();
