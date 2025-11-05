@@ -125,3 +125,104 @@ CREATE TABLE `watching_episode` (
     FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
     FOREIGN KEY (`episode_id`) REFERENCES `episode` (`episode_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+-- Insertions dans la table `user`
+-- --------------------------------------------------------
+INSERT INTO `user` (`user_id`, `mail`, `password`, `name`, `firstname`, `role`) VALUES
+(1, 'alice.dupont@example.com', 'hashed_password_1', 'Dupont', 'Alice', 1),
+(2, 'bob.martin@example.com', 'hashed_password_2', 'Martin', 'Bob', 1),
+(3, 'admin@platform.com', 'hashed_admin_password', 'Super', 'Admin', 99);
+
+-- --------------------------------------------------------
+-- Insertions dans la table `genre`
+-- --------------------------------------------------------
+INSERT INTO `genre` (`genre_id`, `name`) VALUES
+(1, 'Science-Fiction'),
+(2, 'Drame'),
+(3, 'Comédie'),
+(4, 'Thriller');
+
+-- --------------------------------------------------------
+-- Insertions dans la table `series`
+-- --------------------------------------------------------
+INSERT INTO `series` (`series_id`, `title`, `description`, `img`, `year`, `date_added`) VALUES
+(1, 'Au-delà du Ciel', 'Un groupe d\'explorateurs spatiaux découvre une anomalie qui remet en question toute leur existence.', 'sky_img.jpg', 2023, '2023-09-01'),
+(2, 'Le Secret de la Ville', 'Une intrigue politique sombre se déroule dans une capitale moderne.', 'city_secret.jpg', 2022, '2022-11-15'),
+(3, 'Les Aventures de Max', 'Les mésaventures hilarantes d\'un jeune homme essayant de réussir à Hollywood.', 'max_adventures.jpg', 2024, '2024-01-20');
+
+-- --------------------------------------------------------
+-- Insertions dans la table `genre_series`
+-- (Association entre genres et séries)
+-- --------------------------------------------------------
+INSERT INTO `genre_series` (`genre_id`, `series_id`) VALUES
+(1, 1), -- Science-Fiction -> Au-delà du Ciel
+(2, 1), -- Drame -> Au-delà du Ciel
+(2, 2), -- Drame -> Le Secret de la Ville
+(4, 2), -- Thriller -> Le Secret de la Ville
+(3, 3); -- Comédie -> Les Aventures de Max
+
+-- --------------------------------------------------------
+-- Insertions dans la table `episode`
+-- --------------------------------------------------------
+INSERT INTO `episode` (`episode_id`, `num`, `title`, `summary`, `duration`, `file`, `img`, `series_id`) VALUES
+-- Série 1 : Au-delà du Ciel
+(1, 1, 'Le Premier Saut', 'L\'équipage quitte la Terre et rencontre des difficultés inattendues.', 3000, 'ep1_s1.mp4', 'ep1_s1_img.jpg', 1),
+(2, 2, 'Écho Lointain', 'Un signal étrange mène l\'équipage vers un système inconnu.', 3200, 'ep2_s1.mp4', 'ep2_s1_img.jpg', 1),
+(3, 3, 'La Découverte', 'L\'anomalie est localisée, mais son secret pourrait être mortel.', 3400, 'ep3_s1.mp4', 'ep3_s1_img.jpg', 1),
+-- Série 2 : Le Secret de la Ville
+(4, 1, 'L\'Ombre du Maire', 'Une journaliste enquête sur des transactions suspectes.', 2800, 'ep1_s2.mp4', 'ep1_s2_img.jpg', 2),
+(5, 2, 'Filatures', 'La journaliste se retrouve en danger après avoir déterré une information cruciale.', 2900, 'ep2_s2.mp4', 'ep2_s2_img.jpg', 2),
+(6, 3, 'Révélations', 'Le maire est acculé, mais il a une dernière carte à jouer.', 3100, 'ep3_s2.mp4', 'ep3_s2_img.jpg', 2),
+-- Série 3 : Les Aventures de Max
+(7, 1, 'Le Casting Catastrophe', 'Max rate lamentablement une audition pour un petit rôle.', 1500, 'ep1_s3.mp4', 'ep1_s3_img.jpg', 3),
+(8, 2, 'Livreur de Rêves', 'Pour joindre les deux bouts, Max devient livreur de repas.', 1450, 'ep2_s3.mp4', 'ep2_s3_img.jpg', 3),
+(9, 3, 'Rencontre inattendue', 'Max croise une star de cinéma qui lui donne un conseil précieux.', 1600, 'ep3_s3.mp4', 'ep3_s3_img.jpg', 3);
+
+-- --------------------------------------------------------
+-- Insertions dans la table `commentary`
+-- (Commentaires utilisateur/série)
+-- --------------------------------------------------------
+INSERT INTO `commentary` (`user_id`, `series_id`, `text`, `date_added`) VALUES
+(1, 1, 'Une série de Science-Fiction très prenante, jattends la suite avec impatience!', '2023-09-05 14:30:00'),
+(2, 2, 'Un thriller bien ficelé avec des acteurs incroyables.', '2023-10-01 20:15:00'),
+(1, 3, 'Très drôle, parfait pour se détendre!', '2024-02-10 18:00:00');
+
+-- --------------------------------------------------------
+-- Insertions dans la table `notation`
+-- (Notes utilisateur/série)
+-- NOTE: La colonne `note` est de type INT(1) dans le schéma original, supposons qu'elle soit une note sur 5 ou 10. J'utilise une note sur 5 ici (1 à 5).
+-- --------------------------------------------------------
+INSERT INTO `notation` (`user_id`, `series_id`, `note`, `date_added`) VALUES
+(1, 1, 5, '2023-09-05 14:31:00'),
+(2, 1, 4, '2023-10-10 09:00:00'),
+(2, 2, 5, '2023-10-01 20:16:00'),
+(1, 3, 4, '2024-02-10 18:01:00');
+
+-- --------------------------------------------------------
+-- Insertions dans la table `like_list`
+-- (Liste de favoris utilisateur/série)
+-- --------------------------------------------------------
+INSERT INTO `like_list` (`user_id`, `series_id`) VALUES
+(1, 1), -- Alice aime Au-delà du Ciel
+(1, 3), -- Alice aime Les Aventures de Max
+(2, 2); -- Bob aime Le Secret de la Ville
+
+-- --------------------------------------------------------
+-- Insertions dans la table `watch_episode`
+-- (Suivi de visionnage utilisateur/épisode - Épisodes TERMINÉS)
+-- --------------------------------------------------------
+INSERT INTO `watch_episode` (`user_id`, `episode_id`, `viewing_date`) VALUES
+(1, 1, '2023-09-02 21:00:00'), -- Alice a vu S1E1
+(1, 2, '2023-09-03 21:30:00'), -- Alice a vu S1E2
+(2, 4, '2023-10-01 19:30:00'), -- Bob a vu S2E1
+(2, 5, '2023-10-02 19:45:00'), -- Bob a vu S2E2
+(1, 7, '2024-02-10 17:30:00'); -- Alice a vu S3E1
+
+-- --------------------------------------------------------
+-- Insertions dans la table `watching_episode`
+-- (Suivi de visionnage en cours utilisateur/épisode)
+-- --------------------------------------------------------
+INSERT INTO `watching_episode` (`user_id`, `episode_id`, `time`) VALUES
+(1, 3, 1200), -- Alice a commencé S1E3, arrêtée à 1200 secondes
+(2, 6, 500);  -- Bob a commencé S2E3, arrêté à 500 secondes
