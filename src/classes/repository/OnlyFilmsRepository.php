@@ -128,23 +128,23 @@ class OnlyFilmsRepository {
         );
     }
 
-    public function findSeriesByUserId(int $userId): array {
+    public function findFavoriteSeriesByUserID(int $userId): array {
         $stmt = $this->pdo->prepare("
             SELECT s.* FROM series s
             JOIN Like_list l ON s.series_id = l.series_id
             WHERE l.user_id = ? ORDER BY s.date_added DESC");
         $stmt->execute([$userId]);
-        $rows = $stmt->fetchAll();
+        $lignes = $stmt->fetchAll();
 
         $series = [];
-        foreach ($rows as $r) {
+        foreach ($lignes as $ligne) {
             $series[] = new Serie(
-                (int)$r['series_id'],
-                $r['title'],
-                $r['description'] ?? '',
-                $r['img'] ?? '',
-                (int)$r['year'],
-                $r['date_added']
+                (int)$ligne['series_id'],
+                $ligne['title'],
+                $ligne['description'],
+                $ligne['img'],
+                (int)$ligne['year'],
+                $ligne['date_added']
             );
         }
         return $series;
@@ -240,4 +240,6 @@ class OnlyFilmsRepository {
         }
         return false;
     }
+
+
 }
