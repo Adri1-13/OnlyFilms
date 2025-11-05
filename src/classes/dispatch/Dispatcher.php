@@ -43,7 +43,7 @@ class Dispatcher {
             case 'in-progress':
                 $action = new InProgressSeriesAction();
                 break;
-            case 'favourite-series':
+            case 'view-favorites':
                 $action = new DisplayFavoriteAction();
                 break;
             case 'default':
