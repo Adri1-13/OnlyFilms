@@ -11,7 +11,7 @@ class DisplayCatalogueAction extends Action
 
     public function executeGet(): string
     {
-        if (AuthnProvider::isSignedIn()) {
+        if (!AuthnProvider::isSignedIn()) {
             $defaultAction = new DefaultAction();
             return $defaultAction->executeGet();
         }
