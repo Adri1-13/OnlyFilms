@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace iutnc\onlyfilms\video\lists;
 use iutnc\onlyfilms\render\Renderer;
 use iutnc\onlyfilms\Repository\OnlyFilmsRepository;
+use iutnc\onlyfilms\video\tracks\Episode;
 
 class Serie implements Renderer {
 
@@ -42,25 +43,20 @@ class Serie implements Renderer {
                 // titre + photo + Année
                 $html = <<<HTML
                 <div class="serie compact">
-                    <img src="images/{$this->getImage()}" alt="Affiche de {$this->getTitle()}">
+                    <img src="images/{$this->getImage()}" alt="Miniature de {$this->getTitle()}">
                     <h3>{$this->getTitle()}</h3>
                     <p>Année : {$this->getYear()}</p>
                 </div>
                 HTML;
                 break;
-
             case self::LONG:
-
-//                //on récupere tab des épisodes
-//                $repo = OnlyFilmsRepository::getInstance();
-//                $episodes = $repo->findEpisodesBySeriesId($this->getId());
                 $html = <<<HTML
                             <div class="serie long">
-                                <h2>{$this->getTitle()}</h2>
+                                <h2>{$this->getTitle()} - {$this->getYear()}</h2>
                                 <p>{$this->getDescription()}<p/>
                             HTML;
                 foreach ($this->episodes as $episode) {
-                    $HTML .= $episode->render(self::COMPACT);
+                    $html .= $episode->render(self::COMPACT);
                 }
                 $html .= '</div>';
                 break;

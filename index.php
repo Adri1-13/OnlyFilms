@@ -11,8 +11,6 @@ session_start();
 
 OnlyFilmsRepository::setConfig('netvod.db.ini');
 
-
 $dispatcher = new Dispatcher();
-
 
 $dispatcher->run();
