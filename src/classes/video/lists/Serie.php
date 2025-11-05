@@ -1,7 +1,10 @@
 <?php
 declare(strict_types=1);
 namespace iutnc\onlyfilms\video\lists;
-class Serie {
+use iutnc\onlyfilms\render\Renderer;
+use iutnc\onlyfilms\Repository\OnlyFilmsRepository;
+
+class Serie implements Renderer {
 
     private int $id;
     private string $title;
@@ -10,7 +13,7 @@ class Serie {
     private int $year;
     private string $dateAdded; // format 'YYYY-MM-DD'
 
-    public function __construct(
+    public function __construct (
         int $id,
         string $title,
         string $description,
@@ -25,7 +28,43 @@ class Serie {
         $this->year = $year;
         $this->dateAdded = $dateAdded;
     }
-    
+
+    public function render(int $selector): string
+    {
+        switch ($selector) {
+            case self::COMPACT:
+                // titre + photo + Année
+                $html = <<<HTML
+                <div class="serie compact">
+                    <img src="images/{$this->getImage()}" alt="Affiche de {$this->getTitle()}">
+                    <h3>{$this->getTitle()}</h3>
+                    <p>Année : {$this->getYear()}</p>
+                </div>
+                HTML;
+                break;
+
+            case self::LONG:
+                //on récupere tab des épisodes
+                $repo = OnlyFilmsRepository::getInstance();
+                $episodes = $repo->findEpisodesBySeriesId($this->getId());
+                $html = <<<HTML
+                            <div class="serie long">
+                                <h2>{$this->getTitle()}</h2>
+                                <p>{$this->getDescription()}<p/>
+                            HTML;
+                foreach ($episodes as $episode) {
+                    $HTML .= $episode->render(self::COMPACT);
+                }
+                $html .= '</div>';
+                break;
+            default:
+                throw new \Exception("Paramètre renderer incorrect");
+        }
+
+        // On retourne le HTML généré
+        return $html;
+    }
+
     /**
      * @return int
      */

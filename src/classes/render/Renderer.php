@@ -10,5 +10,5 @@ interface Renderer {
     public const COMPACT = 1;
     public const LONG = 2;
 
-    public static function render(int $selector, Episode $episode) : string;
+    public function render(int $selector) : string;
 }

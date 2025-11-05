@@ -2,7 +2,9 @@
 declare(strict_types=1);
 namespace iutnc\onlyfilms\video\tracks;
 
-class Episode {
+use iutnc\onlyfilms\render\Renderer;
+
+class Episode implements Renderer {
 
     private int $id;
     private int $number = 1;
@@ -30,6 +32,40 @@ class Episode {
         $this->duration = $duration;
         $this->file = $file;
         $this->seriesId = $seriesId;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function render(int $selector): string
+    {
+        switch ($selector) {
+            // COMPACT = Nom + Descrption + Durée
+            case self::COMPACT :
+                $html = <<<HTML
+                <div class="episode compact">
+                    <h3>Épisode {$this->getNumber()} : {$this->getTitle()}</h3>
+                    <p>{$this->getSummary()}</p>
+                    <p>Durée : {$this->getDuration()} min</p>
+                </div>
+                HTML;
+                break;
+            // LONG = Lecteur vidéo
+            case self::LONG :
+                $file = $this->getFile();
+                $video = $file ? "<video controls src='video/{$file}'></video>" : "<p>Aucun fichier vidéo disponible.</p>";
+                $html = <<<HTML
+                <div class="episode long">
+                    <h2>{$this->getTitle()}</h2>
+                    {$video}
+                </div>
+                HTML;
+                break;
+            default:
+                throw new \Exception("Paramètre renderer incorrect");
+                break;
+        }
+        return $html;
     }
 
     /**
