@@ -59,6 +59,7 @@ class Episode implements Renderer {
                 $html = <<<HTML
                 <div class="episode long">
                     <h2>{$this->getTitle()}</h2>
+                    <p>{$this->summary}</p>
                     {$video}
                 </div>
                 HTML;

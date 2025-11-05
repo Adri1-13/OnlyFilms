@@ -20,5 +20,6 @@
 /vendor/
 
 **/.ini
+netvod.db.ini
 
 **/.git

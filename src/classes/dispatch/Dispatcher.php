@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace iutnc\onlyfilms\dispatch;
 
 use iutnc\onlyfilms\action\AddUserAction;
+use iutnc\onlyfilms\action\DisplayEpisodeAction;
 use iutnc\onlyfilms\action\SignOutAction;
 use iutnc\onlyfilms\action\DefaultAction;
 use iutnc\onlyfilms\action\SignInAction;
@@ -37,6 +38,9 @@ class Dispatcher {
                 break;
             case 'catalog':
                 $action = new DisplayCatalogueAction();
+                break;
+            case 'display-episode':
+                $action = new DisplayEpisodeAction();
                 break;
             case 'default':
             default:
