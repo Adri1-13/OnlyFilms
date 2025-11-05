@@ -60,7 +60,7 @@ class OnlyFilmsRepository {
         /* =================== USER =================== */
 
 
-    function findUser(string $email) : User | null {
+    public function findUser(string $email) : User | null {
         $requete = "SELECT id, email, passwd, role FROM user WHERE email = ?";
 
         $stmt = $this->pdo->prepare($requete);
@@ -77,7 +77,7 @@ class OnlyFilmsRepository {
 
     }
 
-    function addUser(string $email, string $passwd, int $role) : User {
+    public function addUser(string $email, string $passwd, int $role) : User {
         $requete = "INSERT INTO user(email, passwd, role) VALUES (?,?,?)";
 
         $stmt = $this->pdo->prepare($requete);
@@ -89,64 +89,64 @@ class OnlyFilmsRepository {
     }
     
     /* =================== SERIES =================== */
-public function findAllSeries(): array {
-    $stmt = $this->pdo->query("SELECT * FROM series ORDER BY date_added DESC");
-    $rows = $stmt->fetchAll();
+    public function findAllSeries(): array {
+        $stmt = $this->pdo->query("SELECT * FROM series ORDER BY date_added DESC");
+        $rows = $stmt->fetchAll();
 
-    $series = [];
-    foreach ($rows as $r) {
-        $series[] = new Serie(
-            (int)$r['series_id'],
-            $r['title'],
-            $r['description'] ?? '',
-            $r['img'] ?? '',
-            (int)$r['year'],
-            $r['date_added']
+        $series = [];
+        foreach ($rows as $r) {
+            $series[] = new Serie(
+                (int)$r['series_id'],
+                $r['title'],
+                $r['description'] ?? '',
+                $r['img'] ?? '',
+                (int)$r['year'],
+                $r['date_added']
+            );
+        }
+        return $series;
+    }
+
+
+
+    public function findSeriesBySerieId(int $id): ?Serie {
+        $stmt = $this->pdo->prepare("SELECT * FROM series WHERE series_id = ?");
+        $stmt->execute([$id]);
+        $row = $stmt->fetch();
+
+        if ($row === false) return null;
+
+        return new Serie(
+            (int)$row['series_id'],
+            $row['title'],
+            $row['description'] ?? '',
+            $row['img'] ?? '',
+            (int)$row['year'],
+            $row['date_added']
         );
     }
-    return $series;
-}
 
+    public function findSeriesByUserId(int $userId): array {
+        $stmt = $this->pdo->prepare("
+            SELECT s.* FROM series s
+            JOIN Like_list l ON s.series_id = l.series_id
+            WHERE l.user_id = ? ORDER BY s.date_added DESC");
+        $stmt->execute([$userId]);
+        $rows = $stmt->fetchAll();
 
-
-public function findSeriesBySerieId(int $id): ?Serie {
-    $stmt = $this->pdo->prepare("SELECT * FROM series WHERE series_id = ?");
-    $stmt->execute([$id]);
-    $row = $stmt->fetch();
-
-    if ($row === false) return null;
-
-    return new Serie(
-        (int)$row['series_id'],
-        $row['title'],
-        $row['description'] ?? '',
-        $row['img'] ?? '',
-        (int)$row['year'],
-        $row['date_added']
-    );
-}
-
-public function findSeriesByUserId(int $userId): array {
-    $stmt = $this->pdo->prepare("
-        SELECT s.* FROM series s
-        JOIN Like_list l ON s.series_id = l.series_id
-        WHERE l.user_id = ? ORDER BY s.date_added DESC");
-    $stmt->execute([$userId]);
-    $rows = $stmt->fetchAll();
-
-    $series = [];
-    foreach ($rows as $r) {
-        $series[] = new Serie(
-            (int)$r['series_id'],
-            $r['title'],
-            $r['description'] ?? '',
-            $r['img'] ?? '',
-            (int)$r['year'],
-            $r['date_added']
-        );
+        $series = [];
+        foreach ($rows as $r) {
+            $series[] = new Serie(
+                (int)$r['series_id'],
+                $r['title'],
+                $r['description'] ?? '',
+                $r['img'] ?? '',
+                (int)$r['year'],
+                $r['date_added']
+            );
+        }
+        return $series;
     }
-    return $series;
-}
 
 
         /* =================== EPISODES =================== */
@@ -155,41 +155,42 @@ public function findSeriesByUserId(int $userId): array {
      * @throws \Exception
      */
     public function findEpisodesBySeriesId(int $seriesId): array {
-    $stmt = $this->pdo->prepare("SELECT * FROM episode WHERE series_id = ? ORDER BY num ASC");
-    $stmt->execute([$seriesId]);
-    $rows = $stmt->fetchAll();
+        $stmt = $this->pdo->prepare("SELECT * FROM episode WHERE series_id = ? ORDER BY num ASC");
+        $stmt->execute([$seriesId]);
+        $rows = $stmt->fetchAll();
 
-    $episodes = [];
-    foreach ($rows as $r) {
-        $episodes[] = new Episode(
-            (int)$r['episode_id'],
-            (int)$r['num'],
-            $r['title'],
-            $r['summary'] ?? '',
-            (int)$r['duration'],
-            $r['file'] ?? '',
-            $r['img'],
-            (int)$r['series_id']
-        );
+        $episodes = [];
+        foreach ($rows as $r) {
+            $episodes[] = new Episode(
+                (int)$r['episode_id'],
+                (int)$r['num'],
+                $r['title'],
+                $r['summary'] ?? '',
+                (int)$r['duration'],
+                $r['file'] ?? '',
+                $r['img'],
+                (int)$r['series_id']
+            );
+        }
+        if (!empty($episodes)) {
+            throw new \Exception("Aucun épisode associé a cette série");
+        }
+        return $episodes;
     }
-    if (!empty($episodes)) {
-        throw new \Exception("Aucun épisode associé a cette série");
-    }
-    return $episodes;
-}
-public function addComment(int $userId, int $serieId, string $comment, int $note): void
-{
-    $stmt = $this->pdo->prepare("
-        INSERT INTO commentary (user_id, series_id, text, date_added)
-        VALUES (?, ?, ?, NOW())
-    ");
-    $stmt->execute([$userId, $serieId, $comment]);
 
-    $stmt = $this->pdo->prepare("
-        INSERT INTO notation (user_id, series_id, note, date_added)
-        VALUES (?, ?, ?, NOW())
-    ");
-    $stmt->execute([$userId, $serieId, $note]);
-}
+    public function addComment(int $userId, int $serieId, string $comment, int $note): void
+    {
+        $stmt = $this->pdo->prepare("
+            INSERT INTO commentary (user_id, series_id, text, date_added)
+            VALUES (?, ?, ?, NOW())
+        ");
+        $stmt->execute([$userId, $serieId, $comment]);
+
+        $stmt = $this->pdo->prepare("
+            INSERT INTO notation (user_id, series_id, note, date_added)
+            VALUES (?, ?, ?, NOW())
+        ");
+        $stmt->execute([$userId, $serieId, $note]);
+    }
 
 }
