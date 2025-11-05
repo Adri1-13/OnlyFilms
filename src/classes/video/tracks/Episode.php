@@ -33,6 +33,7 @@ class Episode implements Renderer {
         $this->duration = $duration;
         $this->file = $file;
         $this->seriesId = $seriesId;
+        $this->img = $img;
     }
 
     /**
