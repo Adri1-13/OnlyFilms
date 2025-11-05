@@ -17,7 +17,7 @@ class SignOutAction extends Action {
         }
         unset($_SESSION['user']);
 
-        session_destroy();
+//        session_destroy();
 
         return <<<HTML
             <p>Vous êtes déconnecté</p>

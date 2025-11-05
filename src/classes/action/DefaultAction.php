@@ -15,11 +15,11 @@ class DefaultAction extends Action
         // Si l’utilisateur est connecté
         if (isset($_SESSION['user'])) {
             $user = $_SESSION['user'];
-            $firstname = htmlspecialchars($user->getFirstname());
+            $userMail = htmlspecialchars($user->getMail());
 
             // TODO : modifis actions en fonction de leurs vrais noms
             return <<<HTML
-                <h1>Bienvenue sur OnlyFilms, {$firstname} !</h1>
+                <h1>Bienvenue sur OnlyFilms, {$userMail} !</h1>
                 <p>Accédez au catalogue de séries <a class="btn btn-primary" href="?action=catalog"></a>
                 <br>
                 Reprendre dans vos séries en cours <a class="btn btn-primary" href="?action=in-progress"></a>

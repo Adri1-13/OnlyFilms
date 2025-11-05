@@ -51,7 +51,7 @@ class SignInAction extends Action {
 
             return <<<HTML
                 <p>Connexion réussie</p>
-                <p>Bienvenue {$user->getFirstname()}</p>
+                <p>Bienvenue {$user->getMail()}</p>
             HTML;
 
         } catch (AuthnException $e) {

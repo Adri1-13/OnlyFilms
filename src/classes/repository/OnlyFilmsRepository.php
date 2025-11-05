@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace iutnc\onlyfilms\Repository;
 
+use iutnc\onlyfilms\auth\User;
 use iutnc\onlyfilms\video\lists\Serie;
 use iutnc\onlyfilms\video\tracks\Episode;
 
@@ -73,19 +74,19 @@ class OnlyFilmsRepository {
             return null;
         }
 
-        return new User($ligne['id'], $ligne['firstname'], $ligne['name'], $ligne['mail'], $ligne['passwd'], $ligne['role']);
+        return new User($ligne['user_id'], $ligne['firstname'], $ligne['name'], $ligne['mail'], $ligne['password'], $ligne['role']);
 
     }
 
-    function addUser(string $mail, string $passwd, int $role) : User {
-        $requete = "INSERT INTO user(mail, passwd, role) VALUES (?,?,?)";
+    function addUser(string $mail, string $passwd, string $name, string $firstname, int $role) : User {
+        $requete = "INSERT INTO user(mail, password, name, firstname, role) VALUES (?,?,?,?,?)";
 
         $stmt = $this->pdo->prepare($requete);
-        $stmt->execute([$mail, $passwd, $role]);
+        $stmt->execute([$mail, $passwd, $name, $firstname, $role]);
 
         $nouvID = $this->pdo->lastInsertId();
 
-        return new User((int)$nouvID, $mail, $passwd, $role);
+        return new User((int)$nouvID, $firstname, $name, $mail, $passwd, $role);
     }
     
     /* =================== SERIES =================== */

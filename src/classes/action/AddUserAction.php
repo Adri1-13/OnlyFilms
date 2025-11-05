@@ -32,7 +32,7 @@ class AddUserAction extends Action {
 
     public function executePost(): string
     {
-        if (!isset($_POST['email']) || !isset($_POST['passwd']) || !isset($_POST['passwdconfirm'])) {
+        if (!isset($_POST['email']) || !isset($_POST['passwd']) || !isset($_POST['passwd_confirm'])) {
             return <<<HTML
                     <p>Erreur : Les champs ne peuvent pas être vides</p>
                     <a href="?action=add-user">Retour à l'inscription</a>
@@ -59,8 +59,21 @@ class AddUserAction extends Action {
                     HTML;
         }
 
+        if (count($passwd) <= 10) {
+            return <<<HTML
+                    <p>Les mots de passe doivent faire au moins 10 caractères</p>
+                    <a href="?action=add-user">Retour à l'inscription</a>
+            HTML;
+        }
+
         try {
             $user = AuthnProvider::register($email, $passwd);
+
+            return <<<HTML
+                <p>Connexion réussie</p>
+                <p>Bienvenue {$user->getMail()}</p>
+            HTML;
+
 
             $_SESSION['user'] = $user;
         } catch (AuthnException $e) {
