@@ -17,4 +17,8 @@
 #composer
 *.lock
 
+/vendor/
+
+**/.ini
+
 **/.git
