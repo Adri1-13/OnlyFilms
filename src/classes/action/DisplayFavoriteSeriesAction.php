@@ -11,6 +11,9 @@ use iutnc\onlyfilms\Repository\OnlyFilmsRepository;
 class DisplayFavoriteSeriesAction extends Action
 {
 
+
+    // TODO : peut etre suppr classe entiere
+
     public function executeGet(): string
     {
         if (!AuthnProvider::isSignedIn()) {
