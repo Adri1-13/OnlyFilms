@@ -13,8 +13,8 @@ class SignInAction extends Action {
     {
         return <<<HTML
             <form method="POST" action="?action=signin">
-                <label for="email">Email</label>
-                <input type="email" name="email" required>
+                <label for="mail">Email</label>
+                <input type="email" name="mail" required>
                 
                 <label for="passwd">Mot de passe</label>
                 <input type="password" name="passwd" required>
@@ -27,31 +27,32 @@ class SignInAction extends Action {
 
     public function executePost(): string
     {
-        if (!isset($_POST['email']) || !isset($_POST['passwd'])) {
+        if (!isset($_POST['mail']) || !isset($_POST['passwd'])) {
             return <<<HTML
                 <h2>Tous les champs sont obligatoires dans la page de connexion</h2>
                 <a href="?action=signin"><button>Réesayer</button></a>
             HTML;
         }
 
-        $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
+        $mail = filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL);
         $mdp = $_POST['passwd'];
 
-        if ($email === false) {
+        if ($mail === false) {
             return <<<HTML
                 <h2>Email invalide</h2>
-                <a href="?action=signin"><button>Réesayer</button></a>
+                <a href="?action=signin">Réesayer</a>
             HTML;
         }
 
         try {
-            $user = AuthnProvider::signIn($email, $mdp);
+            $user = AuthnProvider::signIn($mail, $mdp);
 
             $_SESSION['user'] = $user;
 
             return <<<HTML
                 <p>Connexion réussie</p>
                 <p>Bienvenue {$user->getMail()}</p>
+                <a href="?action=default">Aller à l'accueil</a>
             HTML;
 
         } catch (AuthnException $e) {

@@ -9,7 +9,7 @@ class User {
     private int $id;
     private string $firstname;
     private string $name;
-    private string $email;
+    private string $mail;
     private string $passwd;
     private int $role;
 
@@ -32,14 +32,14 @@ class User {
         $this->id = $id;
     }
 
-    public function getEmail(): string
+    public function getMail(): string
     {
-        return $this->email;
+        return $this->mail;
     }
 
     public function setMail(string $mail): void
     {
-        $this->email = $email;
+        $this->mail = $mail;
     }
 
     public function getPasswd(): string

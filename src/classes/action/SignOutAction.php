@@ -13,7 +13,9 @@ class SignOutAction extends Action {
     {
 
         if (!AuthnProvider::isSignedIn()) {
-            return '<div>Vous êtes déjà déconnecté</div>';
+            return <<<HTML
+                <div>Vous êtes déjà déconnecté</div>
+            HTML;
         }
         unset($_SESSION['user']);
 
@@ -21,7 +23,10 @@ class SignOutAction extends Action {
 
         return <<<HTML
             <p>Vous êtes déconnecté</p>
+            <a href="?action=default">Aller à l'accueil</a>
+            <a href="?action=signin">Se connecter</a>
         HTML;
+
     }
 
     public function executePost(): string

@@ -26,18 +26,22 @@ class Dispatcher {
     public function run() : void {
 
         switch ($this->actionQuery) {
+            case 'signin':
+                $action = new SignInAction();
+                break;
             case 'add-user':
                 $action = new AddUserAction();
                 break;
             case 'signout':
                 $action = new SignOutAction();
                 break;
-            case 'signin':
-                $action = new SignInAction();
-                break;
             case 'catalog':
                 $action = new DisplayCatalogueAction();
                 break;
+            case 'in-progress':
+                // TODO : séries du user en cours
+            case 'favourite-series':
+
             case 'default':
             default:
                 $action = new DefaultAction();

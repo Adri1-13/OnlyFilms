@@ -15,16 +15,31 @@ class AddUserAction extends Action {
         return <<<HTML
             <h1>Créer un compte</h1>
             <form method="POST" action="?action=add-user">
-            
-                    <label for="email">Email</label>
-                    <input type="email" name="email" required>
-                    
+                <div>
+                    <label for="firstname">Prénom</label>
+                    <input type="text" name="firstname" required>
+                </div>
+                
+                <div>
+                    <label for="name">Nom</label>
+                    <input type="text" name="name" required>
+                </div>
+                
+                <div>
+                    <label for="mail">Email</label>
+                    <input type="email" name="mail" required>
+                </div>
+                
+                <div>
                     <label for="passwd">Mot de passe (minimum 10 caractères)</label>
-                    <input type="password" name="passwd">
-                    
+                    <input type="password" name="passwd" required minlength="10">
+                </div>
+                
+                <div>
                     <label for="passwd_confirm">Confirmer le mot de passe</label>
-                    <input type="password" name="passwd_confirm">
-                    
+                    <input type="password" name="passwd_confirm" required minlength="10">
+                </div>
+                
                 <button type="submit">S'inscrire</button>
             </form>
         HTML;
@@ -32,16 +47,19 @@ class AddUserAction extends Action {
 
     public function executePost(): string
     {
-        if (!isset($_POST['email']) || !isset($_POST['passwd']) || !isset($_POST['passwd_confirm'])) {
+        if (!isset($_POST['mail']) || !isset($_POST['passwd']) || !isset($_POST['passwd_confirm']) || !isset($_POST['firstname']) || !isset($_POST['name'])) {
             return <<<HTML
-                    <p>Erreur : Les champs ne peuvent pas être vides</p>
+                    <p>Erreur : Tous les champs sont obligatoires</p>
                     <a href="?action=add-user">Retour à l'inscription</a>
                     HTML;
         }
 
-        $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
+        $mail = filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL);
+        $firstname = htmlspecialchars(trim($_POST['firstname']));
+        $name = htmlspecialchars(trim($_POST['name']));
 
-        if ($email === false) {
+
+        if ($mail === false) {
             return <<<HTML
                     <p>Email incorrect</p>
                     <a href="?action=add-user">Retour à l'inscription</a>
@@ -59,23 +77,23 @@ class AddUserAction extends Action {
                     HTML;
         }
 
-        if (count($passwd) <= 10) {
+        if (strlen($passwd) <= 10) {
             return <<<HTML
-                    <p>Les mots de passe doivent faire au moins 10 caractères</p>
+                    <p>Le mot de passe doit faire au moins 10 caractères</p>
                     <a href="?action=add-user">Retour à l'inscription</a>
             HTML;
         }
 
         try {
-            $user = AuthnProvider::register($email, $passwd);
+            $user = AuthnProvider::register($mail, $passwd, $name, $firstname);
+            $_SESSION['user'] = $user;
 
             return <<<HTML
                 <p>Connexion réussie</p>
                 <p>Bienvenue {$user->getMail()}</p>
+                <a href="?action=default">Aller à l'accueil</a>
             HTML;
 
-
-            $_SESSION['user'] = $user;
         } catch (AuthnException $e) {
             return <<<HTML
                      <p>Erreur lors de l'inscription, {$e->getMessage()}</p>
