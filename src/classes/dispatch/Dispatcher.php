@@ -9,6 +9,7 @@ use iutnc\onlyfilms\action\SignOutAction;
 use iutnc\onlyfilms\action\DefaultAction;
 use iutnc\onlyfilms\action\SignInAction;
 use iutnc\onlyfilms\action\DisplayCatalogueAction;
+use iutnc\onlyfilms\action\InProgressSeriesAction;
 
 class Dispatcher {
 
@@ -39,7 +40,8 @@ class Dispatcher {
                 $action = new DisplayCatalogueAction();
                 break;
             case 'in-progress':
-                // TODO : séries du user en cours
+                $action = new InProgressSeriesAction();
+                break;
             case 'favourite-series':
 
             case 'default':
