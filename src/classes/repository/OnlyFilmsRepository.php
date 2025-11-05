@@ -168,6 +168,7 @@ public function findSeriesByUserId(int $userId): array {
             $r['summary'] ?? '',
             (int)$r['duration'],
             $r['file'] ?? '',
+            $r['img'],
             (int)$r['series_id']
         );
     }
