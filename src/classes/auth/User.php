@@ -9,13 +9,13 @@ class User {
     private int $id;
     private string $firstname;
     private string $name;
-    private string $email;
+    private string $mail;
     private string $passwd;
     private int $role;
 
-    public function __construct(int $id, string $email, string $passwd, int $role) {
+    public function __construct(int $id, string $mail, string $passwd, int $role) {
         $this->id = $id;
-        $this->email = $email;
+        $this->mail = $mail;
         $this->passwd = $passwd;
         $this->role = $role;
     }
@@ -32,12 +32,12 @@ class User {
 
     public function getEmail(): string
     {
-        return $this->email;
+        return $this->mail;
     }
 
-    public function setEmail(string $email): void
+    public function setEmail(string $mail): void
     {
-        $this->email = $email;
+        $this->mail = $mail;
     }
 
     public function getPasswd(): string

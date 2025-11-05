@@ -61,12 +61,12 @@ class OnlyFilmsRepository {
         /* =================== USER =================== */
 
 
-    function findUser(string $email) : User | null {
-        $requete = "SELECT id, email, passwd, role FROM user WHERE email = ?";
+    function findUser(string $mail) : User | null {
+        $requete = "SELECT id, mail, passwd, role FROM user WHERE mail = ?";
 
         $stmt = $this->pdo->prepare($requete);
 
-        $stmt->execute([$email]);
+        $stmt->execute([$mail]);
 
         $ligne = $stmt->fetch(\PDO::FETCH_ASSOC); // normalement on a une unique ligne par user
 
@@ -74,19 +74,19 @@ class OnlyFilmsRepository {
             return null;
         }
 
-        return new User($ligne['id'], $ligne['email'], $ligne['passwd'], $ligne['role']);
+        return new User($ligne['id'], $ligne['mail'], $ligne['passwd'], $ligne['role']);
 
     }
 
-    function addUser(string $email, string $passwd, int $role) : User {
-        $requete = "INSERT INTO user(email, passwd, role) VALUES (?,?,?)";
+    function addUser(string $mail, string $passwd, int $role) : User {
+        $requete = "INSERT INTO user(mail, passwd, role) VALUES (?,?,?)";
 
         $stmt = $this->pdo->prepare($requete);
-        $stmt->execute([$email, $passwd, $role]);
+        $stmt->execute([$mail, $passwd, $role]);
 
         $nouvID = $this->pdo->lastInsertId();
 
-        return new User((int)$nouvID, $email, $passwd, $role);
+        return new User((int)$nouvID, $mail, $passwd, $role);
     }
     
     /* =================== SERIES =================== */
@@ -228,7 +228,7 @@ public function addComment(int $userId, int $serieId, string $comment, int $note
         $stmt->execute([$userId, $serieId]);
     }
 
-    public function isInFavList(int $userId, int $serieId): boolean {
+    public function isInFavList(int $userId, int $serieId): bool {
         $stmt = $this->pdo->prepare("SELECT * FROM like_list WHERE user_id = ? AND series_id = ?");
         $stmt->execute([$userId, $serieId]);
         $rows = $stmt->fetchAll();
