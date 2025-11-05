@@ -35,8 +35,8 @@ class DefaultAction extends Action
         // Sinon, affichage pour visiteur
         return <<<HTML
             <h1>Bienvenue sur NetVOD </h1>
-            <p>Explorez notre catalogue de séries en vous <a href="?action=signin">connectant</a>
-            ou en <a href="?action=add-user">créant un compte</a></p>
+            <p>Explorez notre catalogue de séries en vous connectant <a href="?action=signin"></a>
+            ou en créant un compte <a href="?action=add-user"></a></p>
         HTML;
     }
 

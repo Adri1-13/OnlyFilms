@@ -49,11 +49,8 @@ class SignInAction extends Action {
 
             $_SESSION['user'] = $user;
 
-            return <<<HTML
-                <p>Connexion réussie</p>
-                <p>Bienvenue {$user->getMail()}</p>
-                <a href="?action=default">Aller à l'accueil</a>
-            HTML;
+            header('Location: ?action=default');
+            exit();
 
         } catch (AuthnException $e) {
             return <<<HTML

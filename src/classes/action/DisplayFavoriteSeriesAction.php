@@ -14,10 +14,8 @@ class DisplayFavoriteSeriesAction extends Action
     public function executeGet(): string
     {
         if (!AuthnProvider::isSignedIn()) {
-            return <<<HTML
-                <h2>Vous devez être connecté pour voir vos séries favorites</h2>
-                <a href="?action=signin">Se connecter</a>
-            HTML;
+            header('Location:');
+            exit();
         }
 
         try {
