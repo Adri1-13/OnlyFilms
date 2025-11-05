@@ -15,8 +15,7 @@ class DefaultAction extends Action
         // Si l’utilisateur est connecté
         if (isset($_SESSION['user'])) {
             $user = $_SESSION['user'];
-            $firstName = htmlspecialchars($user->getFirstName());
-            $mail = htmlspecialchars($user->getMail());
+            $firstName = htmlspecialchars($user->getFirstname());
 
             // TODO : modifis actions en fonction de leurs vrais noms
             return <<<HTML
@@ -37,7 +36,7 @@ class DefaultAction extends Action
         return <<<HTML
             <h1>Bienvenue sur NetVOD </h1>
             <p>Explorez notre catalogue de séries en vous <a href="?action=signin">connectant</a>
-            ou en <a href="?action=register">créant un compte</a></p>
+            ou en <a href="?action=add-user">créant un compte</a></p>
         HTML;
     }
 

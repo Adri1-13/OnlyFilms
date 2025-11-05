@@ -36,7 +36,7 @@ class AuthnProvider {
             throw new AuthnException("Cet utilisateur existe déjà");
         }
 
-        if (strlen($passwd) < 10) {
+        if (strlen($passwd) <= 10) {
             throw new AuthnException("Mot de passe trop court");
         }
 
