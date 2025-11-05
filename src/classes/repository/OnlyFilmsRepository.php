@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace iutnc\onlyfilms\repository;
+namespace iutnc\onlyfilms\Repository;
 
 use iutnc\onlyfilms\exception\OnlyFilmsRepositoryException;
+use iutnc\onlyfilms\auth\User;
 use iutnc\onlyfilms\video\lists\Serie;
 use iutnc\onlyfilms\video\tracks\Episode;
 
@@ -62,7 +63,7 @@ class OnlyFilmsRepository {
 
 
     function findUser(string $mail) : User | null {
-        $requete = "SELECT id, mail, passwd, role FROM user WHERE mail = ?";
+        $requete = "SELECT * FROM user WHERE mail = ?";
 
         $stmt = $this->pdo->prepare($requete);
 
@@ -74,80 +75,80 @@ class OnlyFilmsRepository {
             return null;
         }
 
-        return new User($ligne['id'], $ligne['mail'], $ligne['passwd'], $ligne['role']);
+        return new User($ligne['user_id'], $ligne['firstname'], $ligne['name'], $ligne['mail'], $ligne['password'], $ligne['role']);
 
     }
 
-    function addUser(string $mail, string $passwd, int $role) : User {
-        $requete = "INSERT INTO user(mail, passwd, role) VALUES (?,?,?)";
+    function addUser(string $mail, string $passwd, string $name, string $firstname, int $role) : User {
+        $requete = "INSERT INTO user(mail, password, name, firstname, role) VALUES (?,?,?,?,?)";
 
         $stmt = $this->pdo->prepare($requete);
-        $stmt->execute([$mail, $passwd, $role]);
+        $stmt->execute([$mail, $passwd, $name, $firstname, $role]);
 
         $nouvID = $this->pdo->lastInsertId();
 
-        return new User((int)$nouvID, $mail, $passwd, $role);
+        return new User((int)$nouvID, $firstname, $name, $mail, $passwd, $role);
     }
     
     /* =================== SERIES =================== */
-public function findAllSeries(): array {
-    $stmt = $this->pdo->query("SELECT * FROM series ORDER BY date_added DESC");
-    $rows = $stmt->fetchAll();
+    public function findAllSeries(): array {
+        $stmt = $this->pdo->query("SELECT * FROM series ORDER BY date_added DESC");
+        $rows = $stmt->fetchAll();
 
-    $series = [];
-    foreach ($rows as $r) {
-        $series[] = new Serie(
-            (int)$r['series_id'],
-            $r['title'],
-            $r['description'] ?? '',
-            $r['img'] ?? '',
-            (int)$r['year'],
-            $r['date_added']
+        $series = [];
+        foreach ($rows as $r) {
+            $series[] = new Serie(
+                (int)$r['series_id'],
+                $r['title'],
+                $r['description'] ?? '',
+                $r['img'] ?? '',
+                (int)$r['year'],
+                $r['date_added']
+            );
+        }
+        return $series;
+    }
+
+
+
+    public function findSeriesBySerieId(int $id): ?Serie {
+        $stmt = $this->pdo->prepare("SELECT * FROM series WHERE series_id = ?");
+        $stmt->execute([$id]);
+        $row = $stmt->fetch();
+
+        if ($row === false) return null;
+
+        return new Serie(
+            (int)$row['series_id'],
+            $row['title'],
+            $row['description'] ?? '',
+            $row['img'] ?? '',
+            (int)$row['year'],
+            $row['date_added']
         );
     }
-    return $series;
-}
 
+    public function findSeriesByUserId(int $userId): array {
+        $stmt = $this->pdo->prepare("
+            SELECT s.* FROM series s
+            JOIN Like_list l ON s.series_id = l.series_id
+            WHERE l.user_id = ? ORDER BY s.date_added DESC");
+        $stmt->execute([$userId]);
+        $rows = $stmt->fetchAll();
 
-
-public function findSeriesBySerieId(int $id): ?Serie {
-    $stmt = $this->pdo->prepare("SELECT * FROM series WHERE series_id = ?");
-    $stmt->execute([$id]);
-    $row = $stmt->fetch();
-
-    if ($row === false) return null;
-
-    return new Serie(
-        (int)$row['series_id'],
-        $row['title'],
-        $row['description'] ?? '',
-        $row['img'] ?? '',
-        (int)$row['year'],
-        $row['date_added']
-    );
-}
-
-public function findSeriesByUserId(int $userId): array {
-    $stmt = $this->pdo->prepare("
-        SELECT s.* FROM series s
-        JOIN Like_list l ON s.series_id = l.series_id
-        WHERE l.user_id = ? ORDER BY s.date_added DESC");
-    $stmt->execute([$userId]);
-    $rows = $stmt->fetchAll();
-
-    $series = [];
-    foreach ($rows as $r) {
-        $series[] = new Serie(
-            (int)$r['series_id'],
-            $r['title'],
-            $r['description'] ?? '',
-            $r['img'] ?? '',
-            (int)$r['year'],
-            $r['date_added']
-        );
+        $series = [];
+        foreach ($rows as $r) {
+            $series[] = new Serie(
+                (int)$r['series_id'],
+                $r['title'],
+                $r['description'] ?? '',
+                $r['img'] ?? '',
+                (int)$r['year'],
+                $r['date_added']
+            );
+        }
+        return $series;
     }
-    return $series;
-}
 
 
         /* =================== EPISODES =================== */
@@ -160,38 +161,39 @@ public function findSeriesByUserId(int $userId): array {
     $stmt->execute([$seriesId]);
     $rows = $stmt->fetchAll();
 
-    $episodes = [];
-    foreach ($rows as $r) {
-        $episodes[] = new Episode(
-            (int)$r['episode_id'],
-            (int)$r['num'],
-            $r['title'],
-            $r['summary'] ?? '',
-            (int)$r['duration'],
-            $r['file'] ?? '',
-            $r['img'],
-            (int)$r['series_id']
-        );
+        $episodes = [];
+        foreach ($rows as $r) {
+            $episodes[] = new Episode(
+                (int)$r['episode_id'],
+                (int)$r['num'],
+                $r['title'],
+                $r['summary'] ?? '',
+                (int)$r['duration'],
+                $r['file'] ?? '',
+                $r['img'],
+                (int)$r['series_id']
+            );
+        }
+        if (!empty($episodes)) {
+            throw new \Exception("Aucun épisode associé a cette série");
+        }
+        return $episodes;
     }
-    if (!empty($episodes)) {
-        throw new OnlyFilmsRepositoryException("Aucun épisode associé a cette série");
-    }
-    return $episodes;
-}
-public function addComment(int $userId, int $serieId, string $comment, int $note): void
-{
-    $stmt = $this->pdo->prepare("
-        INSERT INTO commentary (user_id, series_id, text, date_added)
-        VALUES (?, ?, ?, NOW())
-    ");
-    $stmt->execute([$userId, $serieId, $comment]);
 
-    $stmt = $this->pdo->prepare("
-        INSERT INTO notation (user_id, series_id, note, date_added)
-        VALUES (?, ?, ?, NOW())
-    ");
-    $stmt->execute([$userId, $serieId, $note]);
-}
+    public function addComment(int $userId, int $serieId, string $comment, int $note): void
+    {
+        $stmt = $this->pdo->prepare("
+            INSERT INTO commentary (user_id, series_id, text, date_added)
+            VALUES (?, ?, ?, NOW())
+        ");
+        $stmt->execute([$userId, $serieId, $comment]);
+
+        $stmt = $this->pdo->prepare("
+            INSERT INTO notation (user_id, series_id, note, date_added)
+            VALUES (?, ?, ?, NOW())
+        ");
+        $stmt->execute([$userId, $serieId, $note]);
+    }
 
     /**
      * @throws OnlyFilmsRepositoryException

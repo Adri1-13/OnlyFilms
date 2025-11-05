@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace iutnc\onlyfilms\dispatch;
 
-use iutnc\onlyfilms\action\AddFavAction;
 use iutnc\onlyfilms\action\AddUserAction;
-use iutnc\onlyfilms\action\DisplayEpisodeAction;
 use iutnc\onlyfilms\action\SignOutAction;
 use iutnc\onlyfilms\action\DefaultAction;
 use iutnc\onlyfilms\action\SignInAction;
@@ -37,14 +35,8 @@ class Dispatcher {
             case 'signin':
                 $action = new SignInAction();
                 break;
-            case 'add-fav':
-                $action = new AddFavAction();
-                break;
             case 'catalog':
                 $action = new DisplayCatalogueAction();
-                break;
-            case 'display-episode':
-                $action = new DisplayEpisodeAction();
                 break;
             case 'default':
             default:
