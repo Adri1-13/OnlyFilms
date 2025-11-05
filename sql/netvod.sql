@@ -35,7 +35,7 @@ CREATE TABLE `series` (
     `img` VARCHAR(100) DEFAULT NULL,
     `year` INT(4) DEFAULT NULL,
     `date_added` DATE NOT NULL,
-    PRIMARY KEY (`series_id`),
+    PRIMARY KEY (`series_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
