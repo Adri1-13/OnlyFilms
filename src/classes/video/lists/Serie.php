@@ -12,6 +12,7 @@ class Serie implements Renderer {
     private string $image;
     private int $year;
     private string $dateAdded; // format 'YYYY-MM-DD'
+    private array $episodes;
 
     public function __construct (
         int $id,
@@ -27,6 +28,11 @@ class Serie implements Renderer {
         $this->image = $image;
         $this->year = $year;
         $this->dateAdded = $dateAdded;
+        $this->episodes=[];
+    }
+
+    public function addEpisode(Episode $episode) : void {
+        $this->episodes[] = $episode;
     }
 
     public function render(int $selector): string
@@ -44,15 +50,16 @@ class Serie implements Renderer {
                 break;
 
             case self::LONG:
-                //on récupere tab des épisodes
-                $repo = OnlyFilmsRepository::getInstance();
-                $episodes = $repo->findEpisodesBySeriesId($this->getId());
+
+//                //on récupere tab des épisodes
+//                $repo = OnlyFilmsRepository::getInstance();
+//                $episodes = $repo->findEpisodesBySeriesId($this->getId());
                 $html = <<<HTML
                             <div class="serie long">
                                 <h2>{$this->getTitle()}</h2>
                                 <p>{$this->getDescription()}<p/>
                             HTML;
-                foreach ($episodes as $episode) {
+                foreach ($this->episodes as $episode) {
                     $HTML .= $episode->render(self::COMPACT);
                 }
                 $html .= '</div>';

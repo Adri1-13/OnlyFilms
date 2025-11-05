@@ -150,8 +150,11 @@ public function findSeriesByUserId(int $userId): array {
 
 
         /* =================== EPISODES =================== */
-    
-public function findEpisodesBySeriesId(int $seriesId): array {
+
+    /**
+     * @throws \Exception
+     */
+    public function findEpisodesBySeriesId(int $seriesId): array {
     $stmt = $this->pdo->prepare("SELECT * FROM episode WHERE series_id = ? ORDER BY num ASC");
     $stmt->execute([$seriesId]);
     $rows = $stmt->fetchAll();
@@ -167,6 +170,9 @@ public function findEpisodesBySeriesId(int $seriesId): array {
             $r['file'] ?? '',
             (int)$r['series_id']
         );
+    }
+    if (!empty($episodes)) {
+        throw new \Exception("Aucun épisode associé a cette série");
     }
     return $episodes;
 }

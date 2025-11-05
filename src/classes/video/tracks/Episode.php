@@ -12,6 +12,7 @@ class Episode implements Renderer {
     private ?string $summary = null;
     private int $duration = 0;
     private ?string $file = null;
+    private ?string $img = null;
     private ?int $seriesId = null;
 
     /**
@@ -23,7 +24,7 @@ class Episode implements Renderer {
      * @param string|null $file
      * @param int|null $seriesId
      */
-    public function __construct(int $id, int $number, string $title, ?string $summary, int $duration, ?string $file, ?int $seriesId)
+    public function __construct(int $id, int $number, string $title, ?string $summary, int $duration, ?string $file, ?string $img,?int $seriesId)
     {
         $this->id = $id;
         $this->number = $number;
