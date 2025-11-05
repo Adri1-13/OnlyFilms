@@ -9,8 +9,10 @@ use iutnc\onlyfilms\Repository\OnlyFilmsRepository;
 
 session_start();
 
-//OnlyFilmsRepository::setConfig('netvod.db.ini');
+OnlyFilmsRepository::setConfig('netvod.db.ini');
 
 $dispatcher = new Dispatcher();
 
 $dispatcher->run();
+
+?>

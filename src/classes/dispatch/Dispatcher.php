@@ -8,6 +8,7 @@ use iutnc\onlyfilms\action\AddUserAction;
 use iutnc\onlyfilms\action\SignOutAction;
 use iutnc\onlyfilms\action\DefaultAction;
 use iutnc\onlyfilms\action\SignInAction;
+use iutnc\onlyfilms\action\DisplayCatalogueAction;
 
 class Dispatcher {
 
@@ -33,6 +34,9 @@ class Dispatcher {
                 break;
             case 'signin':
                 $action = new SignInAction();
+                break;
+            case 'catalog':
+                $action = new DisplayCatalogueAction();
                 break;
             case 'default':
             default:

@@ -3,80 +3,85 @@
 ' Définition des tables
 
 entity "user" as User {
-  + **user_id (PK)** : int(11)
-  --
-  mail : varchar(100) [UNIQUE]
-  password : varchar(100)
-  name : varchar(100)
-  firstname : varchar(100)
-  role : int(11)
+    + **user_id (PK)** : int(11)
+    --
+    mail : varchar(100) [UNIQUE]
+    password : varchar(100)
+    name : varchar(100)
+    firstname : varchar(100)
+    role : int(11)
 }
 
 entity "series" as Series {
-  + **series_id (PK)** : int(11)
-  --
-  title : varchar(100)
-  description : text
-  img : varchar(100)
-  year : int(4)
-  date_added : date
-  --
-  # genre_id (FK) : int(11)
+    + **series_id (PK)** : int(11)
+    --
+    title : varchar(100)
+    description : text
+    img : varchar(100)
+    year : int(4)
+    date_added : date
 }
 
 entity "episode" as Episode {
-  + **episode_id (PK)** : int(11)
-  --
-  num : int(11)
-  title : varchar(100)
-  summary : text
-  duration : int(11)
-  file : varchar(100)
-  img : varchar(100)
-  --
-  # series_id (FK) : int(11)
+    + **episode_id (PK)** : int(11)
+    --
+    num : int(11)
+    title : varchar(100)
+    summary : text
+    duration : int(11)
+    file : varchar(100)
+    img : varchar(100)
+    --
+    # series_id (FK) : int(11)
 }
 
 entity "genre" as Genre {
-  + **genre_id (PK)** : int(11)
-  --
-  name : varchar(100) [UNIQUE]
+    + **genre_id (PK)** : int(11)
+    --
+    name : varchar(100) [UNIQUE]
 }
 
 ' Tables d'association
 
 entity "commentary" as Commentary {
-  + **user_id (PK, FK)** : int(11)
-  + **series_id (PK, FK)** : int(11)
-  --
-  text : text
-  date_added : datetime
+    + **user_id (PK, FK)** : int(11)
+    + **series_id (PK, FK)** : int(11)
+    --
+    text : text
+    date_added : datetime
 }
 
 entity "notation" as Notation {
-  + **user_id (PK, FK)** : int(11)
-  + **series_id (PK, FK)** : int(11)
-  --
-  note : int(1)
-  date_added : datetime
+    + **user_id (PK, FK)** : int(11)
+    + **series_id (PK, FK)** : int(11)
+    --
+    note : int(1)
+    date_added : datetime
 }
 
 entity "like_list" as LikeList {
-  + **user_id (PK, FK)** : int(11)
-  + **series_id (PK, FK)** : int(11)
+    + **user_id (PK, FK)** : int(11)
+    + **series_id (PK, FK)** : int(11)
 }
 
 entity "watch_episode" as WatchEpisode {
-  + **user_id (PK, FK)** : int(11)
-  + **episode_id (PK, FK)** : int(11)
-  --
-  viewing_date : datetime
+    + **user_id (PK, FK)** : int(11)
+    + **episode_id (PK, FK)** : int(11)
+    --
+    viewing_date : datetime
 }
 
+entity "watching_episode" as WatchingEpisode {
+    + **user_id (PK, FK)** : int(11)
+    + **episode_id (PK, FK)** : int(11)
+    --
+    time : int(11)
+}
 
-' Définition des relations
-Genre -- Series : "concerne 0..N"
-
+entity "genre_series" as GenreSeries {
+    + **genre_id (PK, FK)** : int(11)
+    + **series_id (PK, FK)** : int(11)
+}
 
 ' Tables de liaison
 User -- Commentary : "écrit 0..N"
@@ -91,5 +96,10 @@ Series -- LikeList : "est préféré par 0..N"
 User -- WatchEpisode : "visionne 0..N"
 Episode -- WatchEpisode : "est visionné par 0..N"
 
+User -- WatchingEpisode : "visionne 0..N"
+Episode -- WatchingEpisode : "est visionné par 0..N"
+
+Series -- GenreSeries : "possède 0..N"
+GenreSeries -- Genre : "est visionné par 0..N"
 
 @enduml
