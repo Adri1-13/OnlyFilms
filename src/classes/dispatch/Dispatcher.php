@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace iutnc\onlyfilms\dispatch;
 
 use iutnc\onlyfilms\action\AddUserAction;
-use iutnc\onlyfilms\action\DisplayEpisodeAction;
-use iutnc\onlyfilms\action\DisplaySerieAction;
+use iutnc\onlyfilms\action\DisplayFavoriteAction;
 use iutnc\onlyfilms\action\SignOutAction;
 use iutnc\onlyfilms\action\DefaultAction;
 use iutnc\onlyfilms\action\SignInAction;
 use iutnc\onlyfilms\action\DisplayCatalogueAction;
 use iutnc\onlyfilms\action\InProgressSeriesAction;
+use iutnc\onlyfilms\auth\AuthnProvider;
+use iutnc\onlyfilms\Repository\OnlyFilmsRepository;
 
 class Dispatcher {
 
@@ -27,35 +28,54 @@ class Dispatcher {
 
 
     public function run() : void {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
 
-        switch ($this->actionQuery) {
-            case 'signin':
-                $action = new SignInAction();
-                break;
-            case 'add-user':
-                $action = new AddUserAction();
-                break;
-            case 'signout':
-                $action = new SignOutAction();
-                break;
-            case 'catalog':
-                $action = new DisplayCatalogueAction();
-                break;
-            case 'display-episode':
-                $action = new DisplayEpisodeAction();
-                break;
-            case 'display-serie':
-                $action = new DisplaySerieAction();
-            case 'in-progress':
-                $action = new InProgressSeriesAction();
-                break;
-            case 'view-favorites':
-                $action = new DisplayFavoriteAction();
-                break;
-            case 'default':
-            default:
-                $action = new DefaultAction();
-                break;
+        if (!AuthnProvider::isSignedIn()) {
+            switch ($this->actionQuery) {
+                case 'signin':
+                    $action = new SignInAction();
+                    break;
+                case 'add-user':
+                    $action = new AddUserAction();
+                    break;
+                case 'default':
+                default:
+                    $action = new DefaultAction();
+                    break;
+            }
+        } else {
+            switch ($this->actionQuery) {
+                case 'signin':
+                    $action = new SignInAction();
+                    break;
+                case 'add-user':
+                    $action = new AddUserAction();
+                    break;
+                case 'signout':
+                    $action = new SignOutAction();
+                    break;
+                case 'catalog':
+                    $action = new DisplayCatalogueAction();
+                    break;
+                case 'in-progress':
+                    $action = new InProgressSeriesAction();
+                    break;
+                case 'view-favorites':
+                    $action = new DisplayFavoriteAction();
+                    break;
+                case 'display-episode':
+                    $action = new DisplayEpisodeAction();
+                    break;
+                case 'display-serie':
+                    $action = new DisplaySerieAction();
+                    break;
+                case 'default':
+                default:
+                    $action = new DefaultAction();
+                    break;
+            }
         }
 
         $htmlres = $action->execute();
