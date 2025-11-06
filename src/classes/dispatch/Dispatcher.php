@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace iutnc\onlyfilms\dispatch;
 
+use iutnc\onlyfilms\action\AddFavAction;
 use iutnc\onlyfilms\action\AddUserAction;
 use iutnc\onlyfilms\action\DisplayEpisodeAction;
-use iutnc\onlyfilms\action\DisplayFavoriteAction;
 use iutnc\onlyfilms\action\DisplaySerieAction;
 use iutnc\onlyfilms\action\SignOutAction;
 use iutnc\onlyfilms\action\DefaultAction;
@@ -49,12 +49,6 @@ class Dispatcher {
             }
         } else {
             switch ($this->actionQuery) {
-                case 'signin':
-                    $action = new SignInAction();
-                    break;
-                case 'add-user':
-                    $action = new AddUserAction();
-                    break;
                 case 'signout':
                     $action = new SignOutAction();
                     break;
@@ -64,8 +58,8 @@ class Dispatcher {
                 case 'in-progress':
                     $action = new InProgressSeriesAction();
                     break;
-                case 'view-favorites':
-                    $action = new DisplayFavoriteAction();
+                case 'add-fav':
+                    $action = new AddFavAction();
                     break;
                 case 'display-episode':
                     $action = new DisplayEpisodeAction();
