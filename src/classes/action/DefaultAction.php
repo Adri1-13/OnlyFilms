@@ -21,7 +21,7 @@ class DefaultAction extends Action
             $firstName = htmlspecialchars($user->getFirstname());
 
             $repo = OnlyFilmsRepository::getInstance();
-            $favouriteSeries = $repo->findFavoriteSeriesByUserID($user->getId());
+            $favouriteSeries = $repo->getUserFavouriteSeries($user->getId());
 
              $htmlres = <<<HTML
                 <h1>Bienvenue sur OnlyFilms, {$firstName} !</h1>
@@ -36,7 +36,7 @@ class DefaultAction extends Action
                 <h2>Vos séries préférées :</h2>
             HTML;
 
-            if (empty($favouritesSeries)) {
+            if (empty($favouriteSeries)) {
                 $htmlres .= <<<HTML
                     <p>Vous n'avez pas encore ajouté de séries à vos favoris</p>
                     <p><a href="?action=catalog">Découvrir le catalogue</a></p>
@@ -44,7 +44,7 @@ class DefaultAction extends Action
 
             } else {
                 // TODO : voir si mettre une div ici pour que l'affichage soit mieux
-                foreach ($favouritesSeries as $serie) {
+                foreach ($favouriteSeries as $serie) {
                     $htmlres .= <<<HTML
                         <p>{$serie->render(Renderer::COMPACT)}</p>
                     HTML;

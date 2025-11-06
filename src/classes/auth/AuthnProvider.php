@@ -38,22 +38,21 @@ class AuthnProvider {
     public static function register(string $mail, string $passwd, string $name, string $firstname) : User {
 
         $repo = OnlyFilmsRepository::getInstance();
-        $user = $repo->findUser($mail);
-
-        if ($user !== null) {
-            throw new AuthnException("Cet utilisateur existe déjà");
-        }
 
         if (strlen($passwd) < 10) {
             throw new AuthnException("Mot de passe trop court");
         }
 
+        if ($repo->userExists($mail)) {
+            throw new AuthnException("Cet utilisateur existe déjà");
+        }
+
         $mdpChiffre = password_hash($passwd, PASSWORD_BCRYPT, ['cost' => 12]);
 
-        // CORRECTION : Passer les paramètres dans le bon ordre (mail, passwd, name, firstname, role)
         $nouvUser = $repo->addUser($mail, $mdpChiffre, $name, $firstname, 1);
 
         return $nouvUser;
+
     }
 
     public static function getSignedInUser() : User {
