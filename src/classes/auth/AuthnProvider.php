@@ -5,21 +5,29 @@ declare(strict_types=1);
 namespace iutnc\onlyfilms\auth;
 
 use iutnc\onlyfilms\exception\AuthnException;
+use iutnc\onlyfilms\exception\OnlyFilmsRepositoryException;
 use iutnc\onlyfilms\Repository\OnlyFilmsRepository;
 
 class AuthnProvider {
 
+    /**
+     * @throws AuthnException
+     */
     public static function signIn(string $mail, string $passwd) : User {
         $repo = OnlyFilmsRepository::getInstance();
-        $user = $repo->findUser($mail);
 
-        if ($user === null) {
+        try {
+            $user = $repo->findUser($mail);
+        } catch (OnlyFilmsRepositoryException $e) {
             throw new AuthnException("Email ou mot de passe incorrect");
         }
+
 
         if (!password_verify($passwd, $user->getPasswd())) { // compare le mdp pas chiffré que rentre l'utilisateur avec celui qui est enregistré dans la bdd sur cet utilisateur
             throw new AuthnException("Email ou mot de passe incorrect");
         }
+
+        $_SESSION['user'] = $user;
 
         return $user;
     }

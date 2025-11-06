@@ -45,9 +45,7 @@ class SignInAction extends Action {
         }
 
         try {
-            $user = AuthnProvider::signIn($mail, $mdp);
-
-            $_SESSION['user'] = $user;
+            AuthnProvider::signIn($mail, $mdp);
 
             header('Location: ?action=default');
             exit();

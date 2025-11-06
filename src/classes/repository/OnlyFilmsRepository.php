@@ -62,6 +62,9 @@ class OnlyFilmsRepository {
         /* =================== USER =================== */
 
 
+    /**
+     * @throws OnlyFilmsRepositoryException
+     */
     function findUser(string $mail) : User | null {
         $requete = "SELECT * FROM user WHERE mail = ?";
 
@@ -72,7 +75,7 @@ class OnlyFilmsRepository {
         $ligne = $stmt->fetch(\PDO::FETCH_ASSOC); // normalement on a une unique ligne par user
 
         if ($ligne === false) {
-            return null;
+            throw new OnlyFilmsRepositoryException("Aucun utilisateur trouvé");
         }
 
         return new User($ligne['user_id'], $ligne['firstname'], $ligne['name'], $ligne['mail'], $ligne['password'], $ligne['role']);

@@ -86,9 +86,8 @@ class AddUserAction extends Action {
 
         try {
             $user = AuthnProvider::register($mail, $passwd, $name, $firstname);
-            $_SESSION['user'] = $user;
 
-            header('Location: ?action=default');
+            header('Location: ?action=signin');
             exit();
 
         } catch (AuthnException $e) {
