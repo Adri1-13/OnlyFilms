@@ -210,7 +210,7 @@ public function findSeriesByUserId(int $userId): array {
                 (int) $r['series_id']
             );
         }
-        if (!empty($episodes)) {
+        if (empty($episodes)) {
             throw new \Exception("Aucun épisode associé a cette série");
         }
         return $episodes;
@@ -236,7 +236,6 @@ public function findSeriesByUserId(int $userId): array {
      */
     public function findEpisodeById(int $id): Episode
     {
-
         if ($id < 0) {
             throw new OnlyFilmsRepositoryException("Id doit etre positif");
         }
@@ -322,7 +321,7 @@ public function findSeriesByUserId(int $userId): array {
             $lastEpisodeId = (int) $stLastEp->fetchColumn();
 
             // 4) Objets avec méthodes existantes
-            $serieObj = $this->findSeriesBySerieId($seriesId);
+            $serieObj = $this->findSerieBySerieId($seriesId);
             if ($serieObj === null)
                 continue;
 
