@@ -46,9 +46,8 @@ class SignInAction extends Action {
 
         try {
             AuthnProvider::signIn($mail, $mdp);
-
-            header('Location: ?action=default');
-            exit();
+            $action = new DisplayCatalogueAction();
+            return $action->execute();
 
         } catch (AuthnException $e) {
             return <<<HTML
