@@ -109,22 +109,37 @@ public function findAllSeries(): array {
 }
 
 
+    /**
+     * @throws OnlyFilmsRepositoryException
+     */
+    public function findSerieBySerieId(int $id): Serie {
 
-public function findSeriesBySerieId(int $id): ?Serie {
+    if ($id < 0) {
+        throw new OnlyFilmsRepositoryException('Id doit être positif');
+    }
     $stmt = $this->pdo->prepare("SELECT * FROM series WHERE series_id = ?");
     $stmt->execute([$id]);
     $row = $stmt->fetch();
 
-    if ($row === false) return null;
+    if (empty($row)) {
+        throw new OnlyFilmsRepositoryException('Serie introuvable');
+    }
 
-    return new Serie(
-        (int)$row['series_id'],
-        $row['title'],
-        $row['description'] ?? '',
-        $row['img'] ?? '',
-        (int)$row['year'],
-        $row['date_added']
-    );
+        try {
+            $episodes = $this->findEpisodesBySeriesId($id);
+        } catch (\Exception $e) {
+            throw new OnlyFilmsRepositoryException('Echec récupération liste épisodes');
+        }
+
+        return new Serie(
+            (int)$row['series_id'],
+            $row['title'],
+            $row['description'] ?? '',
+            $row['img'] ?? '',
+            (int)$row['year'],
+            $row['date_added'],
+            $episodes
+        );
 }
 
 public function findSeriesByUserId(int $userId): array {
@@ -173,7 +188,7 @@ public function findSeriesByUserId(int $userId): array {
             (int)$r['series_id']
         );
     }
-    if (!empty($episodes)) {
+    if (empty($episodes)) {
         throw new OnlyFilmsRepositoryException("Aucun épisode associé a cette série");
     }
     return $episodes;

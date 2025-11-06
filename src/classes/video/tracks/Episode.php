@@ -42,11 +42,11 @@ class Episode implements Renderer {
     public function render(int $selector): string
     {
         switch ($selector) {
-            // COMPACT = Nom + Descrption + Durée
+            // COMPACT = Nom + Description + Durée
             case self::COMPACT :
                 $html = <<<HTML
                 <div class="episode compact">
-                    <h3>Épisode {$this->getNumber()} : {$this->getTitle()}</h3>
+                    <a href='?action=display-episode&episode-id={$this->getId()}'><h3>Épisode {$this->getNumber()} : {$this->getTitle()}</h3></a>
                     <p>{$this->getSummary()}</p>
                     <p>Durée : {$this->getDuration()} min</p>
                 </div>

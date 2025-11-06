@@ -21,7 +21,8 @@ class Serie implements Renderer {
         string $description,
         string $image,
         int $year,
-        string $dateAdded
+        string $dateAdded,
+        ?array $episodes
     ) {
         $this->id = $id;
         $this->title = $title;
@@ -29,11 +30,17 @@ class Serie implements Renderer {
         $this->image = $image;
         $this->year = $year;
         $this->dateAdded = $dateAdded;
-        $this->episodes=[];
+        $this->episodes = $episodes ?? [];
     }
 
     public function addEpisode(Episode $episode) : void {
         $this->episodes[] = $episode;
+    }
+
+    public function addEpisodes(array $episodes): void {
+        foreach ($episodes as $episode) {
+            $this->episodes[] = $episode;
+        }
     }
 
     public function render(int $selector): string
@@ -43,7 +50,7 @@ class Serie implements Renderer {
                 // titre + photo + Année
                 $html = <<<HTML
                 <div class="serie compact">
-                    <img src="images/{$this->getImage()}" alt="Miniature de {$this->getTitle()}">
+                    <a href='?action=display-serie&serie-id={$this->getId()}'><img src="images/{$this->getImage()}" alt="Miniature de {$this->getTitle()}"></a>
                     <h3>{$this->getTitle()}</h3>
                     <p>Année : {$this->getYear()}</p>
                 </div>
