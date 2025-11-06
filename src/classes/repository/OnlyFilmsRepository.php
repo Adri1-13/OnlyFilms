@@ -65,7 +65,7 @@ class OnlyFilmsRepository {
     /**
      * @throws OnlyFilmsRepositoryException
      */
-    function findUser(string $mail) : User | null {
+    function findUser(string $mail) : User | false {
         $requete = "SELECT * FROM user WHERE mail = ?";
 
         $stmt = $this->pdo->prepare($requete);
@@ -82,6 +82,19 @@ class OnlyFilmsRepository {
 
     }
 
+    function userExists(string $mail) : bool {
+        $requete = "SELECT 1 FROM user WHERE mail = ?";
+
+        $stmt = $this->pdo->prepare($requete);
+
+        $stmt->execute([$mail]);
+
+        $ligne = $stmt->fetch(\PDO::FETCH_ASSOC); // normalement on a une unique ligne par user
+
+        return ($ligne === false) ? false : true;
+
+    }
+
     function addUser(string $mail, string $passwd, string $name, string $firstname, int $role) : User {
         $requete = "INSERT INTO user(mail, password, name, firstname, role) VALUES (?,?,?,?,?)";
 
@@ -94,23 +107,23 @@ class OnlyFilmsRepository {
     }
 
     /* =================== SERIES =================== */
-public function findAllSeries(): array {
-    $stmt = $this->pdo->query("SELECT * FROM series ORDER BY date_added DESC");
-    $rows = $stmt->fetchAll();
+    public function findAllSeries(): array {
+        $stmt = $this->pdo->query("SELECT * FROM series ORDER BY date_added DESC");
+        $rows = $stmt->fetchAll();
 
-    $series = [];
-    foreach ($rows as $r) {
-        $series[] = new Serie(
-            (int)$r['series_id'],
-            $r['title'],
-            $r['description'] ?? '',
-            $r['img'] ?? '',
-            (int)$r['year'],
-            $r['date_added'],
-            null
-        );
-    }
-    return $series;
+        $series = [];
+        foreach ($rows as $r) {
+            $series[] = new Serie(
+                (int)$r['series_id'],
+                $r['title'],
+                $r['description'] ?? '',
+                $r['img'] ?? '',
+                (int)$r['year'],
+                $r['date_added'],
+                null
+            );
+        }
+        return $series;
 }
 
 
@@ -348,7 +361,8 @@ public function findSeriesByUserId(int $userId): array {
                 (string) ($r['description'] ?? ''),
                 (string) ($r['img'] ?? ''),
                 (int) $r['year'],
-                (string) $r['date_added']
+                (string) $r['date_added'],
+                null
             );
         }
         return $series;

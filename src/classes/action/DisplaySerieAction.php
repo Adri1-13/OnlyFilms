@@ -27,6 +27,7 @@ class DisplaySerieAction extends Action
             return $serie->render(Renderer::LONG);
 
         } catch (OnlyFilmsRepositoryException $e) {
+            echo $e->getMessage();
             return '<p>ID série incorrecte</p>';
         }
     }
