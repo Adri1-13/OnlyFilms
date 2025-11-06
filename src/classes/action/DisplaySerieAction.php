@@ -24,7 +24,11 @@ class DisplaySerieAction extends Action
         $repo = OnlyFilmsRepository::getInstance();
         try {
             $serie = $repo->findSerieBySerieId($id);
-            return $serie->render(Renderer::LONG);
+            return <<<HTML
+                    {$serie->render(Renderer::LONG)}
+                    <a href="javascript:history.back()">Retour</a>
+                    HTML;
+
 
         } catch (OnlyFilmsRepositoryException $e) {
             //echo $e->getMessage();
