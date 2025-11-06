@@ -46,6 +46,8 @@ class Serie implements Renderer {
     public function render(int $selector): string
     {
         $serieId = $this->getId(); // Récupérer l'ID pour les liens
+        $repo = OnlyFilmsRepository::getInstance();
+        $fav = (!$repo->isInFavList($_SESSION['user']->getId(), $this->id)) ? "<p><a href='?action=add-fav&id={$serieId}'>Ajouter aux favoris</a></p>" : "<p><a href='?action=sup-fav&id={$serieId}'>Supprimer des favoris</a></p>";
 
         switch ($selector) {
             case self::COMPACT:
@@ -55,6 +57,7 @@ class Serie implements Renderer {
                     <a href='?action=display-serie&serie-id={$serieId}'><img src="images/{$this->getImage()}" alt="Miniature de {$this->getTitle()}"></a>
                     <h3>{$this->getTitle()}</h3>
                     <p>Année : {$this->getYear()}</p>
+                    $fav
                     <p><a href="?action=add-comment&serie_id={$serieId}">Noter/Commenter</a></p>
                 </div>
                 HTML;
@@ -64,6 +67,7 @@ class Serie implements Renderer {
                             <div class="serie long">
                                 <h2>{$this->getTitle()} - {$this->getYear()}</h2>
                                 <p>{$this->getDescription()}<p/>
+                                $fav
                                 <p><a href="?action=add-comment&serie_id={$serieId}">Noter/Commenter cette série</a></p>
                                 <hr>
                             HTML;

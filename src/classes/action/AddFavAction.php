@@ -21,8 +21,8 @@ class AddFavAction extends Action {
 
         if (isset($_GET["id"])) {
             $repo = OnlyFilmsRepository::getInstance();
-            if (!$repo->isInFavList($_SESSION["user"]->getId(), $_GET["id"])){
-                $repo->addFav($_SESSION["user"]->getId(), $_GET["id"]);
+            if (!$repo->isInFavList($_SESSION["user"]->getId(), (int)$_GET["id"])){
+                $repo->addFav($_SESSION["user"]->getId(), (int)$_GET["id"]);
             }
         }
 
