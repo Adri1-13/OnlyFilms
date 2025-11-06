@@ -15,16 +15,20 @@ class DefaultAction extends Action
         // Si l’utilisateur est connecté
         if (isset($_SESSION['user'])) {
             $user = $_SESSION['user'];
-            $firstname = htmlspecialchars($user->getFirstname());
+            $firstName = htmlspecialchars($user->getFirstname());
 
             // TODO : modifis actions en fonction de leurs vrais noms
             return <<<HTML
-                <h1>Bienvenue sur OnlyFilms, {$firstname} !</h1>
-                <p>Accédez au catalogue de séries <a class="btn btn-primary" href="?action=catalog"></a>
-                <br>
-                Reprendre dans vos séries en cours <a class="btn btn-primary" href="?action=in-progress"></a>
-                <br>
-                Retrouver vos séries préférées <a href="?action=view-favorites"></a></p>
+                <h1>Bienvenue sur OnlyFilms, {$firstName} !</h1>
+                <p>
+                    <a href="?action=catalog">Catalogue des séries</a>
+                    <br>
+                    <a href="?action=in-progress">Séries en cours</a>
+                    <br>
+                    <a href="?action=view-favorites">Mes favoris</a>
+                    <br>
+                    <a href="?action=signout">Déconnexion</a>
+                </p>
             HTML;
         }
 
@@ -32,7 +36,7 @@ class DefaultAction extends Action
         return <<<HTML
             <h1>Bienvenue sur NetVOD </h1>
             <p>Explorez notre catalogue de séries en vous <a href="?action=signin">connectant</a>
-            ou en <a href="?action=register">créant un compte</a> gratuitement.</p>
+            ou en <a href="?action=add-user">créant un compte</a></p>
         HTML;
     }
 

@@ -11,6 +11,7 @@ use iutnc\onlyfilms\action\SignOutAction;
 use iutnc\onlyfilms\action\DefaultAction;
 use iutnc\onlyfilms\action\SignInAction;
 use iutnc\onlyfilms\action\DisplayCatalogueAction;
+use iutnc\onlyfilms\action\InProgressSeriesAction;
 
 class Dispatcher {
 
@@ -28,14 +29,14 @@ class Dispatcher {
     public function run() : void {
 
         switch ($this->actionQuery) {
+            case 'signin':
+                $action = new SignInAction();
+                break;
             case 'add-user':
                 $action = new AddUserAction();
                 break;
             case 'signout':
                 $action = new SignOutAction();
-                break;
-            case 'signin':
-                $action = new SignInAction();
                 break;
             case 'catalog':
                 $action = new DisplayCatalogueAction();
@@ -45,6 +46,11 @@ class Dispatcher {
                 break;
             case 'display-serie':
                 $action = new DisplaySerieAction();
+            case 'in-progress':
+                $action = new InProgressSeriesAction();
+                break;
+            case 'view-favorites':
+                $action = new DisplayFavoriteAction();
                 break;
             case 'default':
             default:

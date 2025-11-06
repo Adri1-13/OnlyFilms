@@ -11,11 +11,26 @@ class SignOutAction extends Action {
 
     public function executeGet(): string
     {
-        // TODO: Implement executeGet() method.
+
+        if (!AuthnProvider::isSignedIn()) {
+            return <<<HTML
+                <div>Vous êtes déjà déconnecté</div>
+            HTML;
+        }
+        unset($_SESSION['user']);
+
+//        session_destroy();
+
+        return <<<HTML
+            <p>Vous êtes déconnecté</p>
+            <a href="?action=default">Aller à l'accueil</a>
+            <a href="?action=signin">Se connecter</a>
+        HTML;
+
     }
 
     public function executePost(): string
     {
-        // TODO: Implement executePost() method.
+        return $this->executeGet();
     }
 }

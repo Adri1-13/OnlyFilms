@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace iutnc\onlyfilms\repository;
 
 use iutnc\onlyfilms\exception\OnlyFilmsRepositoryException;
+use iutnc\onlyfilms\auth\User;
 use iutnc\onlyfilms\video\lists\Serie;
 use iutnc\onlyfilms\video\tracks\Episode;
 
@@ -114,16 +115,16 @@ public function findAllSeries(): array {
      */
     public function findSerieBySerieId(int $id): Serie {
 
-    if ($id < 0) {
-        throw new OnlyFilmsRepositoryException('Id doit être positif');
-    }
-    $stmt = $this->pdo->prepare("SELECT * FROM series WHERE series_id = ?");
-    $stmt->execute([$id]);
-    $row = $stmt->fetch();
+        if ($id < 0) {
+            throw new OnlyFilmsRepositoryException('Id doit être positif');
+        }
+        $stmt = $this->pdo->prepare("SELECT * FROM series WHERE series_id = ?");
+        $stmt->execute([$id]);
+        $row = $stmt->fetch();
 
-    if (empty($row)) {
-        throw new OnlyFilmsRepositoryException('Serie introuvable');
-    }
+        if (empty($row)) {
+            throw new OnlyFilmsRepositoryException('Serie introuvable');
+        }
 
         try {
             $episodes = $this->findEpisodesBySeriesId($id);
@@ -161,6 +162,8 @@ public function findSeriesByUserId(int $userId): array {
             $r['date_added']
         );
     }
+
+
     return $series;
 }
 
@@ -188,7 +191,7 @@ public function findSeriesByUserId(int $userId): array {
             (int)$r['series_id']
         );
     }
-    if (empty($episodes)) {
+    if (!empty($episodes)) {
         throw new OnlyFilmsRepositoryException("Aucun épisode associé a cette série");
     }
     return $episodes;
