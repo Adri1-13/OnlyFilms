@@ -19,7 +19,7 @@ class AddCommentAction extends Action
 
         // Récupérer l'ID de la série à partir du GET
         $serieId = (int)$_GET['serie_id'];
-        
+
         // Ici, on peut récupérer les informations de la série depuis la base de données si nécessaire
         // Pour l'exemple, on assume que la série a un titre que nous pouvons afficher
         $serieTitle = "Titre de la série";  // À remplacer par une vraie requête BDD pour récupérer le titre
@@ -80,7 +80,7 @@ class AddCommentAction extends Action
         try {
             // Ajouter un commentaire et une note à la série
             $repository->addComment($userId, $serieId, $comment, $note);
-            
+
             // Retour à la page de la série avec un message de succès
             return "<p>Votre commentaire a été ajouté avec succès!</p>";
         } catch (\Exception $e) {
