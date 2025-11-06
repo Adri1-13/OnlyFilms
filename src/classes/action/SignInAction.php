@@ -45,15 +45,10 @@ class SignInAction extends Action {
         }
 
         try {
-            $user = AuthnProvider::signIn($mail, $mdp);
+            AuthnProvider::signIn($mail, $mdp);
 
-            $_SESSION['user'] = $user;
-
-            return <<<HTML
-                <p>Connexion réussie</p>
-                <p>Bienvenue {$user->getMail()}</p>
-                <a href="?action=default">Aller à l'accueil</a>
-            HTML;
+            header('Location: ?action=default');
+            exit();
 
         } catch (AuthnException $e) {
             return <<<HTML

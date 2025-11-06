@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace iutnc\onlyfilms\action;
 
+use iutnc\onlyfilms\auth\AuthnProvider;
 use iutnc\onlyfilms\Repository\OnlyFilmsRepository;
 
 class AddFavAction extends Action {

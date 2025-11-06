@@ -23,7 +23,8 @@ class SignOutAction extends Action {
 
         return <<<HTML
             <p>Vous êtes déconnecté</p>
-            <a href="?action=default">Aller à l'accueil</a>
+            <p><a href="?action=default">Aller à l'accueil</a></p>
+            <br><p>ou</p><br>
             <a href="?action=signin">Se connecter</a>
         HTML;
 

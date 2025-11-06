@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace iutnc\onlyfilms\dispatch;
 
 use iutnc\onlyfilms\action\AddUserAction;
-use iutnc\onlyfilms\action\DisplayFavoriteAction;
+use iutnc\onlyfilms\action\DisplayEpisodeAction;
+use iutnc\onlyfilms\action\DisplaySerieAction;
 use iutnc\onlyfilms\action\SignOutAction;
 use iutnc\onlyfilms\action\DefaultAction;
 use iutnc\onlyfilms\action\SignInAction;
@@ -13,6 +14,7 @@ use iutnc\onlyfilms\action\DisplayCatalogueAction;
 use iutnc\onlyfilms\action\InProgressSeriesAction;
 use iutnc\onlyfilms\auth\AuthnProvider;
 use iutnc\onlyfilms\Repository\OnlyFilmsRepository;
+use iutnc\onlyfilms\action\AddCommentAction;
 
 class Dispatcher {
 

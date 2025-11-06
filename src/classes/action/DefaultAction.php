@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace iutnc\onlyfilms\action;
 
+use iutnc\onlyfilms\render\Renderer;
+use iutnc\onlyfilms\Repository\OnlyFilmsRepository;
+
 class DefaultAction extends Action
 {
     /**
@@ -17,26 +20,45 @@ class DefaultAction extends Action
             $user = $_SESSION['user'];
             $firstName = htmlspecialchars($user->getFirstname());
 
-            // TODO : modifis actions en fonction de leurs vrais noms
-            return <<<HTML
+            $repo = OnlyFilmsRepository::getInstance();
+            $favouriteSeries = $repo->findFavoriteSeriesByUserID($user->getId());
+
+             $htmlres = <<<HTML
                 <h1>Bienvenue sur OnlyFilms, {$firstName} !</h1>
                 <p>
                     <a href="?action=catalog">Catalogue des séries</a>
                     <br>
                     <a href="?action=in-progress">Séries en cours</a>
                     <br>
-                    <a href="?action=view-favorites">Mes favoris</a>
-                    <br>
                     <a href="?action=signout">Déconnexion</a>
                 </p>
+
+                <h2>Vos séries préférées :</h2>
             HTML;
+
+            if (empty($favouritesSeries)) {
+                $htmlres .= <<<HTML
+                    <p>Vous n'avez pas encore ajouté de séries à vos favoris</p>
+                    <p><a href="?action=catalog">Découvrir le catalogue</a></p>
+                HTML;
+
+            } else {
+                // TODO : voir si mettre une div ici pour que l'affichage soit mieux
+                foreach ($favouritesSeries as $serie) {
+                    $htmlres .= <<<HTML
+                        <p>{$serie->render(Renderer::COMPACT)}</p>
+                    HTML;
+                }
+            }
+
+            return $htmlres;
         }
 
         // Sinon, affichage pour visiteur
         return <<<HTML
             <h1>Bienvenue sur NetVOD </h1>
-            <p>Explorez notre catalogue de séries en vous <a href="?action=signin">connectant</a>
-            ou en <a href="?action=add-user">créant un compte</a></p>
+            <p>Explorez notre catalogue de séries en vous connectant <a href="?action=signin">ici</a></p>
+            <p>ou en créant un compte <a href="?action=add-user">ici</a></p>
         HTML;
     }
 
