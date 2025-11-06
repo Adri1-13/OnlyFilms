@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace iutnc\onlyfilms\dispatch;
 
-use iutnc\onlyfilms\action\AddFavAction;
 use iutnc\onlyfilms\action\AddUserAction;
-use iutnc\onlyfilms\action\DisplayFavoriteSeriesAction;
 use iutnc\onlyfilms\action\SignOutAction;
 use iutnc\onlyfilms\action\DefaultAction;
 use iutnc\onlyfilms\action\SignInAction;
 use iutnc\onlyfilms\action\DisplayCatalogueAction;
 use iutnc\onlyfilms\action\InProgressSeriesAction;
+use iutnc\onlyfilms\action\AddCommentAction;
 
 class Dispatcher {
 
@@ -44,14 +43,17 @@ class Dispatcher {
             case 'add-fav':
                 $action = new AddFavAction();
                 break;
+            case 'display-episode':
+                $action = new DisplayEpisodeAction();
+                break;
+            case 'display-serie':
+                $action = new DisplaySerieAction();
             case 'in-progress':
                 $action = new InProgressSeriesAction();
                 break;
-            case 'view-favorites':
-                $action = new DisplayFavoriteAction();
                 break;
-                // TODO : séries du user en cours
-
+            case 'add-comment':
+                $action = new AddCommentAction();
             case 'default':
             default:
                 $action = new DefaultAction();
