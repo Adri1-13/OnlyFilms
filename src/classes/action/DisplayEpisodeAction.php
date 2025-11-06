@@ -25,7 +25,10 @@ class DisplayEpisodeAction extends Action
 
         try {
             $episode = $repo->findEpisodeById($_GET['episode-id']);
-            return $episode->render(Renderer::LONG);
+            return <<<HTML
+                {$episode->render(Renderer::LONG)}
+                <a href="javascript:history.back()">Retour</a>
+                HTML;
 
         } catch (OnlyFilmsRepositoryException $e) {
             return '<p>ID épisode incorrect</p>';
