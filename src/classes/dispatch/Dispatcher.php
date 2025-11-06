@@ -12,6 +12,7 @@ use iutnc\onlyfilms\action\DefaultAction;
 use iutnc\onlyfilms\action\SignInAction;
 use iutnc\onlyfilms\action\DisplayCatalogueAction;
 use iutnc\onlyfilms\action\InProgressSeriesAction;
+use iutnc\onlyfilms\action\AddCommentAction;
 
 class Dispatcher {
 
@@ -51,6 +52,9 @@ class Dispatcher {
                 break;
             case 'view-favorites':
                 $action = new DisplayFavoriteAction();
+                break;
+            case 'add-comment':
+                $action = new AddCommentAction();
                 break;
             case 'default':
             default:

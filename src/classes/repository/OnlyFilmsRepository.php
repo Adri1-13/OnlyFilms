@@ -103,7 +103,8 @@ public function findAllSeries(): array {
             $r['description'] ?? '',
             $r['img'] ?? '',
             (int)$r['year'],
-            $r['date_added']
+            $r['date_added'],
+            null
         );
     }
     return $series;
@@ -139,7 +140,7 @@ public function findAllSeries(): array {
             $row['img'] ?? '',
             (int)$row['year'],
             $row['date_added'],
-            $episodes
+            $episodes,
         );
 }
 
@@ -159,7 +160,8 @@ public function findSeriesByUserId(int $userId): array {
             $r['description'] ?? '',
             $r['img'] ?? '',
             (int)$r['year'],
-            $r['date_added']
+            $r['date_added'],
+            null
         );
     }
 

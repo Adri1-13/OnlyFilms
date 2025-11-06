@@ -45,14 +45,17 @@ class Serie implements Renderer {
 
     public function render(int $selector): string
     {
+        $serieId = $this->getId(); // Récupérer l'ID pour les liens
+
         switch ($selector) {
             case self::COMPACT:
                 // titre + photo + Année
                 $html = <<<HTML
                 <div class="serie compact">
-                    <a href='?action=display-serie&serie-id={$this->getId()}'><img src="images/{$this->getImage()}" alt="Miniature de {$this->getTitle()}"></a>
+                    <a href='?action=display-serie&serie-id={$serieId}'><img src="images/{$this->getImage()}" alt="Miniature de {$this->getTitle()}"></a>
                     <h3>{$this->getTitle()}</h3>
                     <p>Année : {$this->getYear()}</p>
+                    <p><a href="?action=add-comment&serie_id={$serieId}">Noter/Commenter</a></p>
                 </div>
                 HTML;
                 break;
@@ -61,6 +64,8 @@ class Serie implements Renderer {
                             <div class="serie long">
                                 <h2>{$this->getTitle()} - {$this->getYear()}</h2>
                                 <p>{$this->getDescription()}<p/>
+                                <p><a href="?action=add-comment&serie_id={$serieId}">Noter/Commenter cette série</a></p>
+                                <hr>
                             HTML;
                 foreach ($this->episodes as $episode) {
                     $html .= $episode->render(self::COMPACT);

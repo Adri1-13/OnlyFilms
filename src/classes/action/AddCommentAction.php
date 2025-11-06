@@ -51,7 +51,7 @@ class AddCommentAction extends Action
             </div>
         </form>
 
-        <p><a href="serie_detail.php?serie_id={$serieId}">Retour à la série</a></p>
+        <p><a href="?action=catalog">Retour à la liste de série</a></p>
         HTML;
     }
 
