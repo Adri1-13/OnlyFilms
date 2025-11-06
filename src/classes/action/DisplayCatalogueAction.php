@@ -26,7 +26,7 @@ class DisplayCatalogueAction extends Action
                 $html .= '<p>Aucune série disponible dans le catalogue pour le moment.</p>';
             } else {
                 foreach ($seriesList as $serie) {
-                    $html .= $serie->render(Renderer::COMPACT); //
+                    $html .= $serie->render(Renderer::COMPACT);
                 }
             }
 
