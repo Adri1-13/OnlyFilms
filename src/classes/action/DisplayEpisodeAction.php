@@ -24,12 +24,15 @@ class DisplayEpisodeAction extends Action
         $repo = OnlyFilmsRepository::getInstance();
 
         try {
-            $episode = $repo->findEpisodeById($_GET['episode-id']);
-            return <<<HTML
+            $episode = $repo->findEpisodeById($id);
+            $html = <<<HTML
                 {$episode->render(Renderer::LONG)}
                 <a href="javascript:history.back()">Retour</a>
                 HTML;
 
+                $repo->addWatchedEpisode($_SESSION['user']->getId(),$episode->getId());
+                $repo->cleanupSeriesIfCompleted((int)$_SESSION['user']->getId(), (int)$episode->getSeriesId());
+                return $html;
         } catch (OnlyFilmsRepositoryException $e) {
             return '<p>ID épisode incorrect</p>';
         }
