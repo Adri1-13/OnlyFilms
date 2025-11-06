@@ -21,7 +21,7 @@ class DefaultAction extends Action
             $firstName = htmlspecialchars($user->getFirstname());
 
             $repo = OnlyFilmsRepository::getInstance();
-            $favouriteSeries = $repo->findFavoriteSeriesByUserID($user->getId());
+            $favouriteSeries = $repo->getUserFavouriteSeries($user->getId());
 
              $htmlres = <<<HTML
                 <h1>Bienvenue sur OnlyFilms, {$firstName} !</h1>
