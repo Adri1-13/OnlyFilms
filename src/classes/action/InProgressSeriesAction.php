@@ -33,7 +33,7 @@ class InProgressSeriesAction extends Action
 
             $sid      = (int)$serie->getId();
             $title    = htmlspecialchars($serie->getTitle());
-            $img      = (string)$serie->getImg();
+            $img      = (string)$serie->getImage();
             $epId     = (int)$episode->getId();
             $epTitle  = htmlspecialchars($episode->getTitle());
 
@@ -44,7 +44,7 @@ class InProgressSeriesAction extends Action
             $html .= '<h3>'.$title.'</h3>';
             $html .= '<div class="progress"><div class="bar" style="width: '.$pct.'%"></div></div>';
             $html .= '<p>Dernier épisode : '.$epTitle.' — '.$pct.'%</p>';
-            $html .= '<a class="btn" href="?action=display-episode&id='.$epId.'">Reprendre</a>';
+            $html .= '<a class="btn" href="?action=display-episode&episode-id='.$epId.'">Reprendre</a>';
             $html .= '</article>';
         }
         $html .= '</div>';
