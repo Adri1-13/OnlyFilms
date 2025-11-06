@@ -11,6 +11,7 @@ use iutnc\onlyfilms\action\SignOutAction;
 use iutnc\onlyfilms\action\DefaultAction;
 use iutnc\onlyfilms\action\SignInAction;
 use iutnc\onlyfilms\action\DisplayCatalogueAction;
+use iutnc\onlyfilms\action\InProgressSeriesAction;
 
 class Dispatcher {
 
@@ -40,13 +41,15 @@ class Dispatcher {
             case 'catalog':
                 $action = new DisplayCatalogueAction();
                 break;
-            case 'display-favourite-series':
-                $action = new DisplayFavoriteSeriesAction();
-                break;
             case 'add-fav':
                 $action = new AddFavAction();
                 break;
             case 'in-progress':
+                $action = new InProgressSeriesAction();
+                break;
+            case 'view-favorites':
+                $action = new DisplayFavoriteAction();
+                break;
                 // TODO : séries du user en cours
 
             case 'default':

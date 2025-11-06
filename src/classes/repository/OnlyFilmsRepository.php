@@ -134,10 +134,10 @@ class OnlyFilmsRepository {
             JOIN Like_list l ON s.series_id = l.series_id
             WHERE l.user_id = ? ORDER BY s.date_added DESC");
         $stmt->execute([$userId]);
-        $lignes = $stmt->fetchAll();
+        $rows = $stmt->fetchAll();
 
         $series = [];
-        foreach ($lignes as $ligne) {
+        foreach ($rows as $r) {
             $series[] = new Serie(
                 (int)$ligne['series_id'],
                 $ligne['title'],
@@ -162,16 +162,16 @@ class OnlyFilmsRepository {
     $rows = $stmt->fetchAll();
 
         $episodes = [];
-        foreach ($rows as $r) {
+        foreach ($lignes as $ligne) {
             $episodes[] = new Episode(
-                (int)$r['episode_id'],
-                (int)$r['num'],
-                $r['title'],
-                $r['summary'] ?? '',
-                (int)$r['duration'],
-                $r['file'] ?? '',
-                $r['img'],
-                (int)$r['series_id']
+                (int)$ligne['episode_id'],
+                (int)$ligne['num'],
+                $ligne['title'],
+                $ligne['summary'] ?? '',
+                (int)$ligne['duration'],
+                $ligne['file'] ?? '',
+                $ligne['img'],
+                (int)$ligne['series_id']
             );
         }
         if (!empty($episodes)) {
@@ -239,6 +239,96 @@ class OnlyFilmsRepository {
             return true;
         }
         return false;
+    }
+    public function getUserInSerieProgress(int $userId): array
+    {
+        // 1) Par série : combien vus + dernière date de visionnage
+        $sql = "
+        SELECT e.series_id,
+               COUNT(*) AS watched_count,
+               MAX(we.viewing_date) AS last_viewing
+        FROM watch_episode we
+        JOIN episode e ON e.episode_id = we.episode_id
+        WHERE we.user_id = ?
+        GROUP BY e.series_id
+        ORDER BY last_viewing DESC
+    ";
+        $st = $this->pdo->prepare($sql);
+        $st->execute([$userId]);
+        $rows = $st->fetchAll(\PDO::FETCH_ASSOC);
+
+        $result = [];
+
+        foreach ($rows as $r) {
+            $seriesId = (int) $r['series_id'];
+            $watchedCount = (int) $r['watched_count'];
+
+            // 2) Total d'épisodes de la série
+            $stTot = $this->pdo->prepare("SELECT COUNT(*) FROM episode WHERE series_id = ?");
+            $stTot->execute([$seriesId]);
+            $total = (int) $stTot->fetchColumn();
+
+            // Si tout est vu, ce n'est plus "en cours"
+            if ($total <= 0 || $watchedCount >= $total) {
+                continue;
+            }
+
+            // 3) Dernier épisode vu (id) pour cette série
+            $stLastEp = $this->pdo->prepare("
+            SELECT we.episode_id
+            FROM watch_episode we
+            JOIN episode e ON e.episode_id = we.episode_id
+            WHERE we.user_id = ? AND e.series_id = ?
+            ORDER BY we.viewing_date DESC
+            LIMIT 1
+        ");
+            $stLastEp->execute([$userId, $seriesId]);
+            $lastEpisodeId = (int) $stLastEp->fetchColumn();
+
+            // 4) Objets avec méthodes existantes
+            $serieObj = $this->findSeriesBySerieId($seriesId);
+            if ($serieObj === null)
+                continue;
+
+            $episodeObj = $this->findEpisodeById($lastEpisodeId);
+
+            $pct = (int) round(($watchedCount / max(1, $total)) * 100);
+
+            $result[] = [
+                'series' => $serieObj,     // objet Serie
+                'last_episode' => $episodeObj,   // objet Episode
+                'progress_pct' => $pct,          // int
+                'last_viewing' => $r['last_viewing'],
+            ];
+        }
+
+        return $result;
+    }
+    public function getUserFavouriteSeries(int $userId): array
+    {
+        $sql = "
+        SELECT s.*
+        FROM like_list l
+        INNER JOIN series s ON s.series_id = l.series_id
+        WHERE l.user_id = ?
+        ORDER BY s.date_added DESC
+    ";
+        $st = $this->pdo->prepare($sql);
+        $st->execute([$userId]);
+        $rows = $st->fetchAll(\PDO::FETCH_ASSOC);
+
+        $series = [];
+        foreach ($rows as $r) {
+            $series[] = new Serie(
+                (int) $r['series_id'],
+                (string) $r['title'],
+                (string) ($r['description'] ?? ''),
+                (string) ($r['img'] ?? ''),
+                (int) $r['year'],
+                (string) $r['date_added']
+            );
+        }
+        return $series;
     }
 
 

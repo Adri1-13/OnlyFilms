@@ -77,7 +77,7 @@ class AddUserAction extends Action {
                     HTML;
         }
 
-        if (strlen($passwd) <= 10) {
+        if (strlen($passwd) < 10) {
             return <<<HTML
                     <p>Le mot de passe doit faire au moins 10 caractères</p>
                     <a href="?action=add-user">Retour à l'inscription</a>
