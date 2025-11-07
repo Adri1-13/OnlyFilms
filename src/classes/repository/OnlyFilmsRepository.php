@@ -173,7 +173,7 @@ class OnlyFilmsRepository
     {
         $stmt = $this->pdo->prepare("
         SELECT s.* FROM series s
-        JOIN Like_list l ON s.series_id = l.series_id
+        INNER JOIN Like_list l ON s.series_id = l.series_id
         WHERE l.user_id = ? ORDER BY s.date_added DESC");
         $stmt->execute([$userId]);
         $rows = $stmt->fetchAll();
@@ -296,14 +296,14 @@ class OnlyFilmsRepository
                COUNT(*) AS watched_count,
                MAX(we.viewing_date) AS last_viewing
         FROM watch_episode we
-        JOIN episode e ON e.episode_id = we.episode_id
+        INNER JOIN episode e ON e.episode_id = we.episode_id
         WHERE we.user_id = ?
         GROUP BY e.series_id
         ORDER BY last_viewing DESC
-    ";
+        ";
         $st = $this->pdo->prepare($sql);
         $st->execute([$userId]);
-        $rows = $st->fetchAll(\PDO::FETCH_ASSOC);
+        $rows = $st->fetchAll();
 
         $result = [];
 
@@ -314,7 +314,7 @@ class OnlyFilmsRepository
             // 2) Total d'épisodes de la série que l'user a vu
             $stTot = $this->pdo->prepare("SELECT COUNT(*) FROM episode WHERE series_id = ?");
             $stTot->execute([$seriesId]);
-            $total = (int) $stTot->fetchColumn();
+            $total = (int) $stTot->fetch();
 
             // Si tout est vu, ce n'est plus "en cours"
             if ($total <= 0 || $watchedCount >= $total) {
@@ -329,7 +329,7 @@ class OnlyFilmsRepository
             WHERE we.user_id = ? AND e.series_id = ?
             ORDER BY we.viewing_date ASC
             LIMIT 1
-        ");
+            ");
             $stLastEp->execute([$userId, $seriesId]);
             $lastEpisodeId = (int) $stLastEp->fetchColumn();
 
