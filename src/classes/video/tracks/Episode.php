@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace iutnc\onlyfilms\video\tracks;
 
 use iutnc\onlyfilms\render\Renderer;
+use iutnc\onlyfilms\Repository\OnlyFilmsRepository;
 
 class Episode implements Renderer {
 
@@ -41,6 +42,18 @@ class Episode implements Renderer {
      */
     public function render(int $selector): string
     {
+        $repo = OnlyFilmsRepository::getInstance();
+        if ($this->getNumber() > 1){
+            $epiPrec = "<a href='?action=display-episode&episode-id={$repo->findEpisodeIdByNumAndSeriesId($this->getNumber()-1, $this->getSeriesId())}'>Episode Précédent</a>";
+        } else {
+            $epiPrec = "";
+        }
+
+        if ($this->getNumber() < $repo->getTotalEpisodesInSerie($this->getSeriesId())){
+            $epiSuiv = "<a href='?action=display-episode&episode-id={$repo->findEpisodeIdByNumAndSeriesId($this->getNumber()+1, $this->getSeriesId())}'>Episode Suivant</a>";
+        } else {
+            $epiSuiv = "";
+        }
         switch ($selector) {
             // COMPACT = Nom + Description + Durée
             case self::COMPACT :
@@ -61,6 +74,10 @@ class Episode implements Renderer {
                     <h2>{$this->getTitle()}</h2>
                     <p>{$this->summary}</p>
                     {$video}
+                    <div>
+                        {$epiPrec}
+                        {$epiSuiv}
+                    </div>
                 </div>
                 HTML;
                 break;
