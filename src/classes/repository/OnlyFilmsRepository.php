@@ -192,6 +192,13 @@ class OnlyFilmsRepository
 
     /* =================== EPISODES =================== */
 
+    public function getTotalEpisodesInSerie(int $seriesId): int {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM episode WHERE series_id = ?");
+        $stmt->execute([$seriesId]);
+
+        return (int) $stmt->fetchColumn();
+    }
+
     /**
      * Récupère tous les épisodes d'une série
      * @throws \Exception
