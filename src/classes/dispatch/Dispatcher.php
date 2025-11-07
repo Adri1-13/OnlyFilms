@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace iutnc\onlyfilms\dispatch;
 
 use iutnc\onlyfilms\action\AddFavAction;
+use iutnc\onlyfilms\action\DelFavAction;
 use iutnc\onlyfilms\action\AddUserAction;
 use iutnc\onlyfilms\action\DisplayAccountAction;
 use iutnc\onlyfilms\action\DisplayEpisodeAction;
@@ -61,6 +62,9 @@ class Dispatcher {
                     break;
                 case 'add-fav':
                     $action = new AddFavAction();
+                    break;
+                case 'del-fav':
+                    $action = new DelFavAction();
                     break;
                 case 'display-episode':
                     $action = new DisplayEpisodeAction();
