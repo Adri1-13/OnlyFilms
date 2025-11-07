@@ -48,7 +48,7 @@ class Episode implements Renderer {
                 <div class="episode compact">
                     <a href='?action=display-episode&episode-id={$this->getId()}'><h3>Épisode {$this->getNumber()} : {$this->getTitle()}</h3></a>
                     <p>{$this->getSummary()}</p>
-                    <p>Durée : {$this->getDuration()} min</p>
+                    <p>Durée : {$this->getDuration()} sec</p>
                 </div>
                 HTML;
                 break;
