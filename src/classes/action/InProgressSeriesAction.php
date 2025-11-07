@@ -7,17 +7,11 @@ use iutnc\onlyfilms\Repository\OnlyFilmsRepository;
 
 class InProgressSeriesAction extends Action
 {
-    public function execute(): string
-    {
-        return $this->http_method === 'POST' ? $this->executePost() : $this->executeGet();
-    }
-
     public function executeGet(): string
     {
-        AuthnProvider::getSignedInUser();
+        if (!AuthnProvider::isSignedIn()) return '<div>Utilisateur non authentifié.</div>';
+        $user = AuthnProvider::getSignedInUser();
 
-        $user = $_SESSION['user'] ?? null;
-        if (!$user instanceof User) return '<div class="alert">Utilisateur non authentifié.</div>';
         $userId = (int)$user->getId();
 
         $repo = OnlyFilmsRepository::getInstance();
@@ -25,21 +19,21 @@ class InProgressSeriesAction extends Action
 
         if (empty($rows)) return '<h2>Poursuivre la lecture</h2><p>Aucune série en cours.</p>';
 
-        $html = '<h2>Poursuivre la lecture</h2><div class="grid">';
+        $html = '<h2>Poursuivre la lecture</h2><div>';
         foreach ($rows as $r) {
             $serie   = $r['series'];
             $episode = $r['last_episode'];
             $pct     = (int)$r['progress_pct'];
 
             $sid      = (int)$serie->getId();
-            $title    = htmlspecialchars($serie->getTitle());
+            $title    = $serie->getTitle();
             $img      = (string)$serie->getImage();
             $epId     = (int)$episode->getId();
-            $epTitle  = htmlspecialchars($episode->getTitle());
+            $epTitle  = $episode->getTitle();
 
-            $html .= '<article class="card">';
+            $html .= '<article>';
             if ($img !== '') {
-                $html .= '<img src="'.htmlspecialchars($img).'" alt="Affiche '.$title.'" class="cover">';
+                $html .= '<img src="'.$img.'" alt="Affiche '.$title.'" class="cover">';
             }
             $html .= '<h3>'.$title.'</h3>';
             $html .= '<div class="progress"><div class="bar" style="width: '.$pct.'%"></div></div>';
