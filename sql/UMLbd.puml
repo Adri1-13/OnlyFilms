@@ -71,13 +71,6 @@ entity "watch_episode" as WatchEpisode {
     viewing_date : datetime
 }
 
-entity "watching_episode" as WatchingEpisode {
-    + **user_id (PK, FK)** : int(11)
-    + **episode_id (PK, FK)** : int(11)
-    --
-    time : int(11)
-}
-
 entity "genre_series" as GenreSeries {
     + **genre_id (PK, FK)** : int(11)
     + **series_id (PK, FK)** : int(11)
@@ -95,9 +88,6 @@ Series -- LikeList : "est préféré par 0..N"
 
 User -- WatchEpisode : "visionne 0..N"
 Episode -- WatchEpisode : "est visionné par 0..N"
-
-User -- WatchingEpisode : "visionne 0..N"
-Episode -- WatchingEpisode : "est visionné par 0..N"
 
 Series -- GenreSeries : "possède 0..N"
 GenreSeries -- Genre : "est visionné par 0..N"
