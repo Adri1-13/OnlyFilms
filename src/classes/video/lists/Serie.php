@@ -47,7 +47,7 @@ class Serie implements Renderer {
     {
         $serieId = $this->getId(); // Récupérer l'ID pour les liens
         $repo = OnlyFilmsRepository::getInstance();
-        $fav = (!$repo->isInFavList($_SESSION['user']->getId(), $this->id)) ? "<p><a href='?action=add-fav&id={$serieId}'>Ajouter aux favoris</a></p>" : "<p><a href='?action=sup-fav&id={$serieId}'>Supprimer des favoris</a></p>";
+        $fav = (!$repo->isInFavList($_SESSION['user']->getId(), $this->id)) ? "<p><a href='?action=add-fav&id={$serieId}'>Ajouter aux favoris</a></p>" : "<p><a href='?action=del-fav&id={$serieId}'>Supprimer des favoris</a></p>";
 
         switch ($selector) {
             case self::COMPACT:
