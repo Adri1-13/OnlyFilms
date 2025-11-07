@@ -7,6 +7,7 @@ namespace iutnc\onlyfilms\action;
 use iutnc\onlyfilms\repository\OnlyFilmsRepository;
 use iutnc\onlyfilms\auth\AuthnProvider;
 use iutnc\onlyfilms\exception\AuthnException;
+use iutnc\onlyfilms\exception\OnlyFilmsRepositoryException;
 
 class AddCommentAction extends Action
 {
@@ -22,7 +23,13 @@ class AddCommentAction extends Action
 
         // Ici, on peut récupérer les informations de la série depuis la base de données si nécessaire
         // Pour l'exemple, on assume que la série a un titre que nous pouvons afficher
-        $serieTitle = "Titre de la série";  // À remplacer par une vraie requête BDD pour récupérer le titre
+        try {
+            $repo = OnlyFilmsRepository::getInstance();
+            $serie = $repo->findSerieBySerieId($serieId);
+            $serieTitle = $serie->getTitle();
+        } catch (OnlyFilmsRepositoryException $e) {
+            return "<p>Série non trouvée.</p>";
+        }
 
         // Afficher le formulaire pour ajouter un commentaire
         return <<<HTML
