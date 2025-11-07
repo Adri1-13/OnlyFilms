@@ -173,7 +173,7 @@ class OnlyFilmsRepository
     {
         $stmt = $this->pdo->prepare("
         SELECT s.* FROM series s
-        JOIN Like_list l ON s.series_id = l.series_id
+        INNER JOIN Like_list l ON s.series_id = l.series_id
         WHERE l.user_id = ? ORDER BY s.date_added DESC");
         $stmt->execute([$userId]);
         $rows = $stmt->fetchAll();
@@ -296,14 +296,14 @@ class OnlyFilmsRepository
                COUNT(*) AS watched_count,
                MAX(we.viewing_date) AS last_viewing
         FROM watch_episode we
-        JOIN episode e ON e.episode_id = we.episode_id
+        INNER JOIN episode e ON e.episode_id = we.episode_id
         WHERE we.user_id = ?
         GROUP BY e.series_id
         ORDER BY last_viewing DESC
-    ";
+        ";
         $st = $this->pdo->prepare($sql);
         $st->execute([$userId]);
-        $rows = $st->fetchAll(\PDO::FETCH_ASSOC);
+        $rows = $st->fetchAll();
 
         $result = [];
 
@@ -314,7 +314,7 @@ class OnlyFilmsRepository
             // 2) Total d'épisodes de la série que l'user a vu
             $stTot = $this->pdo->prepare("SELECT COUNT(*) FROM episode WHERE series_id = ?");
             $stTot->execute([$seriesId]);
-            $total = (int) $stTot->fetchColumn();
+            $total = (int) $stTot->fetch();
 
             // Si tout est vu, ce n'est plus "en cours"
             if ($total <= 0 || $watchedCount >= $total) {
@@ -325,18 +325,22 @@ class OnlyFilmsRepository
             $stLastEp = $this->pdo->prepare("
             SELECT we.episode_id
             FROM watch_episode we
-            JOIN episode e ON e.episode_id = we.episode_id
-            WHERE we.user_id = ? AND e.series_id = ?
-            ORDER BY we.viewing_date ASC
-            LIMIT 1
-        ");
+            INNER JOIN episode e ON e.episode_id = we.episode_id
+            WHERE we.user_id = ? 
+              AND e.series_id = ?
+              AND we.viewing_date = (
+                  SELECT MIN(we2.viewing_date)
+                  FROM watch_episode we2
+                  INNER JOIN episode e_sub ON e_sub.episode_id = we2.episode_id
+                  WHERE we2.user_id = ? AND e_sub.series_id = ?
+              )
+            ");
             $stLastEp->execute([$userId, $seriesId]);
             $lastEpisodeId = (int) $stLastEp->fetchColumn();
 
             // 4) Objets avec méthodes existantes
             $serieObj = $this->findSerieBySerieId($seriesId);
-            if ($serieObj === null)
-                continue;
+            if ($serieObj === null) continue;
 
             $episodeObj = $this->findEpisodeById($lastEpisodeId);
 
@@ -381,23 +385,43 @@ class OnlyFilmsRepository
     }
     public function addWatchedEpisode(int $userId, int $episodeId): void
     {
-        $sql = "
-        INSERT INTO watch_episode (user_id, episode_id, viewing_date)
-        VALUES (:uid, :eid, NOW())
-        ON DUPLICATE KEY UPDATE viewing_date = VALUES(viewing_date)
-    ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ':uid' => $userId,
-            ':eid' => $episodeId
-        ]);
+        //tester l'existence de la ligne
+        $sqlCheck = "
+        SELECT 1 
+        FROM watch_episode 
+        WHERE user_id = ? AND episode_id = ?
+        ";
+        $stmtCheck = $this->pdo->prepare($sqlCheck);
+        $stmtCheck->execute([$userId, $episodeId]);
+
+        $exists = $stmtCheck->fetch();
+
+        //Exécuter l'action appropriée
+        if ($exists) {
+            //La ligne existe : update la date de visionnage
+            $sqlAction = "
+            UPDATE watch_episode 
+            SET viewing_date = NOW() 
+            WHERE user_id = ? AND episode_id = ?
+            ";
+        } else {
+            //La ligne n'existe pas : insert la nouvelle ligne
+            $sqlAction = "
+            INSERT INTO watch_episode (user_id, episode_id, viewing_date)
+            VALUES (?, ?, NOW())
+            ";
+        }
+
+        //Exécuter la requête d'action
+        $stmtAction = $this->pdo->prepare($sqlAction);
+        $stmtAction->execute([$userId, $episodeId]);
     }
     public function cleanupSeriesIfCompleted(int $userId, int $seriesId): void
     {
         // total d'épisodes de la série
         $st = $this->pdo->prepare("SELECT COUNT(*) FROM episode WHERE series_id = ?");
         $st->execute([$seriesId]);
-        $total = (int) $st->fetchColumn();
+        $total = (int) $st->fetch();
 
         if ($total <= 0)
             return;
@@ -406,11 +430,11 @@ class OnlyFilmsRepository
         $st = $this->pdo->prepare("
         SELECT COUNT(*) 
         FROM watch_episode we
-        JOIN episode e ON e.episode_id = we.episode_id
+        INNER JOIN episode e ON e.episode_id = we.episode_id
         WHERE we.user_id = ? AND e.series_id = ?
-    ");
+        ");
         $st->execute([$userId, $seriesId]);
-        $watched = (int) $st->fetchColumn();
+        $watched = (int) $st->fetch();
 
         // si tout vu : purge les lignes de cette série pour cet utilisateur
         if ($watched >= $total) {
