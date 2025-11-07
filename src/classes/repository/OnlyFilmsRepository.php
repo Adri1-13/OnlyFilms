@@ -173,7 +173,7 @@ class OnlyFilmsRepository
     {
         $stmt = $this->pdo->prepare("
         SELECT s.* FROM series s
-        INNER JOIN Like_list l ON s.series_id = l.series_id
+        JOIN Like_list l ON s.series_id = l.series_id
         WHERE l.user_id = ? ORDER BY s.date_added DESC");
         $stmt->execute([$userId]);
         $rows = $stmt->fetchAll();
@@ -296,14 +296,14 @@ class OnlyFilmsRepository
                COUNT(*) AS watched_count,
                MAX(we.viewing_date) AS last_viewing
         FROM watch_episode we
-        INNER JOIN episode e ON e.episode_id = we.episode_id
+        JOIN episode e ON e.episode_id = we.episode_id
         WHERE we.user_id = ?
         GROUP BY e.series_id
         ORDER BY last_viewing DESC
-        ";
+    ";
         $st = $this->pdo->prepare($sql);
         $st->execute([$userId]);
-        $rows = $st->fetchAll();
+        $rows = $st->fetchAll(\PDO::FETCH_ASSOC);
 
         $result = [];
 
@@ -314,33 +314,24 @@ class OnlyFilmsRepository
             // 2) Total d'épisodes de la série que l'user a vu
             $stTot = $this->pdo->prepare("SELECT COUNT(*) FROM episode WHERE series_id = ?");
             $stTot->execute([$seriesId]);
-            $total = (int) $stTot->fetch();
-
-            // Si tout est vu, ce n'est plus "en cours"
-            if ($total <= 0 || $watchedCount >= $total) {
-                continue;
-            }
+            $total = (int) $stTot->fetchColumn();
 
             // 3) Dernier épisode vu (id) pour cette série
             $stLastEp = $this->pdo->prepare("
             SELECT we.episode_id
             FROM watch_episode we
-            INNER JOIN episode e ON e.episode_id = we.episode_id
-            WHERE we.user_id = ? 
-              AND e.series_id = ?
-              AND we.viewing_date = (
-                  SELECT MIN(we2.viewing_date)
-                  FROM watch_episode we2
-                  INNER JOIN episode e_sub ON e_sub.episode_id = we2.episode_id
-                  WHERE we2.user_id = ? AND e_sub.series_id = ?
-              )
+            JOIN episode e ON e.episode_id = we.episode_id
+            WHERE we.user_id = ? AND e.series_id = ?
+            ORDER BY we.viewing_date ASC
+            LIMIT 1
             ");
             $stLastEp->execute([$userId, $seriesId]);
             $lastEpisodeId = (int) $stLastEp->fetchColumn();
 
             // 4) Objets avec méthodes existantes
             $serieObj = $this->findSerieBySerieId($seriesId);
-            if ($serieObj === null) continue;
+            if ($serieObj === null)
+                continue;
 
             $episodeObj = $this->findEpisodeById($lastEpisodeId);
 
@@ -394,7 +385,7 @@ class OnlyFilmsRepository
         $stmtCheck = $this->pdo->prepare($sqlCheck);
         $stmtCheck->execute([$userId, $episodeId]);
 
-        $exists = $stmtCheck->fetch();
+        $exists = $stmtCheck->fetchColumn();
 
         //Exécuter l'action appropriée
         if ($exists) {
@@ -412,7 +403,7 @@ class OnlyFilmsRepository
             ";
         }
 
-        //Exécuter la requête d'action
+        //exécuter la requête d'action
         $stmtAction = $this->pdo->prepare($sqlAction);
         $stmtAction->execute([$userId, $episodeId]);
     }
@@ -421,7 +412,7 @@ class OnlyFilmsRepository
         // total d'épisodes de la série
         $st = $this->pdo->prepare("SELECT COUNT(*) FROM episode WHERE series_id = ?");
         $st->execute([$seriesId]);
-        $total = (int) $st->fetch();
+        $total = (int) $st->fetchColumn();
 
         if ($total <= 0)
             return;
@@ -430,11 +421,11 @@ class OnlyFilmsRepository
         $st = $this->pdo->prepare("
         SELECT COUNT(*) 
         FROM watch_episode we
-        INNER JOIN episode e ON e.episode_id = we.episode_id
+        JOIN episode e ON e.episode_id = we.episode_id
         WHERE we.user_id = ? AND e.series_id = ?
-        ");
+    ");
         $st->execute([$userId, $seriesId]);
-        $watched = (int) $st->fetch();
+        $watched = (int) $st->fetchColumn();
 
         // si tout vu : purge les lignes de cette série pour cet utilisateur
         if ($watched >= $total) {
