@@ -11,11 +11,6 @@ class DisplayCatalogueAction extends Action
 
     public function executeGet(): string
     {
-        if (!AuthnProvider::isSignedIn()) {
-            $defaultAction = new DefaultAction();
-            return $defaultAction->executeGet();
-        }
-
         try {
             $repo = OnlyFilmsRepository::getInstance();
             $seriesList = $repo->findAllSeries();

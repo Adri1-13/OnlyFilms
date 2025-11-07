@@ -14,11 +14,6 @@ class AddFavAction extends Action {
             session_start();
         }
 
-        if (!AuthnProvider::isSignedIn()) {
-            $action = new DefaultAction();
-            return $action->execute();
-        }
-
         if (isset($_GET["id"])) {
             $repo = OnlyFilmsRepository::getInstance();
             if (!$repo->isInFavList($_SESSION["user"]->getId(), (int)$_GET["id"])){
