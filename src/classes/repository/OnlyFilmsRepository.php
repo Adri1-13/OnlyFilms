@@ -192,7 +192,8 @@ class OnlyFilmsRepository
 
     /* =================== EPISODES =================== */
 
-    public function getTotalEpisodesInSerie(int $seriesId): int {
+    public function getTotalEpisodesInSerie(int $seriesId): int
+    {
         $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM episode WHERE series_id = ?");
         $stmt->execute([$seriesId]);
 
@@ -283,17 +284,26 @@ class OnlyFilmsRepository
         );
     }
 
-    public function addFav(int $userId, int $serieId): void {
-        $stmt = $this->pdo->prepare("INSERT INTO like_list (user_id, series_id) VALUES (?, ?)");
-        $stmt->execute([$userId, $serieId]);
+    public function addFav(int $userId, int $serieId): void
+    {
+        if (isInFavList($userId, $serieId) === null) {
+            $stmt = $this->pdo->prepare("INSERT INTO like_list (user_id, series_id) VALUES (?, ?)");
+            $stmt->execute([$userId, $serieId]);
+        } else {
+            $stmt = $this->pdo->prepare("UPDATE like_list SET user_id = ?, series_id = ? WHERE user_id = ? AND series_id = ?");
+            $stmt->execute([$userId, $serieId, $userId, $serieId]);
+        }
     }
 
-    public function delFav(int $userId, int $serieId): void {
+
+    public function delFav(int $userId, int $serieId): void
+    {
         $stmt = $this->pdo->prepare("DELETE FROM like_list WHERE user_id = ? and series_id = ?");
         $stmt->execute([$userId, $serieId]);
     }
 
-    public function isInFavList(int $userId, int $serieId): bool {
+    public function isInFavList(int $userId, int $serieId): bool
+    {
         $stmt = $this->pdo->prepare("SELECT * FROM like_list WHERE user_id = ? AND series_id = ?");
         $stmt->execute([$userId, $serieId]);
         $rows = $stmt->fetchAll();
