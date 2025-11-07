@@ -26,33 +26,43 @@ class AddCommentAction extends Action
 
         // Afficher le formulaire pour ajouter un commentaire
         return <<<HTML
-        <h1>Ajouter un commentaire pour {$serieTitle}</h1>
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-5">
+                    <div class="card shadow-sm">
+                        <div class="card-body p-4">
+                            <h2 class="card-title text-center mb-4">Noter la série</h2>
+                            <h5 class="card-subtitle mb-3 text-muted text-center">{$serieTitle}</h5>
+                            
+                            <form action="?action=add-comment" method="POST">
+                                <input type="hidden" name="serie_id" value="{$serieId}" />
+                                
+                                <div class="mb-3">
+                                    <label for="note" class="form-label">Votre note :</label>
+                                    <select class="form-select" name="note" id="note" required>
+                                        <option value="" disabled selected>-- Choisir une note --</option>
+                                        <option value="5">★★★★★ (5 étoiles)</option>
+                                        <option value="4">★★★★☆ (4 étoiles)</option>
+                                        <option value="3">★★★☆☆ (3 étoiles)</option>
+                                        <option value="2">★★☆☆☆ (2 étoiles)</option>
+                                        <option value="1">★☆☆☆☆ (1 étoile)</option>
+                                    </select>
+                                </div>
 
-        <form action="index.php?action=add-comment" method="POST">
-            <input type="hidden" name="serie_id" value="{$serieId}" />
-            <div>
-                <label for="comment">Votre commentaire :</label>
-                <textarea name="comment" id="comment" rows="4" required></textarea>
+                                <div class="mb-3">
+                                    <label for="comment" class="form-label">Votre commentaire :</label>
+                                    <textarea class="form-control" name="comment" id="comment" rows="4" placeholder="Laissez votre avis ici..." required></textarea>
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary">Envoyer</button>
+                                    <a href="?action=display-serie&serie-id={$serieId}" class="btn btn-outline-secondary">Annuler</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <div>
-                <label for="note">Votre note (1 à 5) :</label>
-                <select name="note" id="note" required>
-                    <option value="1">1 étoile</option>
-                    <option value="2">2 étoiles</option>
-                    <option value="3">3 étoiles</option>
-                    <option value="4">4 étoiles</option>
-                    <option value="5">5 étoiles</option>
-                </select>
-            </div>
-
-            <div>
-                <button type="submit">Ajouter le commentaire</button>
-            </div>
-        </form>
-
-        <p><a href="?action=catalog">Retour à la liste de série</a></p>
-        HTML;
+            HTML;
     }
 
 
