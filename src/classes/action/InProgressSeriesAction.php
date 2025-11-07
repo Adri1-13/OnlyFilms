@@ -32,8 +32,12 @@ class InProgressSeriesAction extends Action
             $epTitle  = $episode->getTitle();
 
             $html .= '<article class="card">';
-            if ($img !== '') {
-                $html .= '<img src="'.$img.'" alt="Affiche '.$title.'" class="cover">';
+            if ($img !== '') 
+                {
+                $html .= '<img src="images/' . $img . '" alt="Affiche ' . $title . '" class="cover">';
+            }
+            else{
+                echo "Image introuvable";
             }
             $html .= '<h3>'.$title.'</h3>';
             $html .= '<div class="progress"><div class="bar" style="width: '.$pct.'%"></div></div>';
