@@ -67,6 +67,7 @@ class OnlyFilmsRepository
 
 
     /**
+     * Trouve un utilisateur en fonction de son mail
      * @throws OnlyFilmsRepositoryException
      */
     function findUser(string $mail): User|false
@@ -87,6 +88,11 @@ class OnlyFilmsRepository
 
     }
 
+    /**
+     * Vérifie si un utilisateur existe
+     * @param string $mail
+     * @return bool
+     */
     function userExists(string $mail): bool
     {
         $requete = "SELECT 1 FROM user WHERE mail = ?";
@@ -101,6 +107,15 @@ class OnlyFilmsRepository
 
     }
 
+    /**
+     * Ajoute un utilisateur
+     * @param string $mail
+     * @param string $passwd
+     * @param string $name
+     * @param string $firstname
+     * @param int $role
+     * @return User
+     */
     function addUser(string $mail, string $passwd, string $name, string $firstname, int $role): User
     {
         $requete = "INSERT INTO user(mail, password, name, firstname, role) VALUES (?,?,?,?,?)";
@@ -114,6 +129,10 @@ class OnlyFilmsRepository
     }
 
     /* =================== SERIES =================== */
+    /**
+     * Récupère toutes les séries
+     * @return array
+     */
     public function findAllSeries(): array
     {
         $stmt = $this->pdo->query("SELECT * FROM series ORDER BY date_added DESC");
@@ -136,6 +155,7 @@ class OnlyFilmsRepository
 
 
     /**
+     * Récupère une série par son ID avec tous ses épisodes
      * @throws OnlyFilmsRepositoryException
      */
     public function findSerieBySerieId(int $id): Serie
@@ -169,32 +189,6 @@ class OnlyFilmsRepository
         );
     }
 
-    public function findSeriesByUserId(int $userId): array
-    {
-        $stmt = $this->pdo->prepare("
-        SELECT s.* FROM series s
-        JOIN Like_list l ON s.series_id = l.series_id
-        WHERE l.user_id = ? ORDER BY s.date_added DESC");
-        $stmt->execute([$userId]);
-        $rows = $stmt->fetchAll();
-
-        $series = [];
-        foreach ($rows as $r) {
-            $series[] = new Serie(
-                (int) $r['series_id'],
-                $r['title'],
-                $r['description'] ?? '',
-                $r['img'] ?? '',
-                (int) $r['year'],
-                $r['date_added'],
-                null
-            );
-        }
-
-
-        return $series;
-    }
-
 
     /* =================== EPISODES =================== */
 
@@ -206,6 +200,7 @@ class OnlyFilmsRepository
     }
 
     /**
+     * Récupère tous les épisodes d'une série
      * @throws \Exception
      */
     public function findEpisodesBySeriesId(int $seriesId): array
@@ -233,6 +228,14 @@ class OnlyFilmsRepository
         return $episodes;
     }
 
+    /**
+     * Ajoute un commentaire à une série
+     * @param int $userId
+     * @param int $serieId
+     * @param string $comment
+     * @param int $note
+     * @return void
+     */
     public function addComment(int $userId, int $serieId, string $comment, int $note): void
     {
         $stmt = $this->pdo->prepare("
@@ -249,6 +252,7 @@ class OnlyFilmsRepository
     }
 
     /**
+     * Récupère un épisode par son ID
      * @throws OnlyFilmsRepositoryException
      */
     public function findEpisodeById(int $id): Episode
@@ -277,12 +281,24 @@ class OnlyFilmsRepository
         );
     }
 
+    /**
+     * Ajoute une série aux favoris
+     * @param int $userId
+     * @param int $serieId
+     * @return void
+     */
     public function addFav(int $userId, int $serieId): void
     {
         $stmt = $this->pdo->prepare("INSERT INTO like_list (user_id, series_id) VALUES (?, ?)");
         $stmt->execute([$userId, $serieId]);
     }
 
+    /**
+     * Vérifie si une série est dans les favoris d'un utilisateur
+     * @param int $userId
+     * @param int $serieId
+     * @return bool
+     */
     public function isInFavList(int $userId, int $serieId): bool
     {
         $stmt = $this->pdo->prepare("SELECT * FROM like_list WHERE user_id = ? AND series_id = ?");
@@ -294,6 +310,13 @@ class OnlyFilmsRepository
         }
         return false;
     }
+
+    /**
+     * récupère les séries en cours de l'utilisateur
+     * @param int $userId
+     * @return array
+     * @throws OnlyFilmsRepositoryException
+     */
     public function getUserInSerieProgress(int $userId): array
     {
         // 1) Par série : combien vus + dernière date de visionnage
@@ -354,6 +377,12 @@ class OnlyFilmsRepository
 
         return $result;
     }
+
+    /**
+     * Récupère les séries favorites de l'utilisateur
+     * @param int $userId
+     * @return array
+     */
     public function getUserFavouriteSeries(int $userId): array
     {
         $sql = "
@@ -381,6 +410,13 @@ class OnlyFilmsRepository
         }
         return $series;
     }
+
+    /**
+     * Marque un épisode comme visionné
+     * @param int $userId
+     * @param int $episodeId
+     * @return void
+     */
     public function addWatchedEpisode(int $userId, int $episodeId): void
     {
         //tester l'existence de la ligne
