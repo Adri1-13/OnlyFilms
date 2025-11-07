@@ -13,35 +13,50 @@ class AddUserAction extends Action {
     public function executeGet(): string
     {
         return <<<HTML
-            <h1>Créer un compte</h1>
-            <form method="POST" action="?action=add-user">
-                <div>
-                    <label for="firstname">Prénom</label>
-                    <input type="text" name="firstname" required>
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body p-4">
+                            <h2 class="card-title text-center mb-4">Créer un compte</h2>
+                            <form method="POST" action="?action=add-user">
+                                
+                                <div class="mb-3">
+                                    <label for="firstname" class="form-label">Prénom</label>
+                                    <input type="text" class="form-control" id="firstname" name="firstname" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Nom</label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="mail" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="mail" name="mail" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="passwd" class="form-label">Mot de passe</label>
+                                    <input type="password" class="form-control" id="passwd" name="passwd" required minlength="10" aria-describedby="passwordHelpBlock">
+                                    <div id="passwordHelpBlock" class="form-text">
+                                      Minimum 10 caractères.
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="passwd_confirm" class="form-label">Confirmer le mot de passe</label>
+                                    <input type="password" class="form-control" id="passwd_confirm" name="passwd_confirm" required minlength="10">
+                                </div>
+                                
+                                <div class="d-grid mt-4">
+                                    <button type="submit" class="btn btn-primary">S'inscrire</button>
+                                </div>
+                                
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                
-                <div>
-                    <label for="name">Nom</label>
-                    <input type="text" name="name" required>
-                </div>
-                
-                <div>
-                    <label for="mail">Email</label>
-                    <input type="email" name="mail" required>
-                </div>
-                
-                <div>
-                    <label for="passwd">Mot de passe (minimum 10 caractères)</label>
-                    <input type="password" name="passwd" required minlength="10">
-                </div>
-                
-                <div>
-                    <label for="passwd_confirm">Confirmer le mot de passe</label>
-                    <input type="password" name="passwd_confirm" required minlength="10">
-                </div>
-                
-                <button type="submit">S'inscrire</button>
-            </form>
+            </div>
         HTML;
     }
 
