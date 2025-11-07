@@ -71,6 +71,37 @@ class Serie implements Renderer {
                                 <p><a href="?action=add-comment&serie_id={$serieId}">Noter/Commenter cette série</a></p>
                                 <hr>
                             HTML;
+                $avgRating = $repo->getAverageRating($serieId);
+                $comments = $repo->getComments($serieId);
+
+                if ($avgRating !== null) {
+                    $formattedRating = number_format($avgRating, 1);
+                    $html .= "<h3>Note moyenne: {$formattedRating} / 5</h3>";
+                } else {
+                    $html .= "<h3>Note moyenne: (Pas encore de note)</h3>";
+                }
+
+                $html .= "<h4>Commentaires</h4>";
+                if (empty($comments)) {
+                    $html .= "<p>Cette série n'a pas encore de commentaires.</p>";
+                } else {
+                    $html .= '<ul>';
+                    foreach ($comments as $comment) {
+                        $userName = $comment['firstname'];
+                        $userNote = (int)$comment['note'];
+                        $userText = $comment['text']; // Pas de htmlspecialchars
+                        $date = date('d/m/Y', strtotime($comment['date_added']));
+
+                        $html .= <<<COMMENT
+                        <li>
+                            <p><strong>{$userName}</strong> (Note: {$userNote}/5) - <em>{$date}</em></p>
+                            <p>{$userText}</p>
+                        </li>
+                        COMMENT;
+                    }
+                    $html .= '</ul>';
+                }
+
                 foreach ($this->episodes as $episode) {
                     $html .= $episode->render(self::COMPACT);
                 }

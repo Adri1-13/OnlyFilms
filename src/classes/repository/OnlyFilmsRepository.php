@@ -474,7 +474,38 @@ class OnlyFilmsRepository
         }
     }
 
+    /**
+     * Calcule la note moyenne d'une série
+     * @param int $serieId
+     * @return float|null
+     */
+    public function getAverageRating(int $serieId): ?float
+    {
+        $stmt = $this->pdo->prepare("SELECT AVG(note) as avg_rating FROM notation WHERE series_id = ?");
+        $stmt->execute([$serieId]);
+        $result = $stmt->fetchColumn();
+        return ($result !== false && $result !== null) ? (float)$result : null;
+    }
 
+    /**
+     * Récupère tous les commentaires et notes d'une série
+     * @param int $serieId
+     * @return array
+     */
+    public function getComments(int $serieId): array
+    {
+        // On joint les tables commentary, notation et user pour avoir toutes les infos
+        $stmt = $this->pdo->prepare("
+            SELECT n.note, c.text, c.date_added, u.firstname 
+            FROM commentary c
+            JOIN notation n ON c.user_id = n.user_id AND c.series_id = n.series_id
+            JOIN user u ON c.user_id = u.user_id
+            WHERE c.series_id = ? 
+            ORDER BY c.date_added DESC
+        ");
+        $stmt->execute([$serieId]);
+        return $stmt->fetchAll();
+    }
 
 
 }
