@@ -228,14 +228,16 @@ class OnlyFilmsRepository
         return $episodes;
     }
 
-    /**
-     * Ajoute un commentaire à une série
-     * @param int $userId
-     * @param int $serieId
-     * @param string $comment
-     * @param int $note
-     * @return void
-     */
+    public function findEpisodeIdByNumAndSeriesId(int $episodeNum, int $seriesId): int
+    {
+        $stmt = $this->pdo->prepare("SELECT episode_id FROM episode WHERE num = ? AND series_id = ?");
+        $stmt->execute([$episodeNum, $seriesId]);
+
+        $episodeId = $stmt->fetchColumn();
+
+        return (int) $episodeId;
+    }
+
     public function addComment(int $userId, int $serieId, string $comment, int $note): void
     {
         $stmt = $this->pdo->prepare("
