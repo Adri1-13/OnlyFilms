@@ -206,11 +206,3 @@ INSERT INTO `watch_episode` (`user_id`, `episode_id`, `viewing_date`) VALUES
 (2, 4, '2023-10-01 19:30:00'), -- Bob a vu S2E1
 (2, 5, '2023-10-02 19:45:00'), -- Bob a vu S2E2
 (1, 7, '2024-02-10 17:30:00'); -- Alice a vu S3E1
-
--- --------------------------------------------------------
--- Insertions dans la table `watching_episode`
--- (Suivi de visionnage en cours utilisateur/épisode)
--- --------------------------------------------------------
-INSERT INTO `watching_episode` (`user_id`, `episode_id`, `time`) VALUES
-(1, 3, 1200), -- Alice a commencé S1E3, arrêtée à 1200 secondes
-(2, 6, 500);  -- Bob a commencé S2E3, arrêté à 500 secondes

@@ -21,20 +21,22 @@ class DefaultAction extends Action
             $firstName = htmlspecialchars($user->getFirstname());
 
             $repo = OnlyFilmsRepository::getInstance();
+            // récupérer les séries favorites de l'utilisateur
             $favouriteSeries = $repo->getUserFavouriteSeries($user->getId());
+
+            // récupérer les séries en cours
+            $seriesInProgress = $repo->getUserInSerieProgress($user->getId());
 
              $htmlres = <<<HTML
                 <h1>Bienvenue sur OnlyFilms, {$firstName} !</h1>
                 <p>
                     <a href="?action=catalog">Catalogue des séries</a>
                     <br>
-                    <a href="?action=in-progress">Séries en cours</a>
-                    <br>
                     <a href="?action=signout">Déconnexion</a>
                 </p>
 
                 <h2>Vos séries préférées :</h2>
-            HTML;
+             HTML;
 
             if (empty($favouriteSeries)) {
                 $htmlres .= <<<HTML
@@ -49,6 +51,42 @@ class DefaultAction extends Action
                         <p>{$serie->render(Renderer::COMPACT)}</p>
                     HTML;
                 }
+            }
+
+            if (empty($seriesInProgress)) {
+                $htmlres .= <<<HTML
+                    <p>Vous n'avez pas de série en cours de visionnage</p>
+                HTML;
+
+            } else {
+                foreach ($seriesInProgress as $seriesInProgress) {
+                    $serie = $seriesInProgress['series'];
+                    $episode = $seriesInProgress['last_episode'];
+                    $progress = $seriesInProgress['progress_pct'];
+
+                    $serieTitle = htmlspecialchars($serie->getTitle());
+                    $serieImg = htmlspecialchars($serie->getImage());
+                    $episodeTitle = htmlspecialchars($episode->getTitle());
+                    $episodeNum = $episode->getNumber();
+                    $episodeId = $episode->getId();
+
+                    $htmlres .= <<<HTML
+                        <article class="serie-progress">
+                            <img src="images/{$serieImg}" alt="{$serieTitle}" width="150">
+                            <div class="info">
+                                <h3>{$serieTitle}</h3>
+                                <p>Dernier épisode : Épisode {$episodeNum} - {$episodeTitle}</p>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: {$progress}%"></div>
+                                </div>
+                                <p>Progression : {$progress}%</p>
+                                <a href="?action=display-episode&episode-id={$episodeId}" class="btn btn-primary">Reprendre</a>
+                            </div>
+                        </article>
+                    HTML;
+
+                }
+
             }
 
             return $htmlres;
