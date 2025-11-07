@@ -283,26 +283,17 @@ class OnlyFilmsRepository
         );
     }
 
-    /**
-     * Ajoute une série aux favoris
-     * @param int $userId
-     * @param int $serieId
-     * @return void
-     */
-    public function addFav(int $userId, int $serieId): void
-    {
+    public function addFav(int $userId, int $serieId): void {
         $stmt = $this->pdo->prepare("INSERT INTO like_list (user_id, series_id) VALUES (?, ?)");
         $stmt->execute([$userId, $serieId]);
     }
 
-    /**
-     * Vérifie si une série est dans les favoris d'un utilisateur
-     * @param int $userId
-     * @param int $serieId
-     * @return bool
-     */
-    public function isInFavList(int $userId, int $serieId): bool
-    {
+    public function delFav(int $userId, int $serieId): void {
+        $stmt = $this->pdo->prepare("DELETE FROM like_list WHERE user_id = ? and series_id = ?");
+        $stmt->execute([$userId, $serieId]);
+    }
+
+    public function isInFavList(int $userId, int $serieId): bool {
         $stmt = $this->pdo->prepare("SELECT * FROM like_list WHERE user_id = ? AND series_id = ?");
         $stmt->execute([$userId, $serieId]);
         $rows = $stmt->fetchAll();
