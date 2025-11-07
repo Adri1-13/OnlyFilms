@@ -31,7 +31,7 @@ class InProgressSeriesAction extends Action
             $epId     = (int)$episode->getId();
             $epTitle  = $episode->getTitle();
 
-            $html .= '<article>';
+            $html .= '<article class="card">';
             if ($img !== '') {
                 $html .= '<img src="'.$img.'" alt="Affiche '.$title.'" class="cover">';
             }

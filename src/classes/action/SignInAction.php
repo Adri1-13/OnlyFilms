@@ -12,15 +12,30 @@ class SignInAction extends Action {
     public function executeGet(): string
     {
         return <<<HTML
-            <form method="POST" action="?action=signin">
-                <label for="mail">Email</label>
-                <input type="email" name="mail" required>
-                
-                <label for="passwd">Mot de passe</label>
-                <input type="password" name="passwd" required>
-                
-                <button type="submit">Se connecter</button>
-            </form>
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body p-4">
+                            <h2 class="card-title text-center mb-4">Connexion</h2>
+                            <form method="POST" action="?action=signin">
+                                <div class="mb-3">
+                                    <label for="mail" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="mail" name="mail" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="passwd" class="form-label">Mot de passe</label>
+                                    <input type="password" class="form-control" id="passwd" name="passwd" required>
+                                </div>
+                                
+                                <div class="d-grid mt-4">
+                                    <button type="submit" class="btn btn-primary">Se connecter</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         HTML;
 
     }
