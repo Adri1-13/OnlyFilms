@@ -243,7 +243,7 @@ class OnlyFilmsRepository
     {
         // Vérifier si un commentaire existe déjà
         $stmt = $this->pdo->prepare("
-        SELECT id FROM commentary 
+        SELECT * FROM commentary 
         WHERE user_id = ? AND series_id = ?
     ");
         $stmt->execute([$userId, $serieId]);
