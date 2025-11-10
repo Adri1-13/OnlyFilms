@@ -192,7 +192,8 @@ class OnlyFilmsRepository
 
     /* =================== EPISODES =================== */
 
-    public function getTotalEpisodesInSerie(int $seriesId): int {
+    public function getTotalEpisodesInSerie(int $seriesId): int
+    {
         $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM episode WHERE series_id = ?");
         $stmt->execute([$seriesId]);
 
@@ -240,18 +241,45 @@ class OnlyFilmsRepository
 
     public function addComment(int $userId, int $serieId, string $comment, int $note): void
     {
+        // Vérifier si un commentaire existe déjà
         $stmt = $this->pdo->prepare("
+        SELECT id FROM commentary 
+        WHERE user_id = ? AND series_id = ?
+    ");
+        $stmt->execute([$userId, $serieId]);
+        $existingComment = $stmt->fetch();
+        // Ya un commentaire
+        if ($existingComment) {
+            $stmt = $this->pdo->prepare("
+            UPDATE commentary 
+            SET text = ?, date_added = NOW() 
+            WHERE user_id = ? AND series_id = ?
+        ");
+            $stmt->execute([$comment, $userId, $serieId]);
+
+            $stmt = $this->pdo->prepare("
+            UPDATE notation
+            SET note = ?, date_added = NOW()
+            WHERE user_id = ? AND series_id = ?
+        ");
+            $stmt->execute([$note, $userId, $serieId]);
+
+        } else {
+            // Pas de commentaire
+            $stmt = $this->pdo->prepare("
             INSERT INTO commentary (user_id, series_id, text, date_added)
             VALUES (?, ?, ?, NOW())
         ");
-        $stmt->execute([$userId, $serieId, $comment]);
+            $stmt->execute([$userId, $serieId, $comment]);
 
-        $stmt = $this->pdo->prepare("
+            $stmt = $this->pdo->prepare("
             INSERT INTO notation (user_id, series_id, note, date_added)
             VALUES (?, ?, ?, NOW())
         ");
-        $stmt->execute([$userId, $serieId, $note]);
+            $stmt->execute([$userId, $serieId, $note]);
+        }
     }
+
 
     /**
      * Récupère un épisode par son ID
@@ -283,17 +311,20 @@ class OnlyFilmsRepository
         );
     }
 
-    public function addFav(int $userId, int $serieId): void {
+    public function addFav(int $userId, int $serieId): void
+    {
         $stmt = $this->pdo->prepare("INSERT INTO like_list (user_id, series_id) VALUES (?, ?)");
         $stmt->execute([$userId, $serieId]);
     }
 
-    public function delFav(int $userId, int $serieId): void {
+    public function delFav(int $userId, int $serieId): void
+    {
         $stmt = $this->pdo->prepare("DELETE FROM like_list WHERE user_id = ? and series_id = ?");
         $stmt->execute([$userId, $serieId]);
     }
 
-    public function isInFavList(int $userId, int $serieId): bool {
+    public function isInFavList(int $userId, int $serieId): bool
+    {
         $stmt = $this->pdo->prepare("SELECT * FROM like_list WHERE user_id = ? AND series_id = ?");
         $stmt->execute([$userId, $serieId]);
         $rows = $stmt->fetchAll();
@@ -484,7 +515,7 @@ class OnlyFilmsRepository
         $stmt = $this->pdo->prepare("SELECT AVG(note) as avg_rating FROM notation WHERE series_id = ?");
         $stmt->execute([$serieId]);
         $result = $stmt->fetchColumn();
-        return ($result !== false && $result !== null) ? (float)$result : null;
+        return ($result !== false && $result !== null) ? (float) $result : null;
     }
 
     /**
