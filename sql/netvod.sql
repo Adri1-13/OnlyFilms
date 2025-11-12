@@ -127,6 +127,20 @@ CREATE TABLE `watched_series` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
+-- Table `password_reset_token`
+-- --------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS password_reset_token (
+  token CHAR(64) NOT NULL,
+  user_id INT(11) NOT NULL,
+  issued_at DATETIME NOT NULL,
+  expires_at DATETIME NOT NULL,
+  used INT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (token),
+  CONSTRAINT fk_prt_user FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
 -- Insertions dans la table `user`
 -- --------------------------------------------------------
 INSERT INTO `user` (`user_id`, `mail`, `password`, `name`, `firstname`, `role`) VALUES
@@ -255,13 +269,3 @@ BEGIN
 END$$
 
 DELIMITER ;
-
-CREATE TABLE IF NOT EXISTS password_reset_token (
-  token CHAR(64) NOT NULL,            -- bin2hex(random_bytes(32))
-  user_id INT(11) NOT NULL,
-  issued_at DATETIME NOT NULL,
-  expires_at DATETIME NOT NULL,
-  used INT(1) NOT NULL DEFAULT 0,
-  PRIMARY KEY (token),
-  CONSTRAINT fk_prt_user FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
