@@ -189,6 +189,33 @@ class OnlyFilmsRepository
         );
     }
 
+    public function searchSeries(string $query): array
+    {
+        $recherche = '%' . $query . '%';
+
+        $stmt = $this->pdo->prepare("
+            SELECT * FROM series 
+            WHERE title LIKE ? OR description LIKE ? 
+            ORDER BY date_added DESC
+        ");
+
+        $stmt->execute([$recherche, $recherche]);
+        $series = [];
+
+        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $series[] = new Serie(
+                (int) $r['series_id'],
+                $r['title'],
+                $r['description'] ?? '',
+                $r['img'] ?? '',
+                (int) $r['year'],
+                $r['date_added'],
+                null
+            );
+        }
+
+        return $series;
+    }
 
     /* =================== EPISODES =================== */
 
