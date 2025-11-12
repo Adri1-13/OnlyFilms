@@ -55,7 +55,7 @@ class AddCommentAction extends Action
 
                                 <div class="mb-3">
                                     <label for="comment" class="form-label">Votre commentaire :</label>
-                                    <textarea class="form-control" name="comment" id="comment" rows="4" placeholder="Laissez votre avis ici..." required></textarea>
+                                    <textarea class="form-control" name="comment" id="comment" rows="4" placeholder="Laissez votre avis ici..."></textarea>
                                 </div>
 
                                 <div class="d-grid gap-2">

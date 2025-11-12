@@ -1,6 +1,7 @@
 <?php
 namespace iutnc\onlyfilms\action;
 
+use iutnc\onlyfilms\exception\OnlyFilmsRepositoryException;
 use iutnc\onlyfilms\Repository\OnlyFilmsRepository;
 
 class ForgotPasswordAction extends Action
@@ -25,11 +26,13 @@ class ForgotPasswordAction extends Action
         if ($email === '') return '<div class="container mt-4"><p>Email invalide.</p></div>' . $this->executeGet();
 
         $repo = OnlyFilmsRepository::getInstance();
-        $user = $repo->findUser($email);
-
-        if (!$user) {
-            // on dit juste non trouvé
-            return '<div class="container mt-4"><p>Email inconnu.</p></div>' . $this->executeGet();
+        try {
+            $user = $repo->findUser($email);
+            // si le user n'existe déjà pas
+        } catch (OnlyFilmsRepositoryException $e) {
+            return <<<HTML
+                <div class="container mt-4">{$e->getMessage()}</div>
+            HTML;
         }
 
         // crée le token et REDIRIGE direct vers la page de reset
