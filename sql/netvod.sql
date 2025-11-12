@@ -226,32 +226,32 @@ CREATE TRIGGER trg_watch_episode_after_insert
 AFTER INSERT ON watch_episode
 FOR EACH ROW
 BEGIN
-  DECLARE v_series_id INT;
-  DECLARE v_total INT;
-  DECLARE v_watched INT;
+    DECLARE v_series_id INT;
+    DECLARE v_total INT;
+    DECLARE v_watched INT;
 
-  -- Trouver la série de l'épisode inséré
-  SELECT e.series_id INTO v_series_id
-  FROM episode e
-  WHERE e.episode_id = NEW.episode_id;
+      -- Trouver la série de l'épisode inséré
+      SELECT e.series_id INTO v_series_id
+      FROM episode e
+      WHERE e.episode_id = NEW.episode_id;
 
-  -- Nb total d'épisodes de la série
-  SELECT COUNT(*) INTO v_total
-  FROM episode
-  WHERE series_id = v_series_id;
+      -- Nb total d'épisodes de la série
+      SELECT COUNT(*) INTO v_total
+      FROM episode
+      WHERE series_id = v_series_id;
 
-  -- Nb d'épisodes vus par cet utilisateur dans cette série
-  SELECT COUNT(*) INTO v_watched
-  FROM watch_episode we
-  INNER JOIN episode e2 ON e2.episode_id = we.episode_id
-  WHERE we.user_id = NEW.user_id AND e2.series_id = v_series_id;
+      -- Nb d'épisodes vus par cet utilisateur dans cette série
+      SELECT COUNT(*) INTO v_watched
+      FROM watch_episode we
+      INNER JOIN episode e2 ON e2.episode_id = we.episode_id
+      WHERE we.user_id = NEW.user_id AND e2.series_id = v_series_id;
 
-  -- Si tout est vu, placer dans watched_series
-  IF v_total > 0 AND v_watched = v_total THEN
-    INSERT INTO watched_series(user_id, series_id, viewing_date)
-    VALUES (NEW.user_id, v_series_id, NOW())
-    ON DUPLICATE KEY UPDATE viewing_date = NOW();
-  END IF;
+      -- Si tout est vu, placer dans watched_series
+      IF v_total > 0 AND v_watched = v_total THEN
+            INSERT INTO watched_series(user_id, series_id, viewing_date)
+            VALUES (NEW.user_id, v_series_id, NOW())
+            ON DUPLICATE KEY UPDATE viewing_date = NOW();
+      END IF;
 END$$
 
 DELIMITER ;
