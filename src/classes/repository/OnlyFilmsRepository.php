@@ -538,7 +538,6 @@ class OnlyFilmsRepository
         $stmt->execute([$serieId]);
         return $stmt->fetchAll();
     }
-    // OnlyFilmsRepository.php (extraits)
     public function getWatchedSeries(int $userId): array
     {
         $sql = "SELECT s.series_id, s.title, s.img, ws.viewing_date
