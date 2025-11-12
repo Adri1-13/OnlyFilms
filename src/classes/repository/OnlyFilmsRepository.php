@@ -13,15 +13,13 @@ use iutnc\onlyfilms\video\tracks\Episode;
 
 use PDO;
 
-class OnlyFilmsRepository
-{
+class OnlyFilmsRepository {
     private \PDO $pdo;
     private static ?OnlyFilmsRepository $instance = null;
     private static array $config = [];
 
 
-    private function __construct(array $conf)
-    {
+    private function __construct(array $conf) {
         $this->pdo = new \PDO(
             $conf['dsn'],
             $conf['user'],
@@ -36,8 +34,7 @@ class OnlyFilmsRepository
         $this->pdo->prepare('SET NAMES \'UTF8\'')->execute(); // permet de gérer les accents dans les données
     }
 
-    public static function getInstance(): OnlyFilmsRepository
-    {
+    public static function getInstance(): OnlyFilmsRepository {
         if (self::$instance === null) {
             self::$instance = new OnlyFilmsRepository(self::$config);
         }
@@ -49,8 +46,7 @@ class OnlyFilmsRepository
      * ---> obligé parce que pour faire une instance on a besoin de la config, et si setConfig n'est pas static, alors il faut obligatoirement une instance
      * pour appeler la fonction, donc on doit mettre setConfig et config en static pour qu'ils ne dépendent pas d'une instance et ensuite pouvoir créer une instance de repository
      */
-    public static function setConfig($file): void
-    {
+    public static function setConfig($file): void {
         $fichierConfig = parse_ini_file($file);
         if ($fichierConfig === false) {
             throw new \Exception("Erreur dans le fichier de config"); // pourquoi c'est \Exception ? parce que c'est dans un namespace
@@ -64,14 +60,7 @@ class OnlyFilmsRepository
 
 
     /* =================== USER =================== */
-
-
-    /**
-     * Trouve un utilisateur en fonction de son mail
-     * @throws OnlyFilmsRepositoryException
-     */
-    function findUser(string $mail): User|false
-    {
+    public function findUser(string $mail): User|false {
         $requete = "SELECT * FROM user WHERE mail = ?";
 
         $stmt = $this->pdo->prepare($requete);
@@ -88,13 +77,7 @@ class OnlyFilmsRepository
 
     }
 
-    /**
-     * Vérifie si un utilisateur existe
-     * @param string $mail
-     * @return bool
-     */
-    function userExists(string $mail): bool
-    {
+    public function userExists(string $mail): bool {
         $requete = "SELECT 1 FROM user WHERE mail = ?";
 
         $stmt = $this->pdo->prepare($requete);
@@ -107,17 +90,7 @@ class OnlyFilmsRepository
 
     }
 
-    /**
-     * Ajoute un utilisateur
-     * @param string $mail
-     * @param string $passwd
-     * @param string $name
-     * @param string $firstname
-     * @param int $role
-     * @return User
-     */
-    function addUser(string $mail, string $passwd, string $name, string $firstname, int $role): User
-    {
+    public function addUser(string $mail, string $passwd, string $name, string $firstname, int $role): User {
         $requete = "INSERT INTO user(mail, password, name, firstname, role) VALUES (?,?,?,?,?)";
 
         $stmt = $this->pdo->prepare($requete);
@@ -128,251 +101,7 @@ class OnlyFilmsRepository
         return new User((int) $nouvID, $firstname, $name, $mail, $passwd, $role);
     }
 
-    /* =================== SERIES =================== */
-    public function findAllSeries(string $sort): array {
-        $sortClause = $this->getSortClause($sort);
-
-        $stmt = $this->pdo->query("SELECT s.*, AVG(n.note) avg_rating FROM series s 
-                                    LEFT OUTER JOIN notation n ON s.series_id = n.series_id
-                                    GROUP BY s.series_id
-                                    $sortClause");
-        $rows = $stmt->fetchAll();
-
-        $series = [];
-        foreach ($rows as $r) {
-            $series[] = new Serie(
-                (int) $r['series_id'],
-                $r['title'],
-                $r['description'] ?? '',
-                $r['img'] ?? '',
-                (int) $r['year'],
-                $r['date_added'],
-                null
-            );
-        }
-        return $series;
-    }
-
-
-    /**
-     * Récupère une série par son ID avec tous ses épisodes
-     * @throws OnlyFilmsRepositoryException
-     */
-    public function findSerieBySerieId(int $id): Serie
-    {
-
-        if ($id < 0) {
-            throw new OnlyFilmsRepositoryException('Id doit être positif');
-        }
-        $stmt = $this->pdo->prepare("SELECT * FROM series WHERE series_id = ?");
-        $stmt->execute([$id]);
-        $row = $stmt->fetch();
-
-        if (empty($row)) {
-            throw new OnlyFilmsRepositoryException('Serie introuvable');
-        }
-
-        try {
-            $episodes = $this->findEpisodesBySeriesId($id);
-        } catch (\Exception $e) {
-            throw new OnlyFilmsRepositoryException('Echec récupération liste épisodes');
-        }
-
-        return new Serie(
-            (int) $row['series_id'],
-            $row['title'],
-            $row['description'] ?? '',
-            $row['img'] ?? '',
-            (int) $row['year'],
-            $row['date_added'],
-            $episodes,
-        );
-    }
-
-    public function searchSeries(string $query, string $sort): array
-    {
-        $recherche = '%' . $query . '%';
-        $sortClause = $this->getSortClause($sort);
-
-        $stmt = $this->pdo->prepare("
-            SELECT s.*, AVG(n.note) avg_rating FROM series s
-            LEFT OUTER JOIN notation n ON s.series_id = n.series_id
-            WHERE s.title LIKE ? OR s.description LIKE ?
-            GROUP BY s.series_id
-            $sortClause
-        ");
-
-        $stmt->execute([$recherche, $recherche]);
-        $series = [];
-
-        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $series[] = new Serie(
-                (int) $r['series_id'],
-                $r['title'],
-                $r['description'] ?? '',
-                $r['img'] ?? '',
-                (int) $r['year'],
-                $r['date_added'],
-                null
-            );
-        }
-
-        return $series;
-    }
-
-    /* =================== EPISODES =================== */
-
-    public function getTotalEpisodesInSerie(int $seriesId): int
-    {
-        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM episode WHERE series_id = ?");
-        $stmt->execute([$seriesId]);
-
-        return (int) $stmt->fetchColumn();
-    }
-
-    /**
-     * Récupère tous les épisodes d'une série
-     * @throws \Exception
-     */
-    public function findEpisodesBySeriesId(int $seriesId): array
-    {
-        $stmt = $this->pdo->prepare("SELECT * FROM episode WHERE series_id = ? ORDER BY num ASC");
-        $stmt->execute([$seriesId]);
-        $rows = $stmt->fetchAll();
-
-        $episodes = [];
-        foreach ($rows as $r) {
-            $episodes[] = new Episode(
-                (int) $r['episode_id'],
-                (int) $r['num'],
-                $r['title'],
-                $r['summary'] ?? '',
-                (int) $r['duration'],
-                $r['file'] ?? '',
-                $r['img'],
-                (int) $r['series_id']
-            );
-        }
-        if (empty($episodes)) {
-            throw new \Exception("Aucun épisode associé a cette série");
-        }
-        return $episodes;
-    }
-
-    public function findEpisodeIdByNumAndSeriesId(int $episodeNum, int $seriesId): int
-    {
-        $stmt = $this->pdo->prepare("SELECT episode_id FROM episode WHERE num = ? AND series_id = ?");
-        $stmt->execute([$episodeNum, $seriesId]);
-
-        $episodeId = $stmt->fetchColumn();
-
-        return (int) $episodeId;
-    }
-
-    public function addComment(int $userId, int $serieId, string $comment, int $note): void
-    {
-        // Vérifier si un commentaire existe déjà
-        $stmt = $this->pdo->prepare("
-        SELECT * FROM commentary 
-        WHERE user_id = ? AND series_id = ?
-    ");
-        $stmt->execute([$userId, $serieId]);
-        $existingComment = $stmt->fetch();
-        // Ya un commentaire
-        if ($existingComment) {
-            $stmt = $this->pdo->prepare("
-            UPDATE commentary 
-            SET text = ?, date_added = NOW() 
-            WHERE user_id = ? AND series_id = ?
-        ");
-            $stmt->execute([$comment, $userId, $serieId]);
-
-            $stmt = $this->pdo->prepare("
-            UPDATE notation
-            SET note = ?, date_added = NOW()
-            WHERE user_id = ? AND series_id = ?
-        ");
-            $stmt->execute([$note, $userId, $serieId]);
-
-        } else {
-            // Pas de commentaire
-            $stmt = $this->pdo->prepare("
-            INSERT INTO commentary (user_id, series_id, text, date_added)
-            VALUES (?, ?, ?, NOW())
-        ");
-            $stmt->execute([$userId, $serieId, $comment]);
-
-            $stmt = $this->pdo->prepare("
-            INSERT INTO notation (user_id, series_id, note, date_added)
-            VALUES (?, ?, ?, NOW())
-        ");
-            $stmt->execute([$userId, $serieId, $note]);
-        }
-    }
-
-
-    /**
-     * Récupère un épisode par son ID
-     * @throws OnlyFilmsRepositoryException
-     */
-    public function findEpisodeById(int $id): Episode
-    {
-        if ($id < 0) {
-            throw new OnlyFilmsRepositoryException("Id doit etre positif");
-        }
-        $stmt = $this->pdo->prepare("SELECT * FROM episode WHERE episode_id = ?");
-        $stmt->execute([$id]);
-        $rows = $stmt->fetchAll();
-
-        if (empty($rows)) {
-            throw new OnlyFilmsRepositoryException("Aucun épisode trouvé");
-        }
-
-        $row = $rows[0];
-        return new Episode(
-            $row['episode_id'], // $id
-            $row['num'],        // $number
-            $row['title'],      // $title
-            $row['summary'],    // $summary
-            $row['duration'],   // $duration
-            $row['file'],       // $file
-            $row['img'],        // $img
-            $row['series_id']   // $seriesId
-        );
-    }
-
-    public function addFav(int $userId, int $serieId): void
-    {
-        $stmt = $this->pdo->prepare("INSERT INTO like_list (user_id, series_id) VALUES (?, ?)");
-        $stmt->execute([$userId, $serieId]);
-    }
-
-    public function delFav(int $userId, int $serieId): void
-    {
-        $stmt = $this->pdo->prepare("DELETE FROM like_list WHERE user_id = ? and series_id = ?");
-        $stmt->execute([$userId, $serieId]);
-    }
-
-    public function isInFavList(int $userId, int $serieId): bool
-    {
-        $stmt = $this->pdo->prepare("SELECT * FROM like_list WHERE user_id = ? AND series_id = ?");
-        $stmt->execute([$userId, $serieId]);
-        $rows = $stmt->fetchAll();
-
-        if (!empty($rows)) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * récupère les séries en cours de l'utilisateur
-     * @param int $userId
-     * @return array
-     * @throws OnlyFilmsRepositoryException
-     */
-    public function getUserInSerieProgress(int $userId): array
-    {
+    public function getUserInSerieProgress(int $userId): array {
         // 1) Par série : combien vus + dernière date de visionnage
         // Recupere l'ID de la serie , le nombre d'ep qu'il a vu & la dernier date
         $sql = "
@@ -432,13 +161,7 @@ class OnlyFilmsRepository
         return $result;
     }
 
-    /**
-     * Récupère les séries favorites de l'utilisateur
-     * @param int $userId
-     * @return array
-     */
-    public function getUserFavouriteSeries(int $userId): array
-    {
+    public function getUserFavouriteSeries(int $userId): array {
         $sql = "
         SELECT s.*
         FROM like_list l
@@ -465,14 +188,253 @@ class OnlyFilmsRepository
         return $series;
     }
 
-    /**
-     * Marque un épisode comme visionné
-     * @param int $userId
-     * @param int $episodeId
-     * @return void
-     */
-    public function addWatchedEpisode(int $userId, int $episodeId): void
-    {
+
+    /* =================== SERIES =================== */
+    public function findAllSeries(string $tri, ?string $genre): array {
+        $triParam = $this->getTriParam($tri);
+        $where = "";
+
+        //si un genre est fourni, on ajoute la clause where
+        if (!empty($genre)) {
+            $where = "WHERE g.name = ?";
+        }
+
+        $sql = "SELECT s.*, AVG(n.note) avg_rating 
+                FROM series s 
+                LEFT OUTER JOIN notation n ON s.series_id = n.series_id
+                INNER JOIN genre_series gs ON s.series_id = gs.series_id
+                INNER JOIN genre g ON gs.genre_id = g.genre_id
+                {$where}
+                GROUP BY s.series_id
+                {$triParam}";
+
+        //on exécute avec le paramètre $genre s'il y en a un
+        $stmt = $this->pdo->prepare($sql);
+        if (!empty($genre)) {
+            $stmt->execute([$genre]);
+        } else {
+            $stmt->execute();
+        }
+
+        $rows = $stmt->fetchAll();
+
+        $series = [];
+        foreach ($rows as $r) {
+            $series[] = new Serie(
+                (int) $r['series_id'],
+                $r['title'],
+                $r['description'] ?? '',
+                $r['img'] ?? '',
+                (int) $r['year'],
+                $r['date_added'],
+                null
+            );
+        }
+        return $series;
+    }
+
+    public function findSerieBySerieId(int $id): Serie {
+
+        if ($id < 0) {
+            throw new OnlyFilmsRepositoryException('Id doit être positif');
+        }
+        $stmt = $this->pdo->prepare("SELECT * FROM series WHERE series_id = ?");
+        $stmt->execute([$id]);
+        $row = $stmt->fetch();
+
+        if (empty($row)) {
+            throw new OnlyFilmsRepositoryException('Serie introuvable');
+        }
+
+        try {
+            $episodes = $this->findEpisodesBySeriesId($id);
+        } catch (\Exception $e) {
+            throw new OnlyFilmsRepositoryException('Echec récupération liste épisodes');
+        }
+
+        return new Serie(
+            (int) $row['series_id'],
+            $row['title'],
+            $row['description'] ?? '',
+            $row['img'] ?? '',
+            (int) $row['year'],
+            $row['date_added'],
+            $episodes,
+        );
+    }
+
+    public function searchSeries(string $query, string $tri, ?string $genre): array {
+        $recherche = '%' . $query . '%';
+
+        $triParam = $this->getTriParam($tri);
+
+        $params = [$recherche, $recherche];
+        $where = "WHERE (s.title LIKE ? OR s.description LIKE ?)";
+
+        //On modifie la clause where s'il y a un genre
+        if (!empty($genre)) {
+            $where .= " AND g.name = ?";
+            $params[] = $genre; //Et on ajoute le genre dans les paramètres d'exécution
+        }
+
+        $sql = "
+            SELECT s.*, AVG(n.note) avg_rating 
+            FROM series s
+            LEFT OUTER JOIN notation n ON s.series_id = n.series_id
+            INNER JOIN genre_series gs ON s.series_id = gs.series_id
+            INNER JOIN genre g ON gs.genre_id = g.genre_id
+            {$where}
+            GROUP BY s.series_id
+            {$triParam}
+        ";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        $series = [];
+        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $series[] = new Serie(
+                (int) $r['series_id'],
+                $r['title'],
+                $r['description'] ?? '',
+                $r['img'] ?? '',
+                (int) $r['year'],
+                $r['date_added'],
+                null
+            );
+        }
+
+        return $series;
+    }
+
+    /* =================== EPISODES =================== */
+    public function getTotalEpisodesInSerie(int $seriesId): int {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM episode WHERE series_id = ?");
+        $stmt->execute([$seriesId]);
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    public function findEpisodesBySeriesId(int $seriesId): array {
+        $stmt = $this->pdo->prepare("SELECT * FROM episode WHERE series_id = ? ORDER BY num ASC");
+        $stmt->execute([$seriesId]);
+        $rows = $stmt->fetchAll();
+
+        $episodes = [];
+        foreach ($rows as $r) {
+            $episodes[] = new Episode(
+                (int) $r['episode_id'],
+                (int) $r['num'],
+                $r['title'],
+                $r['summary'] ?? '',
+                (int) $r['duration'],
+                $r['file'] ?? '',
+                $r['img'],
+                (int) $r['series_id']
+            );
+        }
+        if (empty($episodes)) {
+            throw new \Exception("Aucun épisode associé a cette série");
+        }
+        return $episodes;
+    }
+
+    public function findEpisodeIdByNumAndSeriesId(int $episodeNum, int $seriesId): int {
+        $stmt = $this->pdo->prepare("SELECT episode_id FROM episode WHERE num = ? AND series_id = ?");
+        $stmt->execute([$episodeNum, $seriesId]);
+
+        $episodeId = $stmt->fetchColumn();
+
+        return (int) $episodeId;
+    }
+
+    public function addComment(int $userId, int $serieId, string $comment, int $note): void {
+        // Vérifier si un commentaire existe déjà
+        $stmt = $this->pdo->prepare("
+        SELECT * FROM commentary 
+        WHERE user_id = ? AND series_id = ?
+    ");
+        $stmt->execute([$userId, $serieId]);
+        $existingComment = $stmt->fetch();
+        // Ya un commentaire
+        if ($existingComment) {
+            $stmt = $this->pdo->prepare("
+            UPDATE commentary 
+            SET text = ?, date_added = NOW() 
+            WHERE user_id = ? AND series_id = ?
+        ");
+            $stmt->execute([$comment, $userId, $serieId]);
+
+            $stmt = $this->pdo->prepare("
+            UPDATE notation
+            SET note = ?, date_added = NOW()
+            WHERE user_id = ? AND series_id = ?
+        ");
+            $stmt->execute([$note, $userId, $serieId]);
+
+        } else {
+            // Pas de commentaire
+            $stmt = $this->pdo->prepare("
+            INSERT INTO commentary (user_id, series_id, text, date_added)
+            VALUES (?, ?, ?, NOW())
+        ");
+            $stmt->execute([$userId, $serieId, $comment]);
+
+            $stmt = $this->pdo->prepare("
+            INSERT INTO notation (user_id, series_id, note, date_added)
+            VALUES (?, ?, ?, NOW())
+        ");
+            $stmt->execute([$userId, $serieId, $note]);
+        }
+    }
+
+    public function findEpisodeById(int $id): Episode {
+        if ($id < 0) {
+            throw new OnlyFilmsRepositoryException("Id doit etre positif");
+        }
+        $stmt = $this->pdo->prepare("SELECT * FROM episode WHERE episode_id = ?");
+        $stmt->execute([$id]);
+        $rows = $stmt->fetchAll();
+
+        if (empty($rows)) {
+            throw new OnlyFilmsRepositoryException("Aucun épisode trouvé");
+        }
+
+        $row = $rows[0];
+        return new Episode(
+            $row['episode_id'], // $id
+            $row['num'],        // $number
+            $row['title'],      // $title
+            $row['summary'],    // $summary
+            $row['duration'],   // $duration
+            $row['file'],       // $file
+            $row['img'],        // $img
+            $row['series_id']   // $seriesId
+        );
+    }
+
+    public function addFav(int $userId, int $serieId): void {
+        $stmt = $this->pdo->prepare("INSERT INTO like_list (user_id, series_id) VALUES (?, ?)");
+        $stmt->execute([$userId, $serieId]);
+    }
+
+    public function delFav(int $userId, int $serieId): void {
+        $stmt = $this->pdo->prepare("DELETE FROM like_list WHERE user_id = ? and series_id = ?");
+        $stmt->execute([$userId, $serieId]);
+    }
+
+    public function isInFavList(int $userId, int $serieId): bool {
+        $stmt = $this->pdo->prepare("SELECT * FROM like_list WHERE user_id = ? AND series_id = ?");
+        $stmt->execute([$userId, $serieId]);
+        $rows = $stmt->fetchAll();
+
+        if (!empty($rows)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function addWatchedEpisode(int $userId, int $episodeId): void {
         //tester l'existence de la ligne
         $sqlCheck = "
         SELECT 1 
@@ -535,27 +497,14 @@ class OnlyFilmsRepository
         }
     }
 
-
-    /**
-     * Calcule la note moyenne d'une série
-     * @param int $serieId
-     * @return float|null
-     */
-    public function getAverageRating(int $serieId): ?float
-    {
+    public function getAverageRating(int $serieId): ?float {
         $stmt = $this->pdo->prepare("SELECT AVG(note) as avg_rating FROM notation WHERE series_id = ?");
         $stmt->execute([$serieId]);
         $result = $stmt->fetchColumn();
         return ($result !== false && $result !== null) ? (float) $result : null;
     }
 
-    /**
-     * Récupère tous les commentaires et notes d'une série
-     * @param int $serieId
-     * @return array
-     */
-    public function getComments(int $serieId): array
-    {
+    public function getComments(int $serieId): array {
         // On joint les tables commentary, notation et user pour avoir toutes les infos
         $stmt = $this->pdo->prepare("
             SELECT n.note, c.text, c.date_added, u.firstname 
@@ -568,8 +517,8 @@ class OnlyFilmsRepository
         $stmt->execute([$serieId]);
         return $stmt->fetchAll();
     }
-    public function getWatchedSeries(int $userId): array
-    {
+
+    public function getWatchedSeries(int $userId): array {
         $sql = "SELECT s.series_id, s.title, s.img, ws.viewing_date
             FROM watched_series ws
             JOIN series s ON s.series_id = ws.series_id
@@ -580,8 +529,8 @@ class OnlyFilmsRepository
         return $st->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    private function getSortClause(string $sort): string {
-        switch ($sort) {
+    private function getTriParam(string $tri): string {
+        switch ($tri) {
             case 'title_asc':
                 return "ORDER BY s.title ASC";
             case 'rating_desc':
@@ -591,7 +540,16 @@ class OnlyFilmsRepository
                 return "ORDER BY s.date_added DESC";
         }
     }
-    
+
+    public function getAllGenres(): array {
+        $stmt = $this->pdo->query("
+            SELECT name FROM genre
+            ORDER BY name ASC
+        ");
+
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
      /** Crée un token pour un user et le retourne (CHAÎNE 64 chars) */
     public function createPasswordResetToken(int $userId): string {
         $token = bin2hex(random_bytes(32)); // 64 chars car 32 octets x 2 pour du hexa sa fait 64
