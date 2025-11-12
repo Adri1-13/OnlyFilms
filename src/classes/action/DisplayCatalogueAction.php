@@ -29,10 +29,9 @@ class DisplayCatalogueAction extends Action
             <div class="row mb-3">
                 <div class="col-md-8 offset-md-2 d-flex justify-content-start gap-2">
                     <p>Trier par :</p>
-                    <a href="?action=catalog&query={$recherche}&sort=date_desc" 
-                       class="btn btn-outline-secondary btn-sm">Date d'ajout (défaut)</a>
-                    <a href="?action=catalog&query={$recherche}&sort=title_asc" 
-                       class="btn btn-outline-secondary btn-sm">Titre (A-Z)</a>
+                    <a href="?action=catalog&query={$recherche}&sort=date_desc" class="btn btn-outline-secondary btn-sm">Date d'ajout (défaut)</a>
+                    <a href="?action=catalog&query={$recherche}&sort=title_asc" class="btn btn-outline-secondary btn-sm">Titre (A-Z)</a>
+                    <a href="?action=catalog&query={$recherche}&sort=rating_desc" class="btn btn-outline-secondary btn-sm">Notation</a>
                 </div>
             </div>
             HTML;
@@ -44,9 +43,7 @@ class DisplayCatalogueAction extends Action
                         <input type="hidden" name="action" value="catalog">
                         <input type="hidden" name="sort" value="{$sort}">
                         
-                        <input type="text" name="query" class="form-control me-2" 
-                               placeholder="Rechercher par titre ou description..." 
-                               value="{$recherche}">
+                        <input type="text" name="query" class="form-control me-2" placeholder="Rechercher par titre ou description..." value="{$recherche}">
                         <button type="submit" class="btn btn-primary">Rechercher</button>
                     </form>
                 </div>

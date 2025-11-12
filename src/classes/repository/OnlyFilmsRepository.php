@@ -132,7 +132,10 @@ class OnlyFilmsRepository
     public function findAllSeries(string $sort): array {
         $sortClause = $this->getSortClause($sort);
 
-        $stmt = $this->pdo->query("SELECT * FROM series $sortClause");
+        $stmt = $this->pdo->query("SELECT s.*, AVG(n.note) avg_rating FROM series s 
+                                    LEFT OUTER JOIN notation n ON s.series_id = n.series_id
+                                    GROUP BY s.series_id
+                                    $sortClause");
         $rows = $stmt->fetchAll();
 
         $series = [];
@@ -192,8 +195,10 @@ class OnlyFilmsRepository
         $sortClause = $this->getSortClause($sort);
 
         $stmt = $this->pdo->prepare("
-            SELECT * FROM series 
-            WHERE title LIKE ? OR description LIKE ? 
+            SELECT s.*, AVG(n.note) avg_rating FROM series s
+            LEFT OUTER JOIN notation n ON s.series_id = n.series_id
+            WHERE s.title LIKE ? OR s.description LIKE ?
+            GROUP BY s.series_id
             $sortClause
         ");
 
@@ -606,10 +611,12 @@ class OnlyFilmsRepository
     private function getSortClause(string $sort): string {
         switch ($sort) {
             case 'title_asc':
-                return "ORDER BY title ASC";
+                return "ORDER BY s.title ASC";
+            case 'rating_desc':
+                return "ORDER BY avg_rating DESC, s.date_added DESC";
             case 'date_desc':
             default:
-                return "ORDER BY date_added DESC";
+                return "ORDER BY s.date_added DESC";
         }
     }
 }
