@@ -117,13 +117,13 @@ CREATE TABLE `watch_episode` (
 -- --------------------------------------------------------
 -- Table d'association `watched_serie`
 -- --------------------------------------------------------
-CREATE TABLE `watched_serie` (
+CREATE TABLE `watched_series` (
     `user_id` INT(11) NOT NULL,
-    `serie_id` INT(11) NOT NULL,
+    `series_id` INT(11) NOT NULL,
     `viewing_date` DATETIME NOT NULL,
-    PRIMARY KEY (`user_id`, `serie_id`),
+    PRIMARY KEY (`user_id`, `series_id`),
     FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
-    FOREIGN KEY (`serie_id`) REFERENCES `serie` (`serie_id`)
+    FOREIGN KEY (`series_id`) REFERENCES `series` (`series_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
