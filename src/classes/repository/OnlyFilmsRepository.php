@@ -505,6 +505,7 @@ class OnlyFilmsRepository
         }
     }
 
+
     /**
      * Calcule la note moyenne d'une série
      * @param int $serieId
@@ -536,6 +537,18 @@ class OnlyFilmsRepository
         ");
         $stmt->execute([$serieId]);
         return $stmt->fetchAll();
+    }
+    // OnlyFilmsRepository.php (extraits)
+    public function getWatchedSeries(int $userId): array
+    {
+        $sql = "SELECT s.series_id, s.title, s.img, ws.viewing_date
+            FROM watched_series ws
+            JOIN series s ON s.series_id = ws.series_id
+            WHERE ws.user_id = :uid
+            ORDER BY ws.viewing_date DESC";
+        $st = $this->pdo->prepare($sql);
+        $st->execute([':uid' => $userId]);
+        return $st->fetchAll(\PDO::FETCH_ASSOC);
     }
 
 
