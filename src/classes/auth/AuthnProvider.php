@@ -23,7 +23,7 @@ class AuthnProvider {
         }
 
         if (!$user->isActivated()) {
-            throw new AuthnException("Votre compte n'est pas encore activé. Veuillez cliquer sur le lien d'activation lors de l'inscription");
+            throw new AuthnException("Votre compte n'est pas encore activé. Veuillez cliquer sur le lien d'activation"); // TODO : faire en sorte que le user puisse activer son compte si il ne l'a pas fait à l'inscription
         }
 
 
@@ -53,11 +53,41 @@ class AuthnProvider {
 
         $mdpChiffre = password_hash($passwd, PASSWORD_BCRYPT, ['cost' => 12]);
 
+
+        return $repo->addUser($mail, $mdpChiffre, $name, $firstname, 0);
+    }
+
+    public static function createActivationToken(int $userId) : string {
+        $repo = OnlyFilmsRepository::getInstance();
+
         $token = bin2hex(random_bytes(32));
 
-        $user = $repo->addUser($mail, $mdpChiffre, $name, $firstname, 0, $token, date('YYYY-MM-DD HH:MI:SS', time() + 60*60*5));
+        $expirationDate = date('Y-m-d H:i:s', time() + 5*60);
 
-        $repo->activateAccount();
+        $repo->activationToken($userId, $token, $expirationDate);
+
+        return $token;
+    }
+
+    public static function activateAccount(string $token) : array {
+        $repo = OnlyFilmsRepository::getInstance();
+
+        try {
+            $tokenBD = $repo->findValidActivationToken($token);
+        } catch (OnlyFilmsRepositoryException $e) {
+            throw new AuthnException($e->getMessage());
+        }
+
+        $userId = $tokenBD['user_id'];
+        $userMail = $tokenBD['mail'];
+
+        if (!$repo->userExists($userMail)) {
+            throw new AuthnException("Cet utilisateur n'est pas encore inscrit, il ne peut pas être activé.");
+        }
+        $repo->activateUser($userId);
+
+        $repo->deleteActivationToken($token);
+
 
     }
 

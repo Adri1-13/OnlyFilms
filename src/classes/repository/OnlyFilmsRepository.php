@@ -116,12 +116,12 @@ class OnlyFilmsRepository
      * @param int $role
      * @return User
      */
-    function addUser(string $mail, string $passwd, string $name, string $firstname, int $role, string $token, string $date_expiry): User
+    function addUser(string $mail, string $passwd, string $name, string $firstname, int $role): User
     {
-        $requete = "INSERT INTO user(mail, password, name, firstname, role, activated, activation_token, token_expiry) VALUES (?,?,?,?,?,0,?,?)";
+        $requete = "INSERT INTO user(mail, password, name, firstname, role, activated) VALUES (?,?,?,?,?,0)";
 
         $stmt = $this->pdo->prepare($requete);
-        $stmt->execute([$mail, $passwd, $name, $firstname, $role, $token, $date_expiry]);
+        $stmt->execute([$mail, $passwd, $name, $firstname, $role]);
 
         $nouvID = $this->pdo->lastInsertId();
 
@@ -631,7 +631,7 @@ class OnlyFilmsRepository
 
     /**
      *
-     * Stocke un token d'activation dans la bd
+     * Stocke un token d'activation
      *
      * @param int $userId
      * @param string $token
@@ -644,9 +644,9 @@ class OnlyFilmsRepository
         $stmt->execute([$userId, $token, $expiration_date]);
     }
 
-    public function findActivationToken(string $token) : ?array {
+    public function findValidActivationToken(string $token) : array {
         $requete = <<<SQL
-            SELECT at.token, at.user_id, at.expiration_date, u.mail, u.firstname
+            SELECT at.token, at.user_id, at.expiration_date, u.mail
             FROM activation_token at
             INNER JOIN user u ON u.user_id = at.user_id
             WHERE at.token = ?
@@ -657,10 +657,16 @@ class OnlyFilmsRepository
         $ligne = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if ($ligne === false) {
-            return null;
+            throw new OnlyFilmsRepositoryException("Token invalide ou déjà utilisé");
         }
-        return $ligne;
+        $expiration = new \DateTime($ligne['expiration_date']);
+        $now = date('Y-m-d H:i:s');
+        if ($now > $expiration) {
+            $this->deleteActivationToken($token);
+            throw new OnlyFilmsRepositoryException("Ce lien d'activation a expiré");
+        }
 
+        return $ligne;
     }
 
     public function deleteActivationToken(string $token) : void {
@@ -670,14 +676,9 @@ class OnlyFilmsRepository
     }
 
 
-    public function setUserActivated(int $userId) : void {
+    public function activateUser(int $userId) : void {
         $requete = "UPDATE user SET activated  = 1 WHERE user_id = ?";
         $stmt = $this->pdo->prepare($requete);
         $stmt->execute([$userId]);
-    }
-
-    public function cleanExpiredTokens() : void {
-        $requete = "DELETE FROM activation_token WHERE expiration_date < NOW()";
-        $this->pdo->exec($requete);
     }
 }
