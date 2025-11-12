@@ -129,13 +129,10 @@ class OnlyFilmsRepository
     }
 
     /* =================== SERIES =================== */
-    /**
-     * Récupère toutes les séries
-     * @return array
-     */
-    public function findAllSeries(): array
-    {
-        $stmt = $this->pdo->query("SELECT * FROM series ORDER BY date_added DESC");
+    public function findAllSeries(string $sort): array {
+        $sortClause = $this->getSortClause($sort);
+
+        $stmt = $this->pdo->query("SELECT * FROM series $sortClause");
         $rows = $stmt->fetchAll();
 
         $series = [];
@@ -189,14 +186,15 @@ class OnlyFilmsRepository
         );
     }
 
-    public function searchSeries(string $query): array
+    public function searchSeries(string $query, string $sort): array
     {
         $recherche = '%' . $query . '%';
+        $sortClause = $this->getSortClause($sort);
 
         $stmt = $this->pdo->prepare("
             SELECT * FROM series 
             WHERE title LIKE ? OR description LIKE ? 
-            ORDER BY date_added DESC
+            $sortClause
         ");
 
         $stmt->execute([$recherche, $recherche]);
@@ -577,10 +575,6 @@ class OnlyFilmsRepository
         return $st->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Récupère toutes les séries, triées par note moyenne
-     * @return array
-     */
     public function findAllSeriesSortedByRating(): array
     {
         $sql = "
@@ -607,5 +601,15 @@ class OnlyFilmsRepository
             );
         }
         return $series;
+    }
+
+    private function getSortClause(string $sort): string {
+        switch ($sort) {
+            case 'title_asc':
+                return "ORDER BY title ASC";
+            case 'date_desc':
+            default:
+                return "ORDER BY date_added DESC";
+        }
     }
 }
