@@ -13,16 +13,43 @@ class DisplayCatalogueAction extends Action
     {
         try {
             $repo = OnlyFilmsRepository::getInstance();
-            $seriesList = $repo->findAllSeries();
+
+            $recherche = $_GET['query'];
+
+            if (!empty($recherche)) {
+                $seriesList = $repo->searchSeries($recherche);
+            } else {
+                $seriesList = $repo->findAllSeries();
+            }
 
             $html = '<h1>Catalogue des Séries</h1>';
 
+            $html .= <<<HTML
+            <div class="row mb-4">
+                <div class="col-md-8 offset-md-2">
+                    <form action="?action=catalog" method="GET" class="d-flex">
+                        <input type="hidden" name="action" value="catalog">
+                        <input type="text" name="query" class="form-control me-2" 
+                               placeholder="Rechercher par titre ou description..." 
+                               value="$recherche">
+                        <button type="submit" class="btn btn-primary">Rechercher</button>
+                    </form>
+                </div>
+            </div>
+            HTML;
+
             if (empty($seriesList)) {
-                $html .= '<p>Aucune série disponible dans le catalogue pour le moment.</p>';
+                if (!empty($recherche)) {
+                    $html .= '<p>Aucune série ne correspond à votre recherche pour "'. htmlspecialchars($recherche) .'".</p>';
+                } else {
+                    $html .= '<p>Aucune série disponible dans le catalogue pour le moment.</p>';
+                }
             } else {
+                $html .= '<div class="catalogue-list">';
                 foreach ($seriesList as $serie) {
                     $html .= $serie->render(Renderer::COMPACT);
                 }
+                $html .= '</div>';
             }
 
             $html .= '<br><a href="?action=default">Retour à l\'accueil</a>';
