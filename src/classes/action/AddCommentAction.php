@@ -9,25 +9,22 @@ use iutnc\onlyfilms\auth\AuthnProvider;
 use iutnc\onlyfilms\exception\AuthnException;
 use iutnc\onlyfilms\exception\OnlyFilmsRepositoryException;
 
-class AddCommentAction extends Action
-{
-    public function executeGet(): string
-    {
+class AddCommentAction extends Action {
+    public function executeGet(): string {
         // verif connecté
         if (!isset($_SESSION['user'])) {
-            return "<p>Vous devez être connecté pour ajouter un commentaire.</p>";
+            return "<div class='alert alert-warning my-3'>Vous devez être connecté pour ajouter un commentaire.</div>";
         }
 
         // recup id série
         $serieId = (int)$_GET['serie_id'];
-
 
         try {
             $repo = OnlyFilmsRepository::getInstance();
             $serie = $repo->findSerieBySerieId($serieId);
             $serieTitle = $serie->getTitle();
         } catch (OnlyFilmsRepositoryException $e) {
-            return "<p>Série non trouvée.</p>";
+            return "<div class='alert alert-warning my-3'>Série non trouvée.</div>";
         }
 
         return <<<HTML
@@ -71,11 +68,10 @@ class AddCommentAction extends Action
     }
 
 
-    public function executePost(): string
-    {
+    public function executePost(): string {
         // verif si connecté
         if (!isset($_SESSION['user'])) {
-            return "<p>Vous devez être connecté pour laisser un commentaire.</p>";
+            return "<div class='alert alert-warning my-3'>Vous devez être connecté pour laisser un commentaire.</div>";
         }
 
         $userId = $_SESSION['user']->getId();
@@ -86,7 +82,7 @@ class AddCommentAction extends Action
         // TODO FILTER VAR !!
 
         if ($note < 1 || $note > 5) {
-            return "<p>La note doit être entre 1 et 5.</p>";
+            return "<div class='alert alert-warning my-3'>La note doit être entre 1 et 5.</div>";
         }
 
         $repository = OnlyFilmsRepository::getInstance();
@@ -95,9 +91,9 @@ class AddCommentAction extends Action
             // ajout commentaire
             $repository->addComment($userId, $serieId, $comment, $note);
 
-            return "<p>Votre commentaire a été ajouté avec succès!</p>";
+            return "<div class='alert alert-success'>Votre commentaire a été ajouté avec succès !</div>";
         } catch (\Exception $e) {
-            return "<p>Une erreur est survenue lors de l'ajout de votre commentaire.</p>";
+            return "<div class='alert alert-warning my-3'>Une erreur est survenue lors de l'ajout de votre commentaire.</div>";
         }
     }
 }

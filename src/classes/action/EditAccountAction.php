@@ -10,9 +10,9 @@ class EditAccountAction extends Action {
     public function executeGet(): string {
         $user = AuthnProvider::getSignedInUser();
         
-        $firstname = htmlspecialchars($user->getFirstname());
-        $name = htmlspecialchars($user->getName());
-        $mail = htmlspecialchars($user->getMail());
+        $firstname = $user->getFirstname();
+        $name = $user->getName();
+        $mail = $user->getMail();
 
         return <<<HTML
         <div class="row justify-content-center">
@@ -53,9 +53,9 @@ class EditAccountAction extends Action {
         $user = AuthnProvider::getSignedInUser();
         $userId = $user->getId();
 
-        $firstnameBase = htmlspecialchars($user->getFirstname());
+        $firstnameBase = $user->getFirstname();
         $firstname = !empty($_POST['firstname']) ? $_POST['firstname'] : $firstnameBase;
-        $nameBase = htmlspecialchars($user->getName());
+        $nameBase = $user->getName();
         $name = !empty($_POST['name']) ? $_POST['name'] : $nameBase;
 
         $repo = OnlyFilmsRepository::getInstance();
