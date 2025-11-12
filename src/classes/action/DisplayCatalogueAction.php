@@ -23,9 +23,7 @@ class DisplayCatalogueAction extends Action
                 $seriesList = $repo->findAllSeries($sort);
             }
 
-            $html = '<h1>Catalogue des Séries</h1>';
-
-            $html .= <<<HTML
+            $html = <<<HTML
             <div class="row mb-3">
                 <div class="col-md-8 offset-md-2 d-flex justify-content-start gap-2">
                     <p>Trier par :</p>
