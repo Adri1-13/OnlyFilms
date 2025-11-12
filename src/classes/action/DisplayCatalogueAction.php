@@ -14,7 +14,7 @@ class DisplayCatalogueAction extends Action
         try {
             $repo = OnlyFilmsRepository::getInstance();
 
-            $recherche = $_GET['query'];
+            $recherche = $_GET['query'] ?? null;
 
             if (!empty($recherche)) {
                 $seriesList = $repo->searchSeries($recherche);
