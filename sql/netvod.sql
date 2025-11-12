@@ -243,9 +243,8 @@ BEGIN
   -- Nb d'épisodes vus par cet utilisateur dans cette série
   SELECT COUNT(*) INTO v_watched
   FROM watch_episode we
-  JOIN episode e2 ON e2.episode_id = we.episode_id
-  WHERE we.user_id = NEW.user_id
-    AND e2.series_id = v_series_id;
+  INNER JOIN episode e2 ON e2.episode_id = we.episode_id
+  WHERE we.user_id = NEW.user_id AND e2.series_id = v_series_id;
 
   -- Si tout est vu, placer dans watched_series
   IF v_total > 0 AND v_watched = v_total THEN
