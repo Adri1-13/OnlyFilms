@@ -13,7 +13,7 @@ class DisplayCatalogueAction extends Action
     {
         try {
             $repo = OnlyFilmsRepository::getInstance();
-            $seriesList = $repo->findAllSeries();
+            $seriesList = $repo->findAllSeriesSortedByRating();
 
             $html = '<h1>Catalogue des Séries</h1>';
 
