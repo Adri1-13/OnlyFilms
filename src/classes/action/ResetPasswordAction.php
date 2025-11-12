@@ -16,11 +16,11 @@ class ResetPasswordAction extends Action
             <input type="hidden" name="token" value="{$t}">
             <div class="mb-3">
               <label class="form-label">Nouveau mot de passe</label>
-              <input type="password" class="form-control" name="p1" required minlength="8">
+              <input type="password" class="form-control" name="p1" required minlength="10">
             </div>
             <div class="mb-3">
               <label class="form-label">Confirmer</label>
-              <input type="password" class="form-control" name="p2" required minlength="8">
+              <input type="password" class="form-control" name="p2" required minlength="10">
             </div>
             <button class="btn btn-primary" type="submit">Valider</button>
           </form>

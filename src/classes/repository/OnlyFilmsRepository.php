@@ -81,7 +81,7 @@ class OnlyFilmsRepository
         $ligne = $stmt->fetch(\PDO::FETCH_ASSOC); // normalement on a une unique ligne par user
 
         if ($ligne === false) {
-            throw new OnlyFilmsRepositoryException("Aucun utilisateur trouvé");
+            throw new OnlyFilmsRepositoryException("Cet utilisateur n'existe pas");
         }
 
         return new User($ligne['user_id'], $ligne['firstname'], $ligne['name'], $ligne['mail'], $ligne['password'], $ligne['role']);
