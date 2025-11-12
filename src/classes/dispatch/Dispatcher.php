@@ -15,6 +15,7 @@ use iutnc\onlyfilms\action\DefaultAction;
 use iutnc\onlyfilms\action\SignInAction;
 use iutnc\onlyfilms\action\DisplayCatalogueAction;
 use iutnc\onlyfilms\action\InProgressSeriesAction;
+use iutnc\onlyfilms\action\WatchedSeriesAction;
 use iutnc\onlyfilms\auth\AuthnProvider;
 use iutnc\onlyfilms\action\AddCommentAction;
 use iutnc\onlyfilms\action\WatchedSeriesAction;
@@ -82,7 +83,11 @@ class Dispatcher
                 case 'display-account':
                     $action = new DisplayAccountAction();
                     break;
+<<<<<<< HEAD
                 case 'watched-series':
+=======
+                case 'watched-series';
+>>>>>>> fonctionnalite-16-watched_series
                     $action = new WatchedSeriesAction();
                     break;
                 case 'default':
