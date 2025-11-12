@@ -33,7 +33,7 @@ class DefaultAction extends Action
                         <h1 class="h3">Bienvenue, {$firstName} !</h1>
                         <div>
                             <a href="?action=catalog" class="btn btn-primary me-2">Catalogue des séries</a>
-                            <a href="?action=signout" class="btn btn-outline-secondary">Déconnexion</a>
+                            
                         </div>
                     </div>
                 </section>
