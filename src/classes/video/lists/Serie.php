@@ -74,6 +74,10 @@ class Serie implements Renderer {
                 $avgRating = $repo->getAverageRating($serieId);
                 $comments = $repo->getComments($serieId);
 
+                foreach ($this->episodes as $episode) {
+                    $html .= $episode->render(self::COMPACT);
+                }
+
                 if ($avgRating !== null) {
                     $formattedRating = number_format($avgRating, 1);
                     $html .= "<h3>Note moyenne: {$formattedRating} / 5</h3>";
@@ -96,15 +100,13 @@ class Serie implements Renderer {
                         <li>
                             <p><strong>{$userName}</strong> (Note: {$userNote}/5) - <em>{$date}</em></p>
                             <p>{$userText}</p>
-                        </li>
+                        </li>   
                         COMMENT;
                     }
                     $html .= '</ul>';
                 }
 
-                foreach ($this->episodes as $episode) {
-                    $html .= $episode->render(self::COMPACT);
-                }
+
                 $html .= '</div>';
                 break;
             default:
