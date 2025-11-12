@@ -188,6 +188,10 @@ class OnlyFilmsRepository {
         return $series;
     }
 
+    public function updateUserInfo(int $userId, string $firstname, string $name): void {
+        $st = $this->pdo->prepare("UPDATE user SET firstname = ?, name = ? WHERE user_id = ?");
+        $st->execute([$firstname, $name, $userId]);
+    }
 
     /* =================== SERIES =================== */
     public function findAllSeries(string $tri, ?string $genre): array {

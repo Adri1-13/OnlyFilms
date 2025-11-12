@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace iutnc\onlyfilms\dispatch;
 
+use iutnc\onlyfilms\action\EditAccountAction;
 use iutnc\onlyfilms\action\ForgotPasswordAction;
 use iutnc\onlyfilms\action\ResetPasswordAction;
 use iutnc\onlyfilms\action\AddFavAction;
@@ -89,6 +90,9 @@ class Dispatcher
                     break;
                 case 'display-account':
                     $action = new DisplayAccountAction();
+                    break;
+                case 'edit-account':
+                    $action = new EditAccountAction();
                     break;
                 case 'watched-series';
                     $action = new WatchedSeriesAction();
