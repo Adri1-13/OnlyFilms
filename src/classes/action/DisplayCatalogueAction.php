@@ -14,7 +14,7 @@ class DisplayCatalogueAction extends Action
         try {
             $repo = OnlyFilmsRepository::getInstance();
 
-            $recherche = $_GET['query'];
+            $recherche = isset($_GET['query']) ?? $_GET['query'];
 
             if (!empty($recherche)) {
                 $seriesList = $repo->searchSeries($recherche);
@@ -28,7 +28,6 @@ class DisplayCatalogueAction extends Action
             <div class="row mb-4">
                 <div class="col-md-8 offset-md-2">
                     <form action="?action=catalog" method="GET" class="d-flex">
-                        <input type="hidden" name="action" value="catalog">
                         <input type="text" name="query" class="form-control me-2" 
                                placeholder="Rechercher par titre ou description..." 
                                value="$recherche">
