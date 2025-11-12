@@ -17,12 +17,15 @@ use iutnc\onlyfilms\action\DisplayCatalogueAction;
 use iutnc\onlyfilms\action\InProgressSeriesAction;
 use iutnc\onlyfilms\auth\AuthnProvider;
 use iutnc\onlyfilms\action\AddCommentAction;
+use iutnc\onlyfilms\action\WatchedSeriesAction;
 
-class Dispatcher {
+class Dispatcher
+{
 
     private string $actionQuery;
 
-    public function __construct() {
+    public function __construct()
+    {
         if (!isset($_GET["action"])) {
             $this->actionQuery = "";
         } else {
@@ -31,7 +34,8 @@ class Dispatcher {
     }
 
 
-    public function run() : void {
+    public function run(): void
+    {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
@@ -78,6 +82,9 @@ class Dispatcher {
                 case 'display-account':
                     $action = new DisplayAccountAction();
                     break;
+                case 'watched-series':
+                    $action = new WatchedSeriesAction();
+                    break;
                 case 'default':
                 default:
                     $action = new DefaultAction();
@@ -91,7 +98,8 @@ class Dispatcher {
 
     }
 
-    private function renderPage(string $html) : void {
+    private function renderPage(string $html): void
+    {
 
         $navbar = <<<NAV
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -113,6 +121,9 @@ class Dispatcher {
                     </li>
                     <li class="nav-item">
                       <a class="nav-link" href="?action=in-progress">Séries en cours</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="?action=watched-series">Séries terminées</a>
                     </li>
                     <li class="nav-item dropdown">
                       <a class="nav-link dropdown-toggle" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
