@@ -83,11 +83,7 @@ class Dispatcher
                 case 'display-account':
                     $action = new DisplayAccountAction();
                     break;
-<<<<<<< HEAD
-                case 'watched-series':
-=======
                 case 'watched-series';
->>>>>>> fonctionnalite-16-watched_series
                     $action = new WatchedSeriesAction();
                     break;
                 case 'default':
