@@ -591,4 +591,41 @@ class OnlyFilmsRepository
                 return "ORDER BY s.date_added DESC";
         }
     }
+    
+     /** Crée un token pour un user et le retourne (CHAÎNE 64 chars) */
+    public function createPasswordResetToken(int $userId): string {
+        $token = bin2hex(random_bytes(32)); // 64 chars car 32 octets x 2 pour du hexa sa fait 64
+        $sql = "INSERT INTO password_reset_token(token, user_id, issued_at, expires_at, used)
+                VALUES(:t, :uid, NOW(), DATE_ADD(NOW(), INTERVAL 30 MINUTE), 0)";
+        $st = $this->pdo->prepare($sql);
+        $st->execute([':t' => $token, ':uid' => $userId]);
+        return $token;
+    }
+
+    /** Vérifie qu’un token est valide (existe, pas expiré, pas utilisé) */
+    public function getValidResetToken(string $token): ?array {
+        $sql = "SELECT prt.token, prt.user_id, u.mail
+                FROM password_reset_token prt
+                JOIN user u ON u.user_id = prt.user_id
+                WHERE prt.token = :t AND prt.used = 0 AND prt.expires_at > NOW()";
+        $st = $this->pdo->prepare($sql);
+        $st->execute([':t' => $token]);
+        $row = $st->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
+    /** Marque un token comme consommé (usage unique) */
+    public function consumeResetToken(string $token): void {
+        $sql = "UPDATE password_reset_token SET used = 1 WHERE token = :t";
+        $st = $this->pdo->prepare($sql);
+        $st->execute([':t' => $token]);
+    }
+
+    /** Met à jour le mot de passe (haché) d’un user */
+    public function updateUserPassword(int $userId, string $plainPassword): void {
+        $hash = password_hash($plainPassword, PASSWORD_DEFAULT);
+        $sql  = "UPDATE user SET password = :p WHERE user_id = :uid";
+        $st = $this->pdo->prepare($sql);
+        $st->execute([':p' => $hash, ':uid' => $userId]);
+    }
 }
