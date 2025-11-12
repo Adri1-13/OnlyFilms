@@ -113,7 +113,9 @@ class Dispatcher
         $navbar = <<<NAV
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
               <div class="container-fluid">
-                <a class="navbar-brand" href="?action=default">OnlyFilms</a>
+                <a class="navbar-brand" href="?action=default">
+                    <img src="images/logo.png" width="120" height="30" alt="OnlyFilms">
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon"></span>
                 </button>
@@ -173,7 +175,9 @@ class Dispatcher
             </head>
             <body>
             {$navbar}
+            <main class="container">
             {$html}
+            </main>
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>      
             </body>
             </html>

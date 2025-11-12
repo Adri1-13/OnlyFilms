@@ -13,16 +13,15 @@ class AddCommentAction extends Action
 {
     public function executeGet(): string
     {
-        // Vérification si l'utilisateur est connecté
+        // verif connecté
         if (!isset($_SESSION['user'])) {
             return "<p>Vous devez être connecté pour ajouter un commentaire.</p>";
         }
 
-        // Récupérer l'ID de la série à partir du GET
+        // recup id série
         $serieId = (int)$_GET['serie_id'];
 
-        // Ici, on peut récupérer les informations de la série depuis la base de données si nécessaire
-        // Pour l'exemple, on assume que la série a un titre que nous pouvons afficher
+
         try {
             $repo = OnlyFilmsRepository::getInstance();
             $serie = $repo->findSerieBySerieId($serieId);
@@ -31,7 +30,6 @@ class AddCommentAction extends Action
             return "<p>Série non trouvée.</p>";
         }
 
-        // Afficher le formulaire pour ajouter un commentaire
         return <<<HTML
             <div class="row justify-content-center">
                 <div class="col-md-6 col-lg-5">
@@ -75,33 +73,30 @@ class AddCommentAction extends Action
 
     public function executePost(): string
     {
-        // Vérification si l'utilisateur est connecté
+        // verif si connecté
         if (!isset($_SESSION['user'])) {
             return "<p>Vous devez être connecté pour laisser un commentaire.</p>";
         }
 
-        // Récupération des données du formulaire
         $userId = $_SESSION['user']->getId();
         $serieId = (int)$_POST['serie_id']; // ID de la série commentée
         $comment = $_POST['comment']; // Le commentaire
         $note = (int)$_POST['note']; // La note de 1 à 5
 
-        // Vérification de la note
+        // TODO FILTER VAR !!
+
         if ($note < 1 || $note > 5) {
             return "<p>La note doit être entre 1 et 5.</p>";
         }
 
-        // Interaction avec le repository pour enregistrer le commentaire et la note
         $repository = OnlyFilmsRepository::getInstance();
 
         try {
-            // Ajouter un commentaire et une note à la série
+            // ajout commentaire
             $repository->addComment($userId, $serieId, $comment, $note);
 
-            // Retour à la page de la série avec un message de succès
             return "<p>Votre commentaire a été ajouté avec succès!</p>";
         } catch (\Exception $e) {
-            // En cas d'erreur, afficher un message
             return "<p>Une erreur est survenue lors de l'ajout de votre commentaire.</p>";
         }
     }

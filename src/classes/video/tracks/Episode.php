@@ -43,40 +43,85 @@ class Episode implements Renderer {
     public function render(int $selector): string
     {
         $repo = OnlyFilmsRepository::getInstance();
+        $title = htmlspecialchars($this->getTitle(), ENT_QUOTES, 'UTF-8');
+        $summary = htmlspecialchars($this->getSummary() ?? '', ENT_QUOTES, 'UTF-8');
+
+        // preparation des id pour les boutons de nav
+        $prevEpId = null;
         if ($this->getNumber() > 1){
-            $epiPrec = "<a href='?action=display-episode&episode-id={$repo->findEpisodeIdByNumAndSeriesId($this->getNumber()-1, $this->getSeriesId())}'>Episode Précédent</a>";
-        } else {
-            $epiPrec = "";
+            $prevEpId = $repo->findEpisodeIdByNumAndSeriesId($this->getNumber()-1, $this->getSeriesId());
         }
 
+        $nextEpId = null;
         if ($this->getNumber() < $repo->getTotalEpisodesInSerie($this->getSeriesId())){
-            $epiSuiv = "<a href='?action=display-episode&episode-id={$repo->findEpisodeIdByNumAndSeriesId($this->getNumber()+1, $this->getSeriesId())}'>Episode Suivant</a>";
-        } else {
-            $epiSuiv = "";
+            $nextEpId = $repo->findEpisodeIdByNumAndSeriesId($this->getNumber()+1, $this->getSeriesId());
         }
+
         switch ($selector) {
-            // COMPACT = Nom + Description + Durée
+
+            // COMPACT = Affichage dans la liste d'épisodes
             case self::COMPACT :
+                $imgTag = '';
+                $imgSrc = $this->img;
+
+                if ($imgSrc) {
+                    $imgTag = '<img src="images/' . htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8') . '" alt="Miniature ' . $title . '" style="width: 120px; height: 68px; object-fit: cover; margin-right: 1rem; border-radius: 0.25rem;">';
+                } else {
+                    // Placeholder
+                    $imgTag = '<div class="bg-light d-flex align-items-center justify-content-center text-muted" style="width: 120px; height: 68px; margin-right: 1rem; flex-shrink: 0; border-radius: 0.25rem;">16:9</div>';
+                }
+
+                $durationMin = floor($this->getDuration() / 60);
+
                 $html = <<<HTML
-                <div class="episode compact">
-                    <a href='?action=display-episode&episode-id={$this->getId()}'><h3>Épisode {$this->getNumber()} : {$this->getTitle()}</h3></a>
-                    <p>{$this->getSummary()}</p>
-                    <p>Durée : {$this->getDuration()} sec</p>
-                </div>
+                <a href='?action=display-episode&episode-id={$this->getId()}' class="list-group-item list-group-item-action d-flex align-items-start py-3">
+                    $imgTag
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between">
+                            <h5 class="mb-1 h6">Épisode {$this->getNumber()} : {$title}</h5>
+                            <small class="text-body-secondary">{$durationMin} min</small>
+                        </div>
+                        <p class="mb-1 small text-body-secondary">{$summary}</p>
+                    </div>
+                </a>
                 HTML;
                 break;
-            // LONG = Lecteur vidéo
+
+            // LONG = lecteur vidéo
             case self::LONG :
                 $file = $this->getFile();
-                $video = $file ? "<video controls src='video/{$file}'></video>" : "<p>Aucun fichier vidéo disponible.</p>";
+
+                $video = $file
+                    ? <<<VIDEO
+                      <div class="ratio ratio-16x9 mb-3 shadow-sm rounded">
+                          <video controls src='video/{$file}' class="w-100 h-100"></video>
+                      </div>
+                      VIDEO
+                    : '<div class="alert alert-warning">Aucun fichier vidéo disponible.</div>';
+
+                // bouton suiv et prec
+                $btnPrec = $prevEpId
+                    ? "<a href='?action=display-episode&episode-id={$prevEpId}' class='btn btn-outline-secondary'>&laquo; Épisode Précédent</a>"
+                    : "<span class='btn btn-outline-secondary disabled'>&laquo; Épisode Précédent</span>";
+
+                $btnSuiv = $nextEpId
+                    ? "<a href='?action=display-episode&episode-id={$nextEpId}' class='btn btn-primary'>Épisode Suivant &raquo;</a>"
+                    : "<span class='btn btn-primary disabled'>Épisode Suivant &raquo;</span>";
+
                 $html = <<<HTML
-                <div class="episode long">
-                    <h2>{$this->getTitle()}</h2>
-                    <p>{$this->summary}</p>
+                <div class="episode-player my-4">
+                    <h2 class="h3 mb-1">{$title}</h2>
+                    <p class="lead mb-3 text-muted">{$summary}</p>
+                    
                     {$video}
-                    <div>
-                        {$epiPrec}
-                        {$epiSuiv}
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        {$btnPrec}
+                        {$btnSuiv}
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="?action=display-serie&serie-id={$this->getSeriesId()}" class="btn btn-sm btn-outline-secondary">Retour à la liste des épisodes</a>
                     </div>
                 </div>
                 HTML;

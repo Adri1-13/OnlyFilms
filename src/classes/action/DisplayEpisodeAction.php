@@ -15,26 +15,26 @@ class DisplayEpisodeAction extends Action
     {
         // verifs
         if (empty($_GET['episode-id'])) {
-            return '<p>Aucun épisode sélectionné</p>';
+            return '<div class="alert alert-warning my-3">Aucun épisode sélectionné.</div>';
         }
         $id = filter_var($_GET['episode-id'],FILTER_VALIDATE_INT);
         if ($id === false) {
-            return '<p>ID épisode incorrect</p>';
+            return '<div class="alert alert-warning my-3">ID d\'épisode incorrect.</div>';
         }
         $repo = OnlyFilmsRepository::getInstance();
 
         try {
             $episode = $repo->findEpisodeById($id);
-            $html = <<<HTML
-                {$episode->render(Renderer::LONG)}
-                <a href="javascript:history.back()">Retour</a>
-                HTML;
 
-                $repo->addWatchedEpisode($_SESSION['user']->getId(),$episode->getId());
-                $repo->cleanupSeriesIfCompleted((int)$_SESSION['user']->getId(), (int)$episode->getSeriesId());
-                return $html;
+            $html = $episode->render(Renderer::LONG);
+
+            $repo->addWatchedEpisode($_SESSION['user']->getId(),$episode->getId());
+            $repo->cleanupSeriesIfCompleted((int)$_SESSION['user']->getId(), (int)$episode->getSeriesId());
+
+            return $html;
+
         } catch (OnlyFilmsRepositoryException $e) {
-            return '<p>ID épisode incorrect</p>';
+            return '<div class="alert alert-danger my-3">ID d\'épisode incorrect ou introuvable.</div>';
         }
     }
 

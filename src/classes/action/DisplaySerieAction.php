@@ -15,24 +15,25 @@ class DisplaySerieAction extends Action
     {
         // verifs
         if (empty($_GET['serie-id'])) {
-            return '<p>Aucune série sélectionnée</p>';
+            return '<div class="alert alert-warning my-3">Aucune série sélectionnée.</div>';
         }
         $id = filter_var($_GET['serie-id'],FILTER_VALIDATE_INT);
         if ($id === null || $id === false) {
-            return '<p>ID série incorrecte</p>';
+            return '<div class="alert alert-warning my-3">ID de série incorrect.</div>';
         }
         $repo = OnlyFilmsRepository::getInstance();
         try {
             $serie = $repo->findSerieBySerieId($id);
             return <<<HTML
                     {$serie->render(Renderer::LONG)}
-                    <a href="javascript:history.back()">Retour</a>
+                    <div class="mt-4">
+                        <a href="?action=catalog" class="btn btn-outline-secondary">Retour au catalogue</a>
+                    </div>
                     HTML;
-
 
         } catch (OnlyFilmsRepositoryException $e) {
             //echo $e->getMessage();
-            return '<p>ID série incorrecte</p>';
+            return '<div class="alert alert-danger my-3">ID de série incorrect ou introuvable.</div>';
         }
     }
 
