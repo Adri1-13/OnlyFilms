@@ -103,7 +103,7 @@ CREATE TABLE `like_list` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
--- Table d'association `watch_episode` (Suivi de visionnage utilisateur/épisode)
+-- Table d'association `watch_episode`
 -- --------------------------------------------------------
 CREATE TABLE `watch_episode` (
     `user_id` INT(11) NOT NULL,
@@ -112,6 +112,18 @@ CREATE TABLE `watch_episode` (
     PRIMARY KEY (`user_id`, `episode_id`),
     FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
     FOREIGN KEY (`episode_id`) REFERENCES `episode` (`episode_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+-- Table d'association `watched_serie`
+-- --------------------------------------------------------
+CREATE TABLE `watched_serie` (
+    `user_id` INT(11) NOT NULL,
+    `serie_id` INT(11) NOT NULL,
+    `viewing_date` DATETIME NOT NULL,
+    PRIMARY KEY (`user_id`, `serie_id`),
+    FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
+    FOREIGN KEY (`serie_id`) REFERENCES `serie` (`serie_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
