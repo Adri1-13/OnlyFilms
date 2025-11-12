@@ -14,24 +14,36 @@ class DisplayCatalogueAction extends Action
         try {
             $repo = OnlyFilmsRepository::getInstance();
 
-            $recherche = $_GET['query'] ?? null;
+            $recherche = $_GET['query'] ?? '';
+            $sort = $_GET['sort'] ?? 'date_desc';
 
             if (!empty($recherche)) {
-                $seriesList = $repo->searchSeries($recherche);
+                $seriesList = $repo->searchSeries($recherche, $sort);
             } else {
-                $seriesList = $repo->findAllSeriesSortedByRating();
+                $seriesList = $repo->findAllSeries($sort);
             }
 
             $html = '<h1>Catalogue des Séries</h1>';
+
+            $html .= <<<HTML
+            <div class="row mb-3">
+                <div class="col-md-8 offset-md-2 d-flex justify-content-start gap-2">
+                    <p>Trier par :</p>
+                    <a href="?action=catalog&query={$recherche}&sort=date_desc" class="btn btn-outline-secondary btn-sm">Date d'ajout (défaut)</a>
+                    <a href="?action=catalog&query={$recherche}&sort=title_asc" class="btn btn-outline-secondary btn-sm">Titre (A-Z)</a>
+                    <a href="?action=catalog&query={$recherche}&sort=rating_desc" class="btn btn-outline-secondary btn-sm">Notation</a>
+                </div>
+            </div>
+            HTML;
 
             $html .= <<<HTML
             <div class="row mb-4">
                 <div class="col-md-8 offset-md-2">
                     <form action="?action=catalog" method="GET" class="d-flex">
                         <input type="hidden" name="action" value="catalog">
-                        <input type="text" name="query" class="form-control me-2" 
-                               placeholder="Rechercher par titre ou description..." 
-                               value="$recherche">
+                        <input type="hidden" name="sort" value="{$sort}">
+                        
+                        <input type="text" name="query" class="form-control me-2" placeholder="Rechercher par titre ou description..." value="{$recherche}">
                         <button type="submit" class="btn btn-primary">Rechercher</button>
                     </form>
                 </div>
@@ -40,16 +52,14 @@ class DisplayCatalogueAction extends Action
 
             if (empty($seriesList)) {
                 if (!empty($recherche)) {
-                    $html .= '<p>Aucune série ne correspond à votre recherche pour "'. htmlspecialchars($recherche) .'".</p>';
+                    $html .= '<p>Aucune série ne correspond à votre recherche pour "'. $recherche .'".</p>';
                 } else {
                     $html .= '<p>Aucune série disponible dans le catalogue pour le moment.</p>';
                 }
             } else {
-                $html .= '<div class="catalogue-list">';
                 foreach ($seriesList as $serie) {
                     $html .= $serie->render(Renderer::COMPACT);
                 }
-                $html .= '</div>';
             }
 
             $html .= '<br><a href="?action=default">Retour à l\'accueil</a>';
