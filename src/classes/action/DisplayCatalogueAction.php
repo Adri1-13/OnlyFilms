@@ -15,22 +15,35 @@ class DisplayCatalogueAction extends Action
             $repo = OnlyFilmsRepository::getInstance();
 
             $recherche = $_GET['query'] ?? '';
+            $sort = $_GET['sort'] ?? 'date_desc';
 
             if (!empty($recherche)) {
-                $seriesList = $repo->searchSeries($recherche);
+                $seriesList = $repo->searchSeries($recherche, $sort);
             } else {
-                $seriesList = $repo->findAllSeriesSortedByRating();
+                $seriesList = $repo->findAllSeries($sort);
             }
 
-            $rechercheHtml = htmlspecialchars($recherche, ENT_QUOTES, 'UTF-8');
-            $html = <<<HTML
-            <div class="row my-4">
+            $html = '<h1>Catalogue des Séries</h1>';
+
+            $html .= <<<HTML
+            <div class="row mb-3">
+                <div class="col-md-8 offset-md-2 d-flex justify-content-start gap-2">
+                    <p>Trier par :</p>
+                    <a href="?action=catalog&query={$recherche}&sort=date_desc" class="btn btn-outline-secondary btn-sm">Date d'ajout (défaut)</a>
+                    <a href="?action=catalog&query={$recherche}&sort=title_asc" class="btn btn-outline-secondary btn-sm">Titre (A-Z)</a>
+                    <a href="?action=catalog&query={$recherche}&sort=rating_desc" class="btn btn-outline-secondary btn-sm">Notation</a>
+                </div>
+            </div>
+            HTML;
+
+            $html .= <<<HTML
+            <div class="row mb-4">
                 <div class="col-md-8 offset-md-2">
-                    <form action="index.php" method="GET" class="d-flex">
+                    <form action="?action=catalog" method="GET" class="d-flex">
                         <input type="hidden" name="action" value="catalog">
-                        <input type="text" name="query" class="form-control me-2" 
-                               placeholder="Rechercher par titre ou description" 
-                               value="{$rechercheHtml}">
+                        <input type="hidden" name="sort" value="{$sort}">
+                        
+                        <input type="text" name="query" class="form-control me-2" placeholder="Rechercher par titre ou description..." value="{$recherche}">
                         <button type="submit" class="btn btn-primary">Rechercher</button>
                     </form>
                 </div>
@@ -39,27 +52,22 @@ class DisplayCatalogueAction extends Action
 
             if (empty($seriesList)) {
                 if (!empty($recherche)) {
-                    $html .= '<div class="alert alert-info">Aucune série ne correspond à votre recherche pour "'. htmlspecialchars($recherche) .'".</div>';
+                    $html .= '<p>Aucune série ne correspond à votre recherche pour "'. $recherche .'".</p>';
                 } else {
-                    $html .= '<div class="alert alert-info">Aucune série disponible dans le catalogue pour le moment.</div>';
+                    $html .= '<p>Aucune série disponible dans le catalogue pour le moment.</p>';
                 }
             } else {
-
-                $html .= '<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-3">';
                 foreach ($seriesList as $serie) {
-                    $html .= '<div class="col">';
                     $html .= $serie->render(Renderer::COMPACT);
-                    $html .= '</div>';
                 }
-                $html .= '</div>';
             }
 
-            $html .= '<br><a href="?action=default" class="btn btn-outline-secondary mt-4">Retour à l\'accueil</a>';
+            $html .= '<br><a href="?action=default">Retour à l\'accueil</a>';
 
             return $html;
 
         } catch (\Exception $e) {
-            return "<div class='alert alert-danger'>Une erreur est survenue : " . $e->getMessage() . "</div>";
+            return "Une erreur est survenue lors de l'affichage du catalogue : " . $e->getMessage();
         }
     }
 

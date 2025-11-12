@@ -129,13 +129,13 @@ class OnlyFilmsRepository
     }
 
     /* =================== SERIES =================== */
-    /**
-     * Récupère toutes les séries
-     * @return array
-     */
-    public function findAllSeries(): array
-    {
-        $stmt = $this->pdo->query("SELECT * FROM series ORDER BY date_added DESC");
+    public function findAllSeries(string $sort): array {
+        $sortClause = $this->getSortClause($sort);
+
+        $stmt = $this->pdo->query("SELECT s.*, AVG(n.note) avg_rating FROM series s 
+                                    LEFT OUTER JOIN notation n ON s.series_id = n.series_id
+                                    GROUP BY s.series_id
+                                    $sortClause");
         $rows = $stmt->fetchAll();
 
         $series = [];
@@ -189,14 +189,17 @@ class OnlyFilmsRepository
         );
     }
 
-    public function searchSeries(string $query): array
+    public function searchSeries(string $query, string $sort): array
     {
         $recherche = '%' . $query . '%';
+        $sortClause = $this->getSortClause($sort);
 
         $stmt = $this->pdo->prepare("
-            SELECT * FROM series 
-            WHERE title LIKE ? OR description LIKE ? 
-            ORDER BY date_added DESC
+            SELECT s.*, AVG(n.note) avg_rating FROM series s
+            LEFT OUTER JOIN notation n ON s.series_id = n.series_id
+            WHERE s.title LIKE ? OR s.description LIKE ?
+            GROUP BY s.series_id
+            $sortClause
         ");
 
         $stmt->execute([$recherche, $recherche]);
@@ -577,35 +580,52 @@ class OnlyFilmsRepository
         return $st->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Récupère toutes les séries, triées par note moyenne
-     * @return array
-     */
-    public function findAllSeriesSortedByRating(): array
-    {
-        $sql = "
-            SELECT s.series_id, s.title, s.description, s.img, s.year, s.date_added, AVG(n.note) AS avg_rating
-            FROM series s
-            LEFT JOIN notation n ON s.series_id = n.series_id
-            GROUP BY s.series_id
-            ORDER BY avg_rating DESC, s.date_added DESC
-        ";
-
-        $stmt = $this->pdo->query($sql);
-        $rows = $stmt->fetchAll();
-
-        $series = [];
-        foreach ($rows as $r) {
-            $series[] = new Serie(
-                (int) $r['series_id'],
-                $r['title'],
-                $r['description'] ?? '',
-                $r['img'] ?? '',
-                (int) $r['year'],
-                $r['date_added'],
-                null
-            );
+    private function getSortClause(string $sort): string {
+        switch ($sort) {
+            case 'title_asc':
+                return "ORDER BY s.title ASC";
+            case 'rating_desc':
+                return "ORDER BY avg_rating DESC, s.date_added DESC";
+            case 'date_desc':
+            default:
+                return "ORDER BY s.date_added DESC";
         }
-        return $series;
+    }
+    
+     /** Crée un token pour un user et le retourne (CHAÎNE 64 chars) */
+    public function createPasswordResetToken(int $userId): string {
+        $token = bin2hex(random_bytes(32)); // 64 chars car 32 octets x 2 pour du hexa sa fait 64
+        $sql = "INSERT INTO password_reset_token(token, user_id, issued_at, expires_at, used)
+                VALUES(:t, :uid, NOW(), DATE_ADD(NOW(), INTERVAL 30 MINUTE), 0)";
+        $st = $this->pdo->prepare($sql);
+        $st->execute([':t' => $token, ':uid' => $userId]);
+        return $token;
+    }
+
+    /** Vérifie qu’un token est valide (existe, pas expiré, pas utilisé) */
+    public function getValidResetToken(string $token): ?array {
+        $sql = "SELECT prt.token, prt.user_id, u.mail
+                FROM password_reset_token prt
+                JOIN user u ON u.user_id = prt.user_id
+                WHERE prt.token = :t AND prt.used = 0 AND prt.expires_at > NOW()";
+        $st = $this->pdo->prepare($sql);
+        $st->execute([':t' => $token]);
+        $row = $st->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
+    /** Marque un token comme consommé (usage unique) */
+    public function consumeResetToken(string $token): void {
+        $sql = "UPDATE password_reset_token SET used = 1 WHERE token = :t";
+        $st = $this->pdo->prepare($sql);
+        $st->execute([':t' => $token]);
+    }
+
+    /** Met à jour le mot de passe (haché) d’un user */
+    public function updateUserPassword(int $userId, string $plainPassword): void {
+        $hash = password_hash($plainPassword, PASSWORD_DEFAULT);
+        $sql  = "UPDATE user SET password = :p WHERE user_id = :uid";
+        $st = $this->pdo->prepare($sql);
+        $st->execute([':p' => $hash, ':uid' => $userId]);
     }
 }

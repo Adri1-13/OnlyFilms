@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace iutnc\onlyfilms\dispatch;
 
+use iutnc\onlyfilms\action\ForgotPasswordAction;
+use iutnc\onlyfilms\action\ResetPasswordAction;
 use iutnc\onlyfilms\action\AddFavAction;
 use iutnc\onlyfilms\action\DelFavAction;
 use iutnc\onlyfilms\action\AddUserAction;
@@ -48,6 +50,12 @@ class Dispatcher
                 case 'add-user':
                     $action = new AddUserAction();
                     break;
+                case 'forgot-password':
+                    $action = new ForgotPasswordAction();
+                    break;
+                case 'reset-password':
+                    $action = new ResetPasswordAction();
+                    break;
                 case 'default':
                 default:
                     $action = new DefaultAction();
@@ -89,6 +97,7 @@ class Dispatcher
                 default:
                     $action = new DefaultAction();
                     break;
+
             }
         }
 
