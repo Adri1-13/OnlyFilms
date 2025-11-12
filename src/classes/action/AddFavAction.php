@@ -21,6 +21,7 @@ class AddFavAction extends Action {
             }
         }
 
+
         $action = new DisplayCatalogueAction();
         return $action->execute();
     }

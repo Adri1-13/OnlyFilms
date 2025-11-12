@@ -49,7 +49,7 @@ class WatchedSeriesAction extends Action
 
             if ($date) {
                 // formatage date
-                $formattedDate = new \DateTime($date)->format('d/m/Y');
+                $formattedDate = (new \DateTime($date))->format('d/m/Y');
                 $html .= '      <small class="card-text text-body-secondary mb-2">Terminée le : ' . $formattedDate . '</small>';
             }
 
