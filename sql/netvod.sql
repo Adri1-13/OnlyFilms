@@ -117,13 +117,13 @@ CREATE TABLE `watch_episode` (
 -- --------------------------------------------------------
 -- Table d'association `watched_serie`
 -- --------------------------------------------------------
-CREATE TABLE `watched_serie` (
+CREATE TABLE `watched_series` (
     `user_id` INT(11) NOT NULL,
-    `serie_id` INT(11) NOT NULL,
+    `series_id` INT(11) NOT NULL,
     `viewing_date` DATETIME NOT NULL,
-    PRIMARY KEY (`user_id`, `serie_id`),
+    PRIMARY KEY (`user_id`, `series_id`),
     FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
-    FOREIGN KEY (`serie_id`) REFERENCES `serie` (`serie_id`)
+    FOREIGN KEY (`series_id`) REFERENCES `series` (`series_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -218,3 +218,41 @@ INSERT INTO `watch_episode` (`user_id`, `episode_id`, `viewing_date`) VALUES
 (2, 4, '2023-10-01 19:30:00'), -- Bob a vu S2E1
 (2, 5, '2023-10-02 19:45:00'), -- Bob a vu S2E2
 (1, 7, '2024-02-10 17:30:00'); -- Alice a vu S3E1
+
+
+DELIMITER $$
+-- Insere une série dans watched_series si toutes les épisodes de cette meme séries sont regardées
+CREATE TRIGGER trg_watch_episode_after_insert
+AFTER INSERT ON watch_episode
+FOR EACH ROW
+BEGIN
+  DECLARE v_series_id INT;
+  DECLARE v_total INT;
+  DECLARE v_watched INT;
+
+  -- Trouver la série de l'épisode inséré
+  SELECT e.series_id INTO v_series_id
+  FROM episode e
+  WHERE e.episode_id = NEW.episode_id;
+
+  -- Nb total d'épisodes de la série
+  SELECT COUNT(*) INTO v_total
+  FROM episode
+  WHERE series_id = v_series_id;
+
+  -- Nb d'épisodes vus par cet utilisateur dans cette série
+  SELECT COUNT(*) INTO v_watched
+  FROM watch_episode we
+  JOIN episode e2 ON e2.episode_id = we.episode_id
+  WHERE we.user_id = NEW.user_id
+    AND e2.series_id = v_series_id;
+
+  -- Si tout est vu, placer dans watched_series
+  IF v_total > 0 AND v_watched = v_total THEN
+    INSERT INTO watched_series(user_id, series_id, viewing_date)
+    VALUES (NEW.user_id, v_series_id, NOW())
+    ON DUPLICATE KEY UPDATE viewing_date = NOW();
+  END IF;
+END$$
+
+DELIMITER ;
