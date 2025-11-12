@@ -15,6 +15,7 @@ use iutnc\onlyfilms\action\DefaultAction;
 use iutnc\onlyfilms\action\SignInAction;
 use iutnc\onlyfilms\action\DisplayCatalogueAction;
 use iutnc\onlyfilms\action\InProgressSeriesAction;
+use iutnc\onlyfilms\action\WatchedSeriesAction;
 use iutnc\onlyfilms\auth\AuthnProvider;
 use iutnc\onlyfilms\action\AddCommentAction;
 
@@ -78,6 +79,9 @@ class Dispatcher {
                 case 'display-account':
                     $action = new DisplayAccountAction();
                     break;
+                case 'watched-series';
+                    $action = new WatchedSeriesAction();
+                    break;
                 case 'default':
                 default:
                     $action = new DefaultAction();
@@ -113,6 +117,9 @@ class Dispatcher {
                     </li>
                     <li class="nav-item">
                       <a class="nav-link" href="?action=in-progress">Séries en cours</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="?action=in-progress">Séries regardées</a>
                     </li>
                     <li class="nav-item dropdown">
                       <a class="nav-link dropdown-toggle" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
