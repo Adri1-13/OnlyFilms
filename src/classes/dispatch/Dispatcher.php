@@ -18,7 +18,6 @@ use iutnc\onlyfilms\action\InProgressSeriesAction;
 use iutnc\onlyfilms\action\WatchedSeriesAction;
 use iutnc\onlyfilms\auth\AuthnProvider;
 use iutnc\onlyfilms\action\AddCommentAction;
-use iutnc\onlyfilms\action\WatchedSeriesAction;
 
 class Dispatcher
 {
