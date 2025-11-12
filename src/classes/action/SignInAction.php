@@ -31,6 +31,7 @@ class SignInAction extends Action {
                                 <div class="d-grid mt-4">
                                     <button type="submit" class="btn btn-primary">Se connecter</button>
                                 </div>
+                                <p class="mt-2"><a href="?action=forgot-password">Mot de passe oublié ?</a></p>
                             </form>
                         </div>
                     </div>
