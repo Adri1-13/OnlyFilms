@@ -22,6 +22,10 @@ class AuthnProvider {
             throw new AuthnException("Email ou mot de passe incorrect");
         }
 
+        if (!$user->isActivated()) {
+            throw new AuthnException("Votre compte n'est pas encore activé. Veuillez cliquer sur le lien d'activation lors de l'inscription");
+        }
+
 
         if (!password_verify($passwd, $user->getPasswd())) { // compare le mdp pas chiffré que rentre l'utilisateur avec celui qui est enregistré dans la bdd sur cet utilisateur
             throw new AuthnException("Email ou mot de passe incorrect");
@@ -49,9 +53,11 @@ class AuthnProvider {
 
         $mdpChiffre = password_hash($passwd, PASSWORD_BCRYPT, ['cost' => 12]);
 
-        $nouvUser = $repo->addUser($mail, $mdpChiffre, $name, $firstname, 1);
+        $token = bin2hex(random_bytes(32));
 
-        return $nouvUser;
+        $user = $repo->addUser($mail, $mdpChiffre, $name, $firstname, 0, $token, date('YYYY-MM-DD HH:MI:SS', time() + 60*60*5));
+
+        $repo->activateAccount();
 
     }
 

@@ -53,7 +53,7 @@ class OnlyFilmsRepository
     {
         $fichierConfig = parse_ini_file($file);
         if ($fichierConfig === false) {
-            throw new \Exception("Erreur dans le fichier de config"); // pourquoi c'est \Exception ? parce que c'est dans un namespace
+            throw new \Exception("Erreur dans le fichier de config");
         }
         $driver = $fichierConfig['driver'];
         $host = $fichierConfig['host'];
@@ -84,7 +84,7 @@ class OnlyFilmsRepository
             throw new OnlyFilmsRepositoryException("Cet utilisateur n'existe pas");
         }
 
-        return new User($ligne['user_id'], $ligne['firstname'], $ligne['name'], $ligne['mail'], $ligne['password'], $ligne['role']);
+        return new User($ligne['user_id'], $ligne['firstname'], $ligne['name'], $ligne['mail'], $ligne['password'], $ligne['role'], (bool)$ligne['activated']);
 
     }
 
@@ -116,16 +116,16 @@ class OnlyFilmsRepository
      * @param int $role
      * @return User
      */
-    function addUser(string $mail, string $passwd, string $name, string $firstname, int $role): User
+    function addUser(string $mail, string $passwd, string $name, string $firstname, int $role, string $token, string $date_expiry): User
     {
-        $requete = "INSERT INTO user(mail, password, name, firstname, role) VALUES (?,?,?,?,?)";
+        $requete = "INSERT INTO user(mail, password, name, firstname, role, activated, activation_token, token_expiry) VALUES (?,?,?,?,?,0,?,?)";
 
         $stmt = $this->pdo->prepare($requete);
-        $stmt->execute([$mail, $passwd, $name, $firstname, $role]);
+        $stmt->execute([$mail, $passwd, $name, $firstname, $role, $token, $date_expiry]);
 
         $nouvID = $this->pdo->lastInsertId();
 
-        return new User((int) $nouvID, $firstname, $name, $mail, $passwd, $role);
+        return new User((int) $nouvID, $firstname, $name, $mail, $passwd, $role, false);
     }
 
     /* =================== SERIES =================== */
@@ -627,5 +627,57 @@ class OnlyFilmsRepository
         $sql  = "UPDATE user SET password = :p WHERE user_id = :uid";
         $st = $this->pdo->prepare($sql);
         $st->execute([':p' => $hash, ':uid' => $userId]);
+    }
+
+    /**
+     *
+     * Stocke un token d'activation dans la bd
+     *
+     * @param int $userId
+     * @param string $token
+     * @param $expiration_date
+     * @return void
+     */
+    public function activationToken(int $userId, string $token, $expiration_date) : void {
+        $requete = "INSERT INTO activation_token(user_id, token,expiration_date) VALUES (?,?,?)";
+        $stmt = $this->pdo->prepare($requete);
+        $stmt->execute([$userId, $token, $expiration_date]);
+    }
+
+    public function findActivationToken(string $token) : ?array {
+        $requete = <<<SQL
+            SELECT at.token, at.user_id, at.expiration_date, u.mail, u.firstname
+            FROM activation_token at
+            INNER JOIN user u ON u.user_id = at.user_id
+            WHERE at.token = ?
+        SQL;
+
+        $stmt = $this->pdo->prepare($requete);
+        $stmt->execute([$token]);
+        $ligne = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if ($ligne === false) {
+            return null;
+        }
+        return $ligne;
+
+    }
+
+    public function deleteActivationToken(string $token) : void {
+        $requete = "DELETE FROM activation_token WHERE token = ?";
+        $stmt = $this->pdo->prepare($requete);
+        $stmt->execute([$token]);
+    }
+
+
+    public function setUserActivated(int $userId) : void {
+        $requete = "UPDATE user SET activated  = 1 WHERE user_id = ?";
+        $stmt = $this->pdo->prepare($requete);
+        $stmt->execute([$userId]);
+    }
+
+    public function cleanExpiredTokens() : void {
+        $requete = "DELETE FROM activation_token WHERE expiration_date < NOW()";
+        $this->pdo->exec($requete);
     }
 }
