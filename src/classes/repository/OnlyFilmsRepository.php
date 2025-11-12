@@ -189,6 +189,33 @@ class OnlyFilmsRepository
         );
     }
 
+    public function searchSeries(string $query): array
+    {
+        $recherche = '%' . $query . '%';
+
+        $stmt = $this->pdo->prepare("
+            SELECT * FROM series 
+            WHERE title LIKE ? OR description LIKE ? 
+            ORDER BY date_added DESC
+        ");
+
+        $stmt->execute([$recherche, $recherche]);
+        $series = [];
+
+        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $series[] = new Serie(
+                (int) $r['series_id'],
+                $r['title'],
+                $r['description'] ?? '',
+                $r['img'] ?? '',
+                (int) $r['year'],
+                $r['date_added'],
+                null
+            );
+        }
+
+        return $series;
+    }
 
     /* =================== EPISODES =================== */
 
@@ -538,5 +565,35 @@ class OnlyFilmsRepository
         return $stmt->fetchAll();
     }
 
+    /**
+     * Récupère toutes les séries, triées par note moyenne
+     * @return array
+     */
+    public function findAllSeriesSortedByRating(): array
+    {
+        $sql = "
+            SELECT s.series_id, s.title, s.description, s.img, s.year, s.date_added, AVG(n.note) AS avg_rating
+            FROM series s
+            LEFT JOIN notation n ON s.series_id = n.series_id
+            GROUP BY s.series_id
+            ORDER BY avg_rating DESC, s.date_added DESC
+        ";
 
+        $stmt = $this->pdo->query($sql);
+        $rows = $stmt->fetchAll();
+
+        $series = [];
+        foreach ($rows as $r) {
+            $series[] = new Serie(
+                (int) $r['series_id'],
+                $r['title'],
+                $r['description'] ?? '',
+                $r['img'] ?? '',
+                (int) $r['year'],
+                $r['date_added'],
+                null
+            );
+        }
+        return $series;
+    }
 }
