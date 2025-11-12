@@ -19,7 +19,7 @@ class DisplayCatalogueAction extends Action
             if (!empty($recherche)) {
                 $seriesList = $repo->searchSeries($recherche);
             } else {
-                $seriesList = $repo->findAllSeries();
+                $seriesList = $repo->findAllSeriesSortedByRating();
             }
 
             $html = '<h1>Catalogue des Séries</h1>';
