@@ -19,7 +19,7 @@ class ActivateAccountAction extends Action {
                     <div class="alert alert-danger">
                         <h2>Lien d'activation invalide</h2>
                         <p>Si vous avez déjà un compte mais que celui-ci n'est pas activé, vous pouvez demander un nouveau lien d'activation</p>
-                        <a href="?action=send-again-activation" class="btn btn-primary">Renvoyer le lien d'activation</a> <!--TODO : pas sur-->
+                        <a href="?action=send-again-activation" class="btn btn-primary">Renvoyer le lien d'activation</a>
                     </div>
                 </div>
             HTML;
