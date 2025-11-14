@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace iutnc\onlyfilms\dispatch;
 
 use iutnc\onlyfilms\action\EditAccountAction;
+use iutnc\onlyfilms\action\ActivateAccountAction;
 use iutnc\onlyfilms\action\ForgotPasswordAction;
 use iutnc\onlyfilms\action\ResetPasswordAction;
 use iutnc\onlyfilms\action\AddFavAction;
@@ -13,6 +14,7 @@ use iutnc\onlyfilms\action\AddUserAction;
 use iutnc\onlyfilms\action\DisplayAccountAction;
 use iutnc\onlyfilms\action\DisplayEpisodeAction;
 use iutnc\onlyfilms\action\DisplaySerieAction;
+use iutnc\onlyfilms\action\SendAgainActivationTokenAction;
 use iutnc\onlyfilms\action\SignOutAction;
 use iutnc\onlyfilms\action\DefaultAction;
 use iutnc\onlyfilms\action\SignInAction;
@@ -56,6 +58,12 @@ class Dispatcher
                     break;
                 case 'reset-password':
                     $action = new ResetPasswordAction();
+                    break;
+                case 'activate-account':
+                    $action = new ActivateAccountAction();
+                    break;
+                case 'send-again-activation':
+                    $action = new SendAgainActivationTokenAction();
                     break;
                 case 'default':
                 default:

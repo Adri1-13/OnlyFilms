@@ -13,6 +13,9 @@ CREATE TABLE `user` (
     `name` VARCHAR(100) DEFAULT NULL,
     `firstname` VARCHAR(100) DEFAULT NULL,
     `role` INT(11) NOT NULL DEFAULT 1,
+    `activated` BOOLEAN NOT NULL DEFAULT FALSE,
+    `activation_token` VARCHAR(64) DEFAULT NULL,
+    `token_generation_date` DATETIME DEFAULT NULL,
     PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -126,19 +129,6 @@ CREATE TABLE `watched_series` (
     FOREIGN KEY (`series_id`) REFERENCES `series` (`series_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
--- Table `password_reset_token`
--- --------------------------------------------------------
-
-CREATE TABLE IF NOT EXISTS password_reset_token (
-  token CHAR(64) NOT NULL,
-  user_id INT(11) NOT NULL,
-  issued_at DATETIME NOT NULL,
-  expires_at DATETIME NOT NULL,
-  used INT(1) NOT NULL DEFAULT 0,
-  PRIMARY KEY (token),
-  CONSTRAINT fk_prt_user FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 -- Insertions dans la table `user`
@@ -269,3 +259,26 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+CREATE TABLE IF NOT EXISTS password_reset_token (
+  token CHAR(64) NOT NULL,            -- bin2hex(random_bytes(32))
+  user_id INT(11) NOT NULL,
+  issued_at DATETIME NOT NULL,
+  expires_at DATETIME NOT NULL,
+  used TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (token),
+  CONSTRAINT fk_prt_user FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS password_reset_token (
+  token CHAR(64) NOT NULL,            -- bin2hex(random_bytes(32))
+  user_id INT(11) NOT NULL,
+  issued_at DATETIME NOT NULL,
+  expires_at DATETIME NOT NULL,
+  used INT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (token),
+  CONSTRAINT fk_prt_user FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+UPDATE user SET activated = 1 WHERE activated = 0;

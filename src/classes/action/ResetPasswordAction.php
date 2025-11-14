@@ -49,7 +49,7 @@ class ResetPasswordAction extends Action
         if (!$row) return '<div class="container mt-4"><p>Lien invalide ou expiré.</p></div>';
 
         if ($p1 !== $p2)  return $this->form($token, 'Les mots de passe ne correspondent pas.');
-        if (strlen($p1) < 8) return $this->form($token, '8 caractères minimum.');
+        if (strlen($p1) < 10) return $this->form($token, '10 caractères minimum.');
 
         $repo->updateUserPassword((int)$row['user_id'], $p1);
         $repo->consumeResetToken($token);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace iutnc\onlyfilms\Repository;
 
+use iutnc\onlyfilms\exception\AuthnException;
 use iutnc\onlyfilms\exception\OnlyFilmsRepositoryException;
 use iutnc\onlyfilms\auth\User;
 use iutnc\onlyfilms\video\lists\Serie;
@@ -49,7 +50,7 @@ class OnlyFilmsRepository {
     public static function setConfig($file): void {
         $fichierConfig = parse_ini_file($file);
         if ($fichierConfig === false) {
-            throw new \Exception("Erreur dans le fichier de config"); // pourquoi c'est \Exception ? parce que c'est dans un namespace
+            throw new \Exception("Erreur dans le fichier de config");
         }
         $driver = $fichierConfig['driver'];
         $host = $fichierConfig['host'];
@@ -73,7 +74,7 @@ class OnlyFilmsRepository {
             throw new OnlyFilmsRepositoryException("Cet utilisateur n'existe pas");
         }
 
-        return new User($ligne['user_id'], $ligne['firstname'], $ligne['name'], $ligne['mail'], $ligne['password'], $ligne['role']);
+        return new User($ligne['user_id'], $ligne['firstname'], $ligne['name'], $ligne['mail'], $ligne['password'], $ligne['role'], (bool)$ligne['activated']);
 
     }
 
@@ -90,15 +91,28 @@ class OnlyFilmsRepository {
 
     }
 
-    public function addUser(string $mail, string $passwd, string $name, string $firstname, int $role): User {
-        $requete = "INSERT INTO user(mail, password, name, firstname, role) VALUES (?,?,?,?,?)";
+    /**
+     * Ajoute un utilisateur
+     * @param string $mail
+     * @param string $passwd
+     * @param string $name
+     * @param string $firstname
+     * @param int $role
+     * @return User
+     */
+    function addUser(string $mail, string $passwd, string $name, string $firstname, int $role, string $token): User
+    {
+
+        $tokenCreationDate = date('Y-m-d H:i:s');
+
+        $requete = "INSERT INTO user(mail, password, name, firstname, role, activated, activation_token, token_generation_date) VALUES (?,?,?,?,?,0,?,?)";
 
         $stmt = $this->pdo->prepare($requete);
-        $stmt->execute([$mail, $passwd, $name, $firstname, $role]);
+        $stmt->execute([$mail, $passwd, $name, $firstname, $role, $token, $tokenCreationDate]);
 
         $nouvID = $this->pdo->lastInsertId();
 
-        return new User((int) $nouvID, $firstname, $name, $mail, $passwd, $role);
+        return new User((int) $nouvID, $firstname, $name, $mail, $passwd, $role, false);
     }
 
     public function getUserInSerieProgress(int $userId): array {
@@ -296,6 +310,7 @@ class OnlyFilmsRepository {
         $stmt->execute($params);
 
         $series = [];
+
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $series[] = new Serie(
                 (int) $r['series_id'],
@@ -589,5 +604,61 @@ class OnlyFilmsRepository {
         $sql  = "UPDATE user SET password = :p WHERE user_id = :uid";
         $st = $this->pdo->prepare($sql);
         $st->execute([':p' => $hash, ':uid' => $userId]);
+    }
+
+
+    /**
+     * @throws \DateMalformedStringException
+     * @throws AuthnException
+     */
+    public function activateAccount(string $token) : void {
+        $requete = <<<SQL
+            SELECT user_id, activated, mail, token_generation_date
+            FROM user
+            WHERE activation_token = ?
+        SQL;
+
+        $stmt = $this->pdo->prepare($requete);
+
+        $stmt->execute([$token]);
+
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user === false) {
+            throw new AuthnException("Token d'activation invalide");
+        }
+
+        $mail = $user['mail'];
+
+        if (!$this->userExists($mail)) {
+            throw new AuthnException("Cet utilisateur n'existe pas il ne peut pas être activé");
+        }
+
+        if ($user['activated']) {
+            throw new AuthnException("Cet utilisateur est déjà activé");
+        }
+
+        $tokenExpirationDate = (new \DateTime($user['token_generation_date']))->getTimestamp() + 15*60;
+        $nowDate= (new \DateTime())->getTimestamp();
+
+        if ($nowDate - $tokenExpirationDate > 15 * 60) {
+            throw new AuthnException("Le token n'est plus valide.");
+        }
+
+        $requeteActivation = <<<SQL
+            UPDATE user SET activated = 1, activation_token = null, token_generation_date = null WHERE activation_token = ?
+        SQL;
+
+        $stmtActivation = $this->pdo->prepare($requeteActivation);
+        $stmtActivation->execute([$token]);
+
+    }
+
+    public function updateActivationToken(string $mail, string $token) : void {
+        $tokenCreationdate = \date('Y-m-d H:i:s');
+
+        $requete = "UPDATE user SET activation_token = ?, token_generation_date = ? WHERE mail = ?";
+        $stmt = $this->pdo->prepare($requete);
+        $stmt->execute([$token, $tokenCreationdate, $mail]);
     }
 }

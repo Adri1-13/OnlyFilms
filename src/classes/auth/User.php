@@ -12,14 +12,16 @@ class User {
     private string $mail;
     private string $passwd;
     private int $role;
+    private bool $activated;
 
-    public function __construct(int $id, string $firstname, string $name, string $mail, string $passwd, int $role) {
+    public function __construct(int $id, string $firstname, string $name, string $mail, string $passwd, int $role, bool $activated) {
         $this->id = $id;
         $this->firstname = $firstname;
         $this->name = $name;
         $this->mail = $mail;
         $this->passwd = $passwd;
         $this->role = $role;
+        $this->activated = $activated;
     }
 
     public function getId(): int
@@ -83,6 +85,18 @@ class User {
     {
         $this->role = $role;
     }
+
+    public function isActivated(): bool
+    {
+        return $this->activated;
+    }
+
+    public function setActivated(bool $activated): void
+    {
+        $this->activated = $activated;
+    }
+
+
 
 
 
