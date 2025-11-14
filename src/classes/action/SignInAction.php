@@ -46,8 +46,10 @@ class SignInAction extends Action {
     {
         if (!isset($_POST['mail']) || !isset($_POST['passwd'])) {
             return <<<HTML
-                <h2>Tous les champs sont obligatoires dans la page de connexion</h2>
-                <a href="?action=signin"><button>Réesayer</button></a>
+                <div class="my-4">
+                <div class="alert alert-warning">Tous les champs sont obligatoires dans la page de connexion</div>
+                <a class="btn btn-primary" href="?action=signin">Réessayer</a>
+                </div>
             HTML;
         }
 
@@ -56,8 +58,10 @@ class SignInAction extends Action {
 
         if ($mail === false) {
             return <<<HTML
-                <h2>Email invalide</h2>
-                <a href="?action=signin">Réesayer</a>
+                <div class="my-4">
+                <div class="alert alert-warning">Email invalide</div>
+                <a class="btn btn-primary" href="?action=signin">Réessayer</a>
+                </div>
             HTML;
         }
 
@@ -67,18 +71,20 @@ class SignInAction extends Action {
             exit();
 
         } catch (AccountActivationException $ea) {
+            $errorMessage = htmlspecialchars($ea->getMessage(), ENT_QUOTES, 'UTF-8');
             return <<<HTML
-                <div class="container mt-5 my-4">
-                    <div class="alert alert-warning">
-                        {$ea->getMessage()}
-                    </div>
-                    <a href="?action=send-again-activation" class="btn btn-primary">Renvoyer le lien d'activation</a>
+                <div class="my-4">
+                <div class="alert alert-warning">{$errorMessage}</div>
+                <a class="btn btn-primary" href="?action=send-again-activation">Renvoyer le lien d'activation</a>
                 </div>
             HTML;
         } catch (AuthnException $e) {
+            $errorMessage = htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
             return <<<HTML
-                <p>{$e->getMessage()}</p>
-                <a href="?action=signin">Réessayer</a>
+                <div class="my-4">
+                <div class="alert alert-warning">{$errorMessage}</div>
+                <a class="btn btn-primary" href="?action=signin">Réessayer</a>
+                </div>
             HTML;
 
         }

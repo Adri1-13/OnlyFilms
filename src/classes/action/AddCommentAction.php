@@ -92,7 +92,7 @@ class AddCommentAction extends Action {
             // ajout commentaire
             $repository->addComment($userId, $serieId, $comment, $note);
 
-            return "<div class='alert alert-success'>Votre commentaire a été ajouté avec succès !</div>";
+            return "<div class=' my-4 alert alert-success'>Votre commentaire a été ajouté avec succès !</div>";
         } catch (\Exception $e) {
             return "<div class='alert alert-warning my-3'>Une erreur est survenue lors de l'ajout de votre commentaire.</div>";
         }
