@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace iutnc\onlyfilms\action;
 
 use iutnc\onlyfilms\auth\AuthnProvider;
+use iutnc\onlyfilms\exception\AccountActivationException;
 use iutnc\onlyfilms\exception\AuthnException;
 
 class SignInAction extends Action {
@@ -65,6 +66,15 @@ class SignInAction extends Action {
             header('Location: ?action=default');
             exit();
 
+        } catch (AccountActivationException $ea) {
+            return <<<HTML
+                <div class="container mt-5 my-4">
+                    <div class="alert alert-warning">
+                        {$ea->getMessage()}
+                    </div>
+                    <a href="?action=send-again-activation" class="btn btn-primary">Renvoyer le lien d'activation</a>
+                </div>
+            HTML;
         } catch (AuthnException $e) {
             return <<<HTML
                 <p>{$e->getMessage()}</p>

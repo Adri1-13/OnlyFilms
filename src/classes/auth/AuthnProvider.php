@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace iutnc\onlyfilms\auth;
 
+use iutnc\onlyfilms\exception\AccountActivationException;
 use iutnc\onlyfilms\exception\AuthnException;
 use iutnc\onlyfilms\exception\OnlyFilmsRepositoryException;
 use iutnc\onlyfilms\Repository\OnlyFilmsRepository;
@@ -22,11 +23,8 @@ class AuthnProvider {
             throw new AuthnException("Email ou mot de passe incorrect");
         }
 
-        if (!$user->isActivated()) { // TODO : revoir ça
-            throw new AuthnException(<<<HTML
-                Votre compte n'est pas encore activé.
-                <a href="?action=activate-account">Activer mon compte</a>
-            HTML);
+        if (!$user->isActivated()) {
+            throw new AccountActivationException("Votre compte n'est pas encore activé.");
         }
 
 
