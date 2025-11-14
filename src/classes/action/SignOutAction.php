@@ -11,21 +11,12 @@ class SignOutAction extends Action {
 
     public function executeGet(): string
     {
-
-        if (!AuthnProvider::isSignedIn()) {
-            header('Location: ?action=default');
-            exit();
-        }
         unset($_SESSION['user']);
 
         session_destroy();
 
-        return <<<HTML
-            <p>Vous êtes déconnecté</p>
-            <p><a href="?action=default">Aller à l'accueil</a></p>
-            <br><p>ou</p><br>
-            <a href="?action=signin">Se connecter</a>
-        HTML;
+        $action = new DefaultAction();
+        return $action->execute();
 
     }
 
