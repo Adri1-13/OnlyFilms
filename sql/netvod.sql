@@ -134,11 +134,10 @@ CREATE TABLE `watched_series` (
 -- Insertions dans la table `user`
 -- --------------------------------------------------------
 INSERT INTO `user` (`user_id`, `mail`, `password`, `name`, `firstname`, `role`) VALUES
-(1, 'test@mail.com', '$2y$12$cz2YmNJz44ERexjO6Q5poehKPog3tD0ZrXbAMWJNT60O1hJm67YEu', 'test', 'test', 1);
-(1, 'alice.dupont@example.com', 'hashed_password_1', 'Dupont', 'Alice', 1),
-(2, 'bob.martin@example.com', 'hashed_password_2', 'Martin', 'Bob', 1),
-(3, 'admin@platform.com', 'hashed_admin_password', 'Super', 'Admin', 99);
-
+(1, 'test@mail.com', '$2y$12$cz2YmNJz44ERexjO6Q5poehKPog3tD0ZrXbAMWJNT60O1hJm67YEu', 'test', 'test', 1),
+(2, 'alice.dupont@example.com', 'hashed_password_1', 'Dupont', 'Alice', 1),
+(3, 'bob.martin@example.com', 'hashed_password_2', 'Martin', 'Bob', 1),
+(4, 'admin@platform.com', 'hashed_admin_password', 'Super', 'Admin', 99);
 -- --------------------------------------------------------
 -- Insertions dans la table `genre`
 -- --------------------------------------------------------
@@ -188,7 +187,10 @@ INSERT INTO `episode` (`episode_id`, `num`, `title`, `summary`, `duration`, `fil
 -- Insertions dans la table `commentary`
 -- (Commentaires utilisateur/série)
 -- --------------------------------------------------------
-
+INSERT INTO `commentary` (`user_id`, `series_id`, `text`, `date_added`) VALUES
+(1, 1, 'Une série de Science-Fiction très prenante, jattends la suite avec impatience!', '2023-09-05 14:30:00'),
+(2, 2, 'Un thriller bien ficelé avec des acteurs incroyables.', '2023-10-01 20:15:00'),
+(1, 3, 'Très drôle, parfait pour se détendre!', '2024-02-10 18:00:00');
 
 -- --------------------------------------------------------
 -- Insertions dans la table `notation`
@@ -198,31 +200,8 @@ INSERT INTO `episode` (`episode_id`, `num`, `title`, `summary`, `duration`, `fil
 INSERT INTO `notation` (`user_id`, `series_id`, `note`, `date_added`) VALUES
 (1, 1, 5, '2023-09-05 14:31:00'),
 (2, 1, 4, '2023-10-10 09:00:00'),
-(2, 2, 5, '2023-10-01 20:16:00'),- --------------------------------------------------------
--- Insertions dans la table `commentary`
--- (Commentaires utilisateur/s�rie)
--- --------------------------------------------------------
-
-
--- --------------------------------------------------------
--- Insertions dans la table `notation`
--- (Notes utilisateur/s�rie)
--- NOTE: La colonne `note` est de type INT(1) dans le sch�ma original, supposons qu'elle soit une note sur 5 ou 10. J'utilise une note sur 5 ici (1 � 5).
--- --------------------------------------------------------
-INSERT INTO `notation` (`user_id`, `series_id`, `note`, `date_added`) VALUES
-(1, 1, 5, '2023-09-05 14:31:00'),
-(2, 1, 4, '2023-10-10 09:00:00'),
 (2, 2, 5, '2023-10-01 20:16:00'),
 (1, 3, 4, '2024-02-10 18:01:00');
-MySQL a répondu : Documentation
-
-#1452 - Cannot add or update a child row: a foreign key constraint fails (`onle`.`notation`, CONSTRAINT `notation_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`))
-(1, 3, 4, '2024-02-10 18:01:00');
-
-INSERT INTO `commentary` (`user_id`, `series_id`, `text`, `date_added`) VALUES
-                                                                            (1, 1, 'Une série de Science-Fiction très prenante, jattends la suite avec impatience!', '2023-09-05 14:30:00'),
-                                                                            (2, 2, 'Un thriller bien ficelé avec des acteurs incroyables.', '2023-10-01 20:15:00'),
-                                                                            (1, 3, 'Très drôle, parfait pour se détendre!', '2024-02-10 18:00:00');
 
 -- --------------------------------------------------------
 -- Insertions dans la table `like_list`
