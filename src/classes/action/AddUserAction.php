@@ -64,8 +64,10 @@ class AddUserAction extends Action {
     {
         if (!isset($_POST['mail']) || !isset($_POST['passwd']) || !isset($_POST['passwd_confirm']) || !isset($_POST['firstname']) || !isset($_POST['name'])) {
             return <<<HTML
-                    <p>Erreur : Tous les champs sont obligatoires</p>
-                    <a href="?action=add-user">Retour à l'inscription</a>
+                    <div class="my-4">
+                    <div class="alert alert-warning">Erreur : Tous les champs sont obligatoires</div>
+                    <a class="btn btn-primary" href="?action=add-user">Retour à l'inscription</a>
+                    </div>   
                     HTML;
         }
 
@@ -76,8 +78,10 @@ class AddUserAction extends Action {
 
         if ($mail === false) {
             return <<<HTML
-                    <p>Email incorrect</p>
-                    <a href="?action=add-user">Retour à l'inscription</a>
+                    <div class="my-4">
+                    <p class="alert alert-warning">Email incorrect</p>
+                    <a class="btn btn-primary" href="?action=add-user">Retour à l'inscription</a>
+                    </div>
             HTML;
         }
 
@@ -87,30 +91,41 @@ class AddUserAction extends Action {
 
         if ($passwd !== $passwd_confirm) {
             return <<<HTML
-                    <p>Les deux mots de passe ne correspondent pas.</p>
-                    <a href="?action=add-user">Retour à l'inscription</a>
-                    HTML;
+                    <div class="my-4">
+                    <div class="alert alert-warning">Les deux mots de passe ne correspondent pas.</div>
+                    <a class="btn btn-primary" href="?action=add-user">Retour à l'inscription</a>
+                    </div>
+                HTML;
         }
 
         if (strlen($passwd) < 10) {
             return <<<HTML
-                    <p>Le mot de passe doit faire au moins 10 caractères</p>
-                    <a href="?action=add-user">Retour à l'inscription</a>
-            HTML;
+                    <div class="my-4">
+                    <div class="alert alert-warning">Le mot de passe doit faire au moins 10 caractères</div>
+                    </div>
+                    <a class="btn btn-primary" href="?action=add-user">Retour à l'inscription</a>
+                HTML;
         }
 
         try {
             $activationToken = AuthnProvider::register($mail, $passwd, $name, $firstname);
 
             return <<<HTML
-                <h3>Veuillez maintenant activer votre compte</h3>
-                <a href="?action=activate-account&token={$activationToken}">Cliquer ici</a>
+                <div class="my-4">
+                    <div class="alert alert-success">
+                        <p>Votre compte a été créé. Cliquez sur le bouton ci-dessous pour l'activer.</p>
+                    </div>
+                </div>
+                   <a class="btn btn-success" href="?action=activate-account&token={$activationToken}">Cliquer ici pour activer</a>
             HTML;
 
         } catch (AuthnException $e) {
+            $errorMessage = htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
             return <<<HTML
-                <p>Erreur lors de l'inscription : {$e->getMessage()}</p>
-                <a href="?action=add-user">Retour à l'inscription</a>
+                <div class="my-4">
+                <div class="alert alert-warning">Erreur lors de l'inscription : {$errorMessage}</div>
+                <a class="btn btn-primary" href="?action=add-user">Retour à l'inscription</a>
+                </div>
             HTML;
         }
 

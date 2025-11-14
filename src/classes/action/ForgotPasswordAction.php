@@ -8,16 +8,26 @@ class ForgotPasswordAction extends Action
 {
     public function executeGet(): string {
         return <<<HTML
-        <div class="container mt-4">
-          <h2>Mot de passe oublié</h2>
-          <form method="post" class="mt-3">
-            <div class="mb-3">
-              <label for="mail" class="form-label">Adresse email</label>
-              <input type="email" class="form-control" id="mail" name="mail" required>
+            <div class="row justify-content-center my-4">
+                <div class="col-md-6 col-lg-5">
+                    <div class="card shadow-sm">
+                        <div class="card-body p-4 p-md-5">
+                            <h2 class="card-title text-center mb-4">Mot de passe oublié</h2>
+                            <p class="text-center text-muted mb-4">Entrez votre email pour recevoir un lien de réinitialisation.</p>
+                            
+                            <form method="POST" action="?action=forgot-password">
+                                <div class="mb-3">
+                                    <label for="mail" class="form-label">Adresse email</label>
+                                    <input type="email" class="form-control" id="mail" name="mail" required>
+                                </div>
+                                <div class="d-grid mt-4">
+                                    <button class="btn btn-primary" type="submit">Envoyer le lien</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <button class="btn btn-primary" type="submit">Générer le lien</button>
-          </form>
-        </div>
         HTML;
     }
 
@@ -31,7 +41,7 @@ class ForgotPasswordAction extends Action
             // si le user n'existe déjà pas
         } catch (OnlyFilmsRepositoryException $e) {
             return <<<HTML
-                <div class="container mt-4">{$e->getMessage()}</div>
+                <div class="my-4 alert alert-warning">Si le compte existe un mail a été envoyé</div>
             HTML;
         }
 
