@@ -76,7 +76,8 @@ class AddCommentAction extends Action {
 
         $userId = $_SESSION['user']->getId();
         $serieId = (int)$_POST['serie_id']; // ID de la série commentée
-        $comment = $_POST['comment']; // Le commentaire
+        $comment_raw = $_POST['comment']; // Le commentaire
+        $comment = filter_var($comment_raw, FILTER_SANITIZE_SPECIAL_CHARS);
         $note = (int)$_POST['note']; // La note de 1 à 5
 
         // TODO FILTER VAR !!

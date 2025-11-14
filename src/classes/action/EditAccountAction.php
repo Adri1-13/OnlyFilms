@@ -56,9 +56,12 @@ class EditAccountAction extends Action {
         // TODO filtrer les entrées ??? pas d'injection sql mais peut poser probleme a l'affichage si on utilise pas htmlspecialchar
 
         $firstnameBase = $user->getFirstname();
-        $firstname = !empty($_POST['firstname']) ? $_POST['firstname'] : $firstnameBase;
+        $firstname_raw = !empty($_POST['firstname']) ? $_POST['firstname'] : $firstnameBase;
+        $firstname = filter_var($firstname_raw, FILTER_SANITIZE_SPECIAL_CHARS);
+
         $nameBase = $user->getName();
-        $name = !empty($_POST['name']) ? $_POST['name'] : $nameBase;
+        $name_raw = !empty($_POST['name']) ? $_POST['name'] : $nameBase;
+        $name = filter_var($name_raw, FILTER_SANITIZE_SPECIAL_CHARS);
 
         $repo = OnlyFilmsRepository::getInstance();
         $repo->updateUserInfo($userId, $firstname, $name);
