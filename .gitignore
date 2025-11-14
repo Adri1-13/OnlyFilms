@@ -23,4 +23,6 @@
 
 **/.git
 
+.htaccess
+
 testVideo.php
