@@ -73,7 +73,7 @@ class SendAgainActivationTokenAction extends Action
                 <div class="container mt-5">
                     <div class="alert alert-danger">
                         <p>{$e->getMessage()}</p>
-                        <a href="?action=resend-activation">Réessayer</a>
+                        <a href="?action=send-again-activation">Réessayer</a>
                     </div>
                 </div>
             HTML;
