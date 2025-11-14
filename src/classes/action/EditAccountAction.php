@@ -16,7 +16,7 @@ class EditAccountAction extends Action {
 
         return <<<HTML
         <div class="row justify-content-center">
-            <div class="col-md-6">
+            <div class="my-4 col-md-6">
                 <div class="card shadow-sm">
                     <div class="card-body p-4">
                         <h2 class="card-title text-center mb-4">Modifier mes informations</h2>
@@ -52,6 +52,8 @@ class EditAccountAction extends Action {
     public function executePost(): string {
         $user = AuthnProvider::getSignedInUser();
         $userId = $user->getId();
+
+        // TODO filtrer les entrées ??? pas d'injection sql mais peut poser probleme a l'affichage si on utilise pas htmlspecialchar
 
         $firstnameBase = $user->getFirstname();
         $firstname = !empty($_POST['firstname']) ? $_POST['firstname'] : $firstnameBase;
