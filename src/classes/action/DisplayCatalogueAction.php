@@ -52,7 +52,7 @@ class DisplayCatalogueAction extends Action {
                     <input type="hidden" name="tri" value="{$triHtml}">
                     <input type="hidden" name="recherche" value="{$rechercheHtml}">
                     <label for="genre" class="form-label me-2 mb-0 flex-shrink-0">Genre:</label>
-                    <select name="genre" class="form-select form-select-sm" onchange="document.getElementById('genreForm').submit();">
+                    <select name="genre" class="form-select" onchange="document.getElementById('genreForm').submit();">
                         <option value="">Aucun</option>
             HTML;
             //document.getElementById('genreForm').submit(), commande js pour submit le formulaire quant un élément est selectionné.
@@ -77,14 +77,13 @@ class DisplayCatalogueAction extends Action {
             HTML;
 
             if (empty($seriesList)) {
-                // Utilisation des alertes Bootstrap
                 if (!empty($recherche) || !empty($genre)) {
                     $html .= '<div class="alert alert-info">Aucune série ne correspond à vos filtres.</div>';
                 } else {
                     $html .= '<div class="alert alert-info">Aucune série disponible dans le catalogue pour le moment.</div>';
                 }
             } else {
-                // Utilisation de la grille Bootstrap pour les cartes
+                // grille bootstrap pour les cartes
                 $html .= '<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-3">';
                 foreach ($seriesList as $serie) {
                     $html .= '<div class="col">';
