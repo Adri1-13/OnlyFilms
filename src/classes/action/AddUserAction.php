@@ -76,8 +76,14 @@ class AddUserAction extends Action {
 
         if ($mail === false) {
             return <<<HTML
-                    <p>Email incorrect</p>
-                    <a href="?action=add-user">Retour à l'inscription</a>
+                <div class="container mt-5">
+                    <div class="alert alert-danger" role="alert">
+                        <h4 class="alert-heading">Email invalide</h4>
+                        <p>L'adresse email saisie n'est pas valide.</p>
+                        <hr>
+                        <a href="?action=add-user" class="btn btn-outline-danger">Retour à l'inscription</a>
+                    </div>
+                </div>
             HTML;
         }
 
@@ -87,15 +93,27 @@ class AddUserAction extends Action {
 
         if ($passwd !== $passwd_confirm) {
             return <<<HTML
-                    <p>Les deux mots de passe ne correspondent pas.</p>
-                    <a href="?action=add-user">Retour à l'inscription</a>
-                    HTML;
+                <div class="container mt-5">
+                    <div class="alert alert-danger" role="alert">
+                        <h4 class="alert-heading">Erreur</h4>
+                        <p>Tous les champs sont obligatoires.</p>
+                        <hr>
+                        <a href="?action=add-user" class="btn btn-outline-danger">Retour à l'inscription</a>
+                    </div>
+                </div>
+            HTML;
         }
 
         if (strlen($passwd) < 10) {
             return <<<HTML
-                    <p>Le mot de passe doit faire au moins 10 caractères</p>
-                    <a href="?action=add-user">Retour à l'inscription</a>
+                <div class="container mt-5">
+                    <div class="alert alert-warning" role="alert">
+                        <h4 class="alert-heading">⚠️ Mot de passe trop court</h4>
+                        <p>Le mot de passe doit faire au moins 10 caractères.</p>
+                        <hr>
+                        <a href="?action=add-user" class="btn btn-outline-warning">Retour à l'inscription</a>
+                    </div>
+                </div>
             HTML;
         }
 
@@ -103,14 +121,34 @@ class AddUserAction extends Action {
             $activationToken = AuthnProvider::register($mail, $passwd, $name, $firstname);
 
             return <<<HTML
-                <h3>Veuillez maintenant activer votre compte</h3>
-                <a href="?action=activate-account&token={$activationToken}">Cliquer ici</a>
+                <div class="container mt-5">
+                    <div class="card shadow-sm">
+                        <div class="card-body p-5 text-center">
+                            <h2 class="text-success mb-4">Inscription réussie !</h2>
+                            <p class="text-muted mb-4">Pour finaliser votre inscription, veuillez activer votre compte :</p>
+                            
+                            <div class="alert alert-info">
+                                <p class="mb-2"><strong>Lien d'activation :</strong></p>
+                                <a href="?action=activate-account&token={$activationToken}" class="btn btn-primary btn-lg">
+                                    Activer mon compte
+                                </a>
+                            </div>
+                            
+                            <small class="text-muted">Attention, ce lien est valide pendant 15 minutes.</small>
+                        </div>
+                    </div>
+                </div>
             HTML;
 
         } catch (AuthnException $e) {
             return <<<HTML
-                <p>Erreur lors de l'inscription : {$e->getMessage()}</p>
-                <a href="?action=add-user">Retour à l'inscription</a>
+                <div class="container mt-5">
+                    <div class="alert alert-danger" role="alert">
+                        <h4 class="alert-heading">Erreur lors de l'inscription</h4>
+                        <hr>
+                        <a href="?action=add-user" class="btn btn-outline-danger">Retour à l'inscription</a>
+                    </div>
+                </div>
             HTML;
         }
 

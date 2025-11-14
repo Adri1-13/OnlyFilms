@@ -638,10 +638,10 @@ class OnlyFilmsRepository {
             throw new AuthnException("Cet utilisateur est déjà activé");
         }
 
-        $tokenExpirationDate = (new \DateTime($user['token_generation_date']))->getTimestamp() + 15*60;
+        $tokenGenerationDate = (new \DateTime($user['token_generation_date']))->getTimestamp();
         $nowDate= (new \DateTime())->getTimestamp();
 
-        if ($nowDate - $tokenExpirationDate > 15 * 60) {
+        if ($nowDate - $tokenGenerationDate > 15 * 60) {
             throw new AuthnException("Le token n'est plus valide.");
         }
 
