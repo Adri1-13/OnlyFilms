@@ -13,7 +13,7 @@ class SignInAction extends Action {
     {
         return <<<HTML
             <div class="row justify-content-center">
-                <div class="col-md-6 col-lg-4">
+                <div class="my-4 col-md-6 col-lg-4">
                     <div class="card shadow-sm">
                         <div class="card-body p-4">
                             <h2 class="card-title text-center mb-4">Connexion</h2>
