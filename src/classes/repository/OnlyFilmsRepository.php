@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace iutnc\onlyfilms\Repository;
 
+use Cassandra\Date;
+use iutnc\onlyfilms\exception\AuthnException;
 use iutnc\onlyfilms\exception\OnlyFilmsRepositoryException;
 use iutnc\onlyfilms\auth\User;
 use iutnc\onlyfilms\video\lists\Serie;
@@ -116,12 +118,15 @@ class OnlyFilmsRepository
      * @param int $role
      * @return User
      */
-    function addUser(string $mail, string $passwd, string $name, string $firstname, int $role): User
+    function addUser(string $mail, string $passwd, string $name, string $firstname, int $role, string $token): User
     {
-        $requete = "INSERT INTO user(mail, password, name, firstname, role, activated) VALUES (?,?,?,?,?,0)";
+
+        $tokenCreationDate = date('Y-m-d H:i:s');
+
+        $requete = "INSERT INTO user(mail, password, name, firstname, role, activated, activation_token, token_generation_date) VALUES (?,?,?,?,?,0,?,?)";
 
         $stmt = $this->pdo->prepare($requete);
-        $stmt->execute([$mail, $passwd, $name, $firstname, $role]);
+        $stmt->execute([$mail, $passwd, $name, $firstname, $role, $token, $tokenCreationDate]);
 
         $nouvID = $this->pdo->lastInsertId();
 
@@ -629,56 +634,59 @@ class OnlyFilmsRepository
         $st->execute([':p' => $hash, ':uid' => $userId]);
     }
 
-    /**
-     *
-     * Stocke un token d'activation
-     *
-     * @param int $userId
-     * @param string $token
-     * @param $expiration_date
-     * @return void
-     */
-    public function activationToken(int $userId, string $token, $expiration_date) : void {
-        $requete = "INSERT INTO activation_token(user_id, token,expiration_date) VALUES (?,?,?)";
-        $stmt = $this->pdo->prepare($requete);
-        $stmt->execute([$userId, $token, $expiration_date]);
-    }
 
-    public function findValidActivationToken(string $token) : array {
+    /**
+     * @throws \DateMalformedStringException
+     * @throws AuthnException
+     */
+    public function activateAccount(string $token) : void {
         $requete = <<<SQL
-            SELECT at.token, at.user_id, at.expiration_date, u.mail
-            FROM activation_token at
-            INNER JOIN user u ON u.user_id = at.user_id
-            WHERE at.token = ?
+            SELECT user_id, activated, mail, token_generation_date
+            FROM user
+            WHERE activation_token = ?
         SQL;
 
         $stmt = $this->pdo->prepare($requete);
-        $stmt->execute([$token]);
-        $ligne = $stmt->fetch(\PDO::FETCH_ASSOC);
 
-        if ($ligne === false) {
-            throw new OnlyFilmsRepositoryException("Token invalide ou déjà utilisé");
-        }
-        $expiration = new \DateTime($ligne['expiration_date']);
-        $now = date('Y-m-d H:i:s');
-        if ($now > $expiration) {
-            $this->deleteActivationToken($token);
-            throw new OnlyFilmsRepositoryException("Ce lien d'activation a expiré");
+        $stmt->execute([$token]);
+
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user === false) {
+            throw new AuthnException("Token d'activation invalide");
         }
 
-        return $ligne;
+        $mail = $user['mail'];
+
+        if (!$this->userExists($mail)) {
+            throw new AuthnException("Cet utilisateur n'existe pas il ne peut pas être activé");
+        }
+
+        if ($user['activated']) {
+            throw new AuthnException("Cet utilisateur est déjà activé");
+        }
+
+        $tokenExpirationDate = (new \DateTime($user['token_generation_date']))->getTimestamp() + 15*60;
+        $nowDate= (new \DateTime())->getTimestamp();
+
+        if ($nowDate - $tokenExpirationDate > 15 * 60) {
+            throw new AuthnException("Le token n'est plus valide.");
+        }
+
+        $requeteActivation = <<<SQL
+            UPDATE user SET activated = 1, activation_token = null, token_generation_date = null WHERE activation_token = ?
+        SQL;
+
+        $stmtActivation = $this->pdo->prepare($requeteActivation);
+        $stmtActivation->execute([$token]);
+
     }
 
-    public function deleteActivationToken(string $token) : void {
-        $requete = "DELETE FROM activation_token WHERE token = ?";
-        $stmt = $this->pdo->prepare($requete);
-        $stmt->execute([$token]);
-    }
+    public function updateActivationToken(string $mail, string $token) : void {
+        $tokenCreationdate = \date('Y-m-d H:i:s');
 
-
-    public function activateUser(int $userId) : void {
-        $requete = "UPDATE user SET activated  = 1 WHERE user_id = ?";
+        $requete = "UPDATE user SET activation_token = ?, token_generation_date = ? WHERE mail = ?";
         $stmt = $this->pdo->prepare($requete);
-        $stmt->execute([$userId]);
+        $stmt->execute([$token, $tokenCreationdate, $mail]);
     }
 }

@@ -13,7 +13,9 @@ CREATE TABLE `user` (
     `name` VARCHAR(100) DEFAULT NULL,
     `firstname` VARCHAR(100) DEFAULT NULL,
     `role` INT(11) NOT NULL DEFAULT 1,
-    `activated` BOOLEAN NOT NULL DEFAULT 0,
+    `activated` BOOLEAN NOT NULL DEFAULT FALSE,
+    `activation_token` VARCHAR(64) DEFAULT NULL,
+    `token_generation_date` DATETIME DEFAULT NULL,
     PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -277,13 +279,5 @@ CREATE TABLE IF NOT EXISTS password_reset_token (
   CONSTRAINT fk_prt_user FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-
-CREATE TABLE IF NOT EXISTS `activation_token` (
-    `user_id` INT(11) NOT NULL,
-    `token` VARCHAR(64) NOT NULL,
-    `expiration_date` DATETIME NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES user(user_id),
-    PRIMARY KEY (token)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 UPDATE user SET activated = 1 WHERE activated = 0;

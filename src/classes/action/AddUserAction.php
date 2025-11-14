@@ -100,17 +100,20 @@ class AddUserAction extends Action {
         }
 
         try {
-            $user = AuthnProvider::register($mail, $passwd, $name, $firstname);
+            $activationToken = AuthnProvider::register($mail, $passwd, $name, $firstname);
 
-            header('Location: ?action=signin');
-            exit();
+            return <<<HTML
+                <h3>Veuillez maintenant activer votre compte</h3>
+                <a href="?action=activate-account&token={$activationToken}">Cliquer ici</a>
+            HTML;
 
         } catch (AuthnException $e) {
             return <<<HTML
-                     <p>Erreur lors de l'inscription, {$e->getMessage()}</p>
-                    <a href="?action=add-user">Retour à l'inscription</a>
+                <p>Erreur lors de l'inscription : {$e->getMessage()}</p>
+                <a href="?action=add-user">Retour à l'inscription</a>
             HTML;
         }
+
     }
 
 }
