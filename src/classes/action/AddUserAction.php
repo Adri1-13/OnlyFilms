@@ -72,8 +72,8 @@ class AddUserAction extends Action {
         }
 
         $mail = filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL);
-        $firstname = htmlspecialchars(trim($_POST['firstname']));
-        $name = htmlspecialchars(trim($_POST['name']));
+        $firstname = filter_var(($_POST['firstname']), FILTER_SANITIZE_SPECIAL_CHARS);
+        $name = filter_var(($_POST['name']), FILTER_SANITIZE_SPECIAL_CHARS);
 
 
         if ($mail === false) {

@@ -40,7 +40,7 @@ class AddCommentAction extends Action {
                                 
                                 <div class="mb-3">
                                     <label for="note" class="form-label">Votre note :</label>
-                                    <select class="form-select" name="note" id="note" required>
+                                    <select class="form-select" name="note" id="note">
                                         <option value="" disabled selected>-- Choisir une note --</option>
                                         <option value="5">★★★★★ (5 étoiles)</option>
                                         <option value="4">★★★★☆ (4 étoiles)</option>

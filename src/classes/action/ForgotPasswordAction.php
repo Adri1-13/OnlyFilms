@@ -48,11 +48,19 @@ class ForgotPasswordAction extends Action
         // crée le token et REDIRIGE direct vers la page de reset
         $token = $repo->createPasswordResetToken((int)$user->getId());
 
-        // URL absolue propre
-        $base = (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
-        $url  = $base . '?action=reset-password&token=' . urlencode($token);
 
-        header('Location: ' . $url);
-        return ''; // stop rendu après redirection
+        return <<<HTML
+        <div class="container mt-5">
+            <div class="alert alert-info">
+                <h4>Email envoyé</h4>
+                <p>Si un compte existe avec cette adresse mail, vous recevrez un lien de réinitialisation.</p>
+                <p>Pour la sae, le lien a été généré ci-dessous (en réalité, il serait envoyé par email).</p>
+                <div class="alert alert-warning mt-3">
+                    <p><strong>Lien de réinitialisation (valable 30 minutes) :</strong></p>
+                    <a href="?action=reset-password&token={$token}" class="btn btn-primary">Réinitialiser mon mot de passe</a>
+                </div>
+            </div>
+        </div>
+    HTML;
     }
 }

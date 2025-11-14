@@ -53,7 +53,6 @@ class EditAccountAction extends Action {
         $user = AuthnProvider::getSignedInUser();
         $userId = $user->getId();
 
-        // TODO filtrer les entrées ??? pas d'injection sql mais peut poser probleme a l'affichage si on utilise pas htmlspecialchar
 
         $firstnameBase = $user->getFirstname();
         $firstname_raw = !empty($_POST['firstname']) ? $_POST['firstname'] : $firstnameBase;

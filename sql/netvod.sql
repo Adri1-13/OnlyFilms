@@ -134,9 +134,7 @@ CREATE TABLE `watched_series` (
 -- Insertions dans la table `user`
 -- --------------------------------------------------------
 INSERT INTO `user` (`user_id`, `mail`, `password`, `name`, `firstname`, `role`) VALUES
-(1, 'alice.dupont@example.com', 'hashed_password_1', 'Dupont', 'Alice', 1),
-(2, 'bob.martin@example.com', 'hashed_password_2', 'Martin', 'Bob', 1),
-(3, 'admin@platform.com', 'hashed_admin_password', 'Super', 'Admin', 99);
+(1, 'test@mail.com', '$2y$12$cz2YmNJz44ERexjO6Q5poehKPog3tD0ZrXbAMWJNT60O1hJm67YEu', 'test', 'test', 1);
 
 -- --------------------------------------------------------
 -- Insertions dans la table `genre`
