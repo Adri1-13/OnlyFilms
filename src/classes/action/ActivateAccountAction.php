@@ -15,11 +15,14 @@ class ActivateAccountAction extends Action {
 
         if (!isset($_GET['token']) || empty($_GET['token'])) {
             return <<<HTML
-                <div class="container mt-5">
-                    <div class="alert alert-danger">
-                        <h2>Lien d'activation invalide</h2>
-                        <p>Si vous avez déjà un compte mais que celui-ci n'est pas activé, vous pouvez demander un nouveau lien d'activation</p>
-                        <a href="?action=send-again-activation" class="btn btn-primary">Renvoyer le lien d'activation</a>
+                <div class="row justify-content-center my-5">
+                    <div class="col-md-8">
+                        <div class="alert alert-danger" role="alert">
+                            <h4 class="alert-heading">Lien d'activation invalide</h4>
+                            <p>Le lien que vous avez utilisé est manquant ou incorrect.</p>
+                            <p class="mb-0">Si vous avez déjà un compte mais que celui-ci n'est pas activé, vous pouvez demander un nouveau lien.</p>
+                            <a href="?action=send-again-activation" class="btn btn-danger mt-3">Renvoyer un lien d'activation</a>
+                        </div>
                     </div>
                 </div>
             HTML;
@@ -32,18 +35,30 @@ class ActivateAccountAction extends Action {
             AuthnProvider::activateAccount($token);
 
             return <<<HTML
-                <div class="container mt-5">
-                    <div class="card shadow-sm">
-                        <div class="card-body p-5 text-center">
-                            <h2 class="text-success mb-4">Votre compte a été activé</h2>
-                            <p class="lead">Vous pouvez maintenant vous connecter.</p>
-                            <a href="?action=signin" class="btn btn-primary btn-lg mt-3">Se connecter</a>
+                <div class="row justify-content-center my-5">
+                    <div class="col-md-6">
+                        <div class="card shadow-sm text-center">
+                            <div class="card-body p-4 p-md-5">
+                                <h2 class="h3 mb-3 text-success">Votre compte a été activé !</h2>
+                                <p class="lead mb-4">Vous pouvez maintenant vous connecter.</p>
+                                <a href="?action=signin" class="btn btn-primary btn-lg">Se connecter</a>
+                            </div>
                         </div>
                     </div>
                 </div>
             HTML;
+
         } catch (AuthnException $e) {
-            return "<h2>" . $e->getMessage() . "</h2>";
+            return <<<HTML
+                <div class="row justify-content-center my-5">
+                    <div class="col-md-8">
+                        <div class="alert alert-warning" role="alert">
+                            <h4 class="alert-heading">Erreur d'activation</h4>
+                            <p class="mb-0">Veuillez réessayer ou <a href="?action=send-again-activation" class="alert-link">demander un nouveau lien</a>.</p>
+                        </div>
+                    </div>
+                </div>
+            HTML;
         }
     }
 
